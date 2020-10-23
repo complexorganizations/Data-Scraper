@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"reflect"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/chromedp"
 )
 
 const (
@@ -19,17 +21,21 @@ const (
 	outputJSON     = "output.json"
 )
 
-var (
-	config = &tls.Config{
-		InsecureSkipVerify: false,
-	}
-	transport = &http.Transport{
-		TLSClientConfig: config,
-	}
-	netClient = &http.Client{
-		Transport: transport,
-	}
-)
+// var (
+// 	config = &tls.Config{
+// 		InsecureSkipVerify: false,
+// 	}
+// 	transport = &http.Transport{
+// 		TLSClientConfig: config,
+// 	}
+// 	netClient = &http.Client{
+// 		Transport: transport,
+// 	}
+// )
+
+var config *Config
+
+var proxyIndex int = 0
 
 type Selectors struct {
 	ID               string
@@ -48,17 +54,18 @@ type Scraping struct {
 	Selectors []Selectors
 }
 
+type Config struct {
+	JavaScript    bool
+	Proxy         bool
+	ProxyLists    []string
+	RotatingProxy bool
+	Export        string
+}
+
 func readSettingsJSON() {
 	// open the file and read the file
 	data, err := ioutil.ReadFile(settingsConfig)
 	// define data struture
-	type Config struct {
-		JavaScript    bool
-		Proxy         bool
-		ProxyLists    []string
-		RotatingProxy bool
-		Export        string
-	}
 	// json data
 	var settings Config
 	err = json.Unmarshal(data, &settings)
@@ -72,6 +79,8 @@ func readSettingsJSON() {
 	fmt.Println("ProxyLists: ", settings.ProxyLists)
 	fmt.Println("RotatingProxy: ", settings.RotatingProxy)
 	fmt.Println("Export: ", settings.Export)
+
+	config = &settings
 }
 
 func readSiteMap() *Scraping {
@@ -95,7 +104,6 @@ func SelectorText(doc *goquery.Document, selector *Selectors) []string {
 	var text []string
 	var matchText string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
-
 		if selector.Regex != "" {
 			// re := regexp.MustCompile(selector.Regex)
 			// matchText = re.FindString(s.Text())
@@ -233,6 +241,40 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 }
 
 func crawlURL(href string) *goquery.Document {
+	var transport *http.Transport
+
+	tls := &tls.Config{
+		InsecureSkipVerify: false,
+	}
+	// if proxy is set use for transport
+	if config.Proxy {
+		var proxyString string
+
+		if config.RotatingProxy {
+			if proxyIndex <= len(config.ProxyLists) {
+				proxyString = config.ProxyLists[proxyIndex]
+			} else {
+				proxyString = config.ProxyLists[0]
+				proxyIndex = 0
+			}
+		}
+
+		proxyUrl, _ := url.Parse(proxyString)
+
+		transport = &http.Transport{
+			TLSClientConfig: tls,
+			Proxy:           http.ProxyURL(proxyUrl),
+		}
+	} else {
+		transport = &http.Transport{
+			TLSClientConfig: tls,
+		}
+	}
+
+	netClient := &http.Client{
+		Transport: transport,
+	}
+
 	response, err := netClient.Get(href)
 	if err != nil {
 		log.Println(err)
@@ -304,6 +346,71 @@ func HasElem(s interface{}, elem interface{}) bool {
 	return false
 }
 
+func JSScraper(siteMap *Scraping, parent string) interface{} {
+	output := make(map[string]interface{})
+	urlLength := len(siteMap.StartUrl)
+	// for _, startURL := range siteMap.StartUrl {
+	for i := 0; i < urlLength; i++ {
+		startURL := siteMap.StartUrl[i]
+		linkOutput := make(map[string]interface{})
+		fmt.Printf("startURL: %s\n", startURL)
+		for _, selector := range siteMap.Selectors {
+			if parent == selector.ParentSelectors[0] {
+				linkOutput[selector.ID] = emulateURL(startURL, selector.Type, selector.Selector)
+			}
+		}
+
+		if len(linkOutput) != 0 {
+			output[startURL] = linkOutput
+		}
+	}
+
+	return output
+}
+
+func emulateURL(url string, selType string, selector string) string {
+	// create context
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+	var err error
+
+	// run task list
+	var res string
+	var attr map[string]string
+
+	if selType == "SelectorText" {
+		err = chromedp.Run(ctx,
+			chromedp.Navigate(url),
+			chromedp.InnerHTML(selector, &res, chromedp.NodeVisible, chromedp.ByQuery),
+		)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else if selType == "SelectorImage" || selType == "SelectorLink" || selType == "SelectorElementAttribute" {
+		err = chromedp.Run(ctx,
+			chromedp.Navigate(url),
+			// chromedp.Text(selector, &res, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Attributes(selector, &attr, chromedp.NodeVisible, chromedp.ByQuery),
+		)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if selType == "SelectorLink" {
+			res = attr["href"]
+		} else if selType == "SelectorElementAttribute" {
+			res = attr[selector]
+		} else {
+			res = attr["src"]
+		}
+	}
+
+	return res
+}
+
 func scraper(siteMap *Scraping, parent string) interface{} {
 
 	output := make(map[string]interface{})
@@ -372,7 +479,15 @@ func scraper(siteMap *Scraping, parent string) interface{} {
 
 func main() {
 	siteMap := readSiteMap()
-	finalOutput := scraper(siteMap, "_root")
+	readSettingsJSON()
+
+	var finalOutput interface{}
+
+	if config.JavaScript {
+		finalOutput = JSScraper(siteMap, "_root")
+	} else {
+		finalOutput = scraper(siteMap, "_root")
+	}
 
 	file, err := json.MarshalIndent(finalOutput, "", " ")
 	if err != nil {
@@ -381,5 +496,4 @@ func main() {
 	}
 
 	_ = ioutil.WriteFile(outputJSON, file, 0644)
-
 }
