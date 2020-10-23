@@ -2,7 +2,8 @@
     "JavaScript": false,
     "Proxy": false,
     "ProxyLists": [
-        "127.0.0.1:8080"
+        "socks5://127.0.0.1:8080",
+        "http://localhost:8080"
     ],
     "RotatingProxy": false,
     "Export": "json"

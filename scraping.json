@@ -1,5 +1,5 @@
 {
-  "id": "prajwalkoirala.com",
+  "_id": "prajwalkoirala.com",
   "startUrl": [
     "https://www.prajwalkoirala.com"
   ],
@@ -23,7 +23,6 @@
       ],
       "selector": "img",
       "multiple": false,
-      "regex": "",
       "delay": 0
     }
   ]
