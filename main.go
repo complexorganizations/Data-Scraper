@@ -465,7 +465,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		for startURL := range fc {
 			// startURL := siteMap.StartURL[i]
 			linkOutput := make(map[string]interface{})
-			fmt.Println("Start URL:", startURL)
+			fmt.Println("URL:", startURL)
 			for _, selector := range siteMap.Selectors {
 				if parent == selector.ParentSelectors[0] {
 					var doc *goquery.Document
