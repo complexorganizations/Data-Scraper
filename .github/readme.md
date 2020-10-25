@@ -32,7 +32,7 @@ You can finally run the scraper.
 - Concurrency scraping ***(Coming Soon)***
 - JavaScript rendering ***Google Chrome (Required)***
 - Dynamic applications
-- Proxy support ***(Coming Soon)***
+- Proxy support
 - Exports to JSON|CSV|XML ***(Coming Soon)***
 
 ---
