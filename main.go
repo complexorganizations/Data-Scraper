@@ -256,10 +256,13 @@ func crawlURL(href string) *goquery.Document {
 		if config.RotatingProxy {
 			if proxyIndex <= len(config.ProxyLists) {
 				proxyString = config.ProxyLists[proxyIndex]
+				proxyIndex = proxyIndex + 1
 			} else {
 				proxyString = config.ProxyLists[0]
 				proxyIndex = 0
 			}
+		} else {
+			proxyString = config.ProxyLists[0]
 		}
 
 		proxyUrl, _ := url.Parse(proxyString)
@@ -281,6 +284,7 @@ func crawlURL(href string) *goquery.Document {
 	response, err := netClient.Get(href)
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 	defer response.Body.Close()
 
@@ -351,9 +355,34 @@ func HasElem(s interface{}, elem interface{}) bool {
 }
 
 func emulateURL(url string) *goquery.Document {
+	var proxyString string
+	var opts []func(*chromedp.ExecAllocator)
+
+	if config.Proxy {
+		if config.RotatingProxy {
+			if proxyIndex <= len(config.ProxyLists) {
+				proxyString = config.ProxyLists[proxyIndex]
+				proxyIndex = proxyIndex + 1
+			} else {
+				proxyString = config.ProxyLists[0]
+				proxyIndex = 0
+			}
+		} else {
+			proxyString = config.ProxyLists[0]
+		}
+
+		opts = append(chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.ProxyServer(proxyString),
+		)
+	} else {
+		opts = append(chromedp.DefaultExecAllocatorOptions[:])
+	}
+
 	// create context
-	ctx, cancel := chromedp.NewContext(context.Background())
+	bctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	ctx, _ := chromedp.NewContext(bctx)
 	defer cancel()
+
 	var err error
 
 	// run task list
@@ -366,6 +395,7 @@ func emulateURL(url string) *goquery.Document {
 
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 
 	r := strings.NewReader(body)
@@ -442,6 +472,10 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						doc = emulateURL(startURL)
 					} else {
 						doc = crawlURL(startURL)
+					}
+
+					if doc == nil {
+						continue
 					}
 
 					if selector.Type == "SelectorText" {
