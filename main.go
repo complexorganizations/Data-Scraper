@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"runtime"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -18,6 +20,7 @@ import (
 	// change from 3rd party packages to golang packages
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
+	any "github.com/clbanning/anyxml"
 	"github.com/dlclark/regexp2"
 	// "golang.org/x/net/proxy"
 )
@@ -29,8 +32,9 @@ var (
 
 const (
 	settingsConfig = "settings.json"
-	scrapingConfig = "scraping.json"
-	outputFile     = "output.json"
+	scrapingJSON   = "scraping.json"
+	outputJSON     = "output.json"
+	fileName       = "scrapedata"
 )
 
 // Selectors is struct to Marshal selector
@@ -62,36 +66,57 @@ type Config struct {
 
 // To function properly, a lot of memory is needed to clean up files.
 func clearCache() {
-	// temp files
-	os.RemoveAll(os.TempDir())
-	debug.FreeOSMemory()
+	operatingSystem := runtime.GOOS
+	switch operatingSystem {
+	case "windows":
+		// temp files
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+		// old files
+		os.Remove("C:/Windows.old")
+	case "darwin":
+		// temp files
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+	case "linux":
+		// temp files
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+		// old files
+		os.Remove("/vmlinuz.old")
+		os.Remove("/initrd.img.old")
+	default:
+		fmt.Println("Removed the cache")
+	}
 }
 
 func readSettingsJSON() {
 	// open the file and read the file
 	data, err := ioutil.ReadFile(settingsConfig)
-	// define data struture, json data
+	// define data struture
+	// json data
 	var settings Config
 	err = json.Unmarshal(data, &settings)
 	// log any errors
 	if err != nil {
 		log.Println(err)
 	}
-	// set config to settings
+	//
 	config = &settings
 }
 
 func readSiteMap() *Scraping {
 	// open the file and read the file
-	data, err := ioutil.ReadFile(scrapingConfig)
-	// define data struture, json data
+	data, err := ioutil.ReadFile(scrapingJSON)
+
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
+
 	// log any errors
 	if err != nil {
 		log.Println(err)
 	}
-	// return a value
+
 	return &scrape
 }
 
@@ -128,7 +153,7 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr("href")
 		if !ok {
-			fmt.Println("HREF has not been found")
+			fmt.Printf("HREF has not been found")
 		}
 
 		links = append(links, toFixedURL(href, baseURL))
@@ -350,33 +375,168 @@ func HasElem(s interface{}, elem interface{}) bool {
 	return false
 }
 
-func emulateURL(url string) *goquery.Document {
+func JSScraper(siteMap *Scraping, parent string) interface{} {
+	output := make(map[string]interface{})
+	urlLength := len(siteMap.StartURL)
+	// for _, startURL := range siteMap.StartUrl {
+	for i := 0; i < urlLength; i++ {
+		startURL := siteMap.StartURL[i]
+		linkOutput := make(map[string]interface{})
+		fmt.Println("Start URL:", startURL)
+		for _, selector := range siteMap.Selectors {
+			if parent == selector.ParentSelectors[0] {
+				linkOutput[selector.ID] = emulateURL(startURL, selector.Type, selector.Selector)
+			}
+		}
+
+		if len(linkOutput) != 0 {
+			if parent == "_root" {
+				out, err := ioutil.ReadFile(outputJSON)
+				if err != nil {
+					fmt.Printf("Error while reading %s file\n", outputJSON)
+					os.Exit(1)
+				}
+
+				var data map[string]interface{}
+				err = json.Unmarshal(out, &data)
+				if err != nil {
+					fmt.Printf("Failed to unmarshal %s file\n", outputJSON)
+					os.Exit(1)
+				}
+				data[startURL] = linkOutput
+				// fmt.Println(file)
+				saveScrapeData(data)
+			} else {
+				output[startURL] = linkOutput
+			}
+		}
+	}
+
+	return output
+}
+
+//save JSON format
+func saveJSONFormat(data map[string]interface{}, format string) {
+
+	outputFile := fmt.Sprintf("%s.%s", fileName, format)
+
+	_, err := os.Create(outputFile)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	json, err := json.MarshalIndent(data, "", " ")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = ioutil.WriteFile(outputFile, json, 0644)
+}
+
+//save xml format
+func saveXMLFormat(data map[string]interface{}, format string) {
+
+	outputFile := fmt.Sprintf("%s.%s", fileName, format)
+
+	_, err := os.Create(outputFile)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	xml, err := any.XmlIndent(data, "", "   ")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = ioutil.WriteFile(outputFile, xml, 0644)
+}
+
+// save CSV saveCsvFormat
+func saveCSVFormat(data map[string]interface{}, format string) {
+
+	var result [][]string
+
+	outputFile := fmt.Sprintf("%s.%s", fileName, format)
+
+	File, _ := os.Create(outputFile)
+
+	w := csv.NewWriter(File)
+
+	for _, v := range data {
+
+		if rec, ok := v.(map[string]interface{}); ok {
+			for key, val := range rec {
+				var res []string
+				fmt.Println("\ninside rec")
+				res = append(res, key)
+				res = append(res, fmt.Sprint(val))
+				result = append(result, res)
+			}
+		}
+	}
+	w.WriteAll(result)
+	w.Flush()
+
+}
+
+func saveScrapeData(data map[string]interface{}) {
+
+	switch strings.ToLower(config.Export) {
+	case "json":
+		saveJSONFormat(data, "json")
+	case "xml":
+		saveXMLFormat(data, "xml")
+	case "csv":
+		saveCSVFormat(data, "csv")
+
+	}
+}
+
+func emulateURL(url string, selType string, selector string) string {
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 	var err error
 
 	// run task list
-	var body string
+	var res string
+	var attr map[string]string
 
-	err = chromedp.Run(ctx,
-		chromedp.Navigate(url),
-		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
-	)
+	if selType == "SelectorText" {
+		err = chromedp.Run(ctx,
+			chromedp.Navigate(url),
+			chromedp.InnerHTML(selector, &res, chromedp.NodeVisible, chromedp.ByQuery),
+		)
 
-	if err != nil {
-		log.Println(err)
+		if err != nil {
+			log.Println(err)
+		}
+
+	} else if selType == "SelectorImage" || selType == "SelectorLink" || selType == "SelectorElementAttribute" {
+		err = chromedp.Run(ctx,
+			chromedp.Navigate(url),
+			// chromedp.Text(selector, &res, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Attributes(selector, &attr, chromedp.NodeVisible, chromedp.ByQuery),
+		)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		if selType == "SelectorLink" {
+			res = attr["href"]
+		} else if selType == "SelectorElementAttribute" {
+			res = attr[selector]
+		} else {
+			res = attr["src"]
+		}
 	}
 
-	r := strings.NewReader(body)
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(r)
-	if err != nil {
-		log.Println(err)
-	}
-
-	return doc
+	return res
 }
 
 // generator using a channel and a goroutine
@@ -436,14 +596,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			fmt.Println("Start URL:", startURL)
 			for _, selector := range siteMap.Selectors {
 				if parent == selector.ParentSelectors[0] {
-					var doc *goquery.Document
-
-					if config.JavaScript {
-						doc = emulateURL(startURL)
-					} else {
-						doc = crawlURL(startURL)
-					}
-
+					doc := crawlURL(startURL)
 					if selector.Type == "SelectorText" {
 						resultText := SelectorText(doc, &selector)
 						// fmt.Printf("text resultText = %v", resultText)
@@ -500,26 +653,22 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			fmt.Printf("linkoutput = %v", linkOutput)
 			if len(linkOutput) != 0 {
 				if parent == "_root" {
-					out, err := ioutil.ReadFile(outputFile)
+					out, err := ioutil.ReadFile(outputJSON)
 					if err != nil {
-						fmt.Printf("Error while reading %s file\n", outputFile)
+						fmt.Printf("Error while reading %s file\n", outputJSON)
 						os.Exit(1)
 					}
 
-					var data map[string]interface{}
+					//var data map[string]interface{}
+					data := make(map[string]interface{})
 					err = json.Unmarshal(out, &data)
 					if err != nil {
-						fmt.Printf("Failed to unmarshal %s file\n", outputFile)
+						fmt.Printf("Failed to unmarshal %s file\n", outputJSON)
 						os.Exit(1)
 					}
 					data[startURL] = linkOutput
-					file, err := json.MarshalIndent(data, "", " ")
-					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
-					}
-					// fmt.Println(file)
-					_ = ioutil.WriteFile(outputFile, file, 0644)
+					saveScrapeData(data)
+
 				} else {
 					output[startURL] = linkOutput
 				}
@@ -531,10 +680,13 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 
 func main() {
 	clearCache()
-	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
+	_ = ioutil.WriteFile(outputJSON, []byte("{}"), 0644)
 	siteMap := readSiteMap()
 	readSettingsJSON()
 
-	_ = scraper(siteMap, "_root")
-
+	if config.JavaScript {
+		_ = JSScraper(siteMap, "_root")
+	} else {
+		_ = scraper(siteMap, "_root")
+	}
 }
