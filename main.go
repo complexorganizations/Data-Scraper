@@ -428,7 +428,7 @@ func getURL(urls []string) <-chan string {
 					urlRange2 = strings.Replace(urlRange2, charc, "", -2)
 				}
 				rang := strings.Split(urlRange2, "-")
-				fmt.Println(rang)
+				// fmt.Println(rang)
 				// using ParseInt method
 				int1, _ := strconv.ParseInt(rang[0], 10, 64)
 				int2, _ := strconv.ParseInt(rang[1], 10, 64)
@@ -506,7 +506,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 								newSiteMap := getSiteMap(links, &selector)
 								// fmt.Printf("newSiteMap = %+v", newSiteMap)
 								result := scraper(newSiteMap, selector.ID)
-								fmt.Printf("result = %+v", result)
+								// fmt.Printf("result = %+v", result)
 								linkOutput[selector.ID] = result
 							}
 						}
@@ -531,7 +531,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					}
 				}
 			}
-			fmt.Printf("linkoutput = %v", linkOutput)
+			//fmt.Printf("linkoutput = %v", linkOutput)
 			if len(linkOutput) != 0 {
 				if parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
