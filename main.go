@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"runtime/debug"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -610,7 +610,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 }
 
 func main() {
-	// clearCache()
+	clearCache()
 	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
 	siteMap := readSiteMap()
 	readSettingsJSON()
