@@ -30,7 +30,7 @@ You can finally run the scraper.
 ### Features
 - Unlimited scraping ***NO LIMITS***
 - Distributed scraping
-- Concurrency scraping ***(Coming Soon)***
+- Concurrency scraping
 - JavaScript rendering ***Google Chrome (Required)***
 - Dynamic applications
 - Proxy support
