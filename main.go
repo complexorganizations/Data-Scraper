@@ -4,8 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	// "encoding/csv"
-	// "encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,10 +11,11 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"runtime/debug"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 
 	// change from 3rd party packages to golang packages
 	"github.com/PuerkitoBio/goquery"
@@ -26,8 +25,9 @@ import (
 )
 
 var (
-	config     *Config
-	proxyIndex = 0
+	config          *Config
+	proxyIndex      = 0
+	numberOfWorkers = 5
 )
 
 const (
@@ -55,12 +55,22 @@ type Scraping struct {
 	Selectors []Selectors
 }
 
+// Config setting struct
 type Config struct {
 	JavaScript    bool
 	Proxy         bool
 	ProxyLists    []string
 	RotatingProxy bool
 	Export        string
+}
+
+// WorkerJob struct defination
+type WorkerJob struct {
+	startURL string
+	parent   string
+	siteMap  *Scraping
+	// doc        *goquery.Document
+	linkOutput map[string]interface{}
 }
 
 // To function properly, a lot of memory is needed to clean up files.
@@ -111,8 +121,6 @@ func readSiteMap() *Scraping {
 
 // SelectorText get data text for html tag
 func SelectorText(doc *goquery.Document, selector *Selectors) []string {
-	// Find the review items
-	// fmt.Println(selector.Selector)
 	var text []string
 	var matchText *regexp2.Match
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -136,8 +144,6 @@ func SelectorText(doc *goquery.Document, selector *Selectors) []string {
 
 // SelectorLink get data href for html tag
 func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []string {
-	// Find the review items
-	// fmt.Println(selector.Selector)
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr("href")
@@ -156,8 +162,6 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 
 // SelectorElementAttribute get define attribute for html tag
 func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []string {
-	// Find the review items
-	// fmt.Println(selector.Selector)
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr(selector.ExtractAttribute)
@@ -215,8 +219,6 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 
 // SelectorImage get src of Image for html tag
 func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
-	// Find the review items
-	// fmt.Println(selector.Selector)
 	var srcs []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
@@ -279,11 +281,11 @@ func crawlURL(href string) *goquery.Document {
 			proxyString = config.ProxyLists[0]
 		}
 
-		proxyUrl, _ := url.Parse(proxyString)
+		proxyURL, _ := url.Parse(proxyString)
 
 		transport = &http.Transport{
 			TLSClientConfig: tls,
-			Proxy:           http.ProxyURL(proxyUrl),
+			Proxy:           http.ProxyURL(proxyURL),
 		}
 	} else {
 		transport = &http.Transport{
@@ -430,31 +432,24 @@ func getURL(urls []string) <-chan string {
 	c := make(chan string)
 	go func() {
 		re := regexp2.MustCompile(`(\[\d{1,10}-\d{1,10}\]$)`, 0)
+
 		for _, urlLink := range urls {
 			urlRange, _ := re.FindStringMatch(urlLink)
-			// fmt.Printf("urlrange = %s ", urlRange)
 			if urlRange != nil {
 				val2 := strings.Replace(urlLink, fmt.Sprintf("%s", urlRange), "", -2)
-				// val2 := fmt.Sprintf("%s", val)
-				// fmt.Println(val2)
 				urlRange2 := fmt.Sprintf("%s", urlRange)
 				for _, charc := range []string{"[", "]"} {
 					urlRange2 = strings.Replace(urlRange2, charc, "", -2)
 				}
 				rang := strings.Split(urlRange2, "-")
-				// fmt.Println(rang)
 				// using ParseInt method
 				int1, _ := strconv.ParseInt(rang[0], 10, 64)
 				int2, _ := strconv.ParseInt(rang[1], 10, 64)
-				// create an anonymous inner function
-				// keyword "go" starts a goroutine
 
+				// Send url in channel
 				for x := int1; x <= int2; x++ {
 					c <- fmt.Sprintf("%s%d", val2, x)
 				}
-				// close(c) sets the status of the channel c to false
-				// and is needed by the for/range loop to end
-				// close(c)
 
 			} else {
 				c <- urlLink
@@ -467,113 +462,150 @@ func getURL(urls []string) <-chan string {
 	return c
 }
 
-func scraper(siteMap *Scraping, parent string) map[string]interface{} {
+func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
+	defer wg.Done()
+	fmt.Printf("Worker %d started\n", workerID)
+	for job := range jobs {
 
-	output := make(map[string]interface{})
-	// urlLength := len(siteMap.StartURL)
-	fc := getURL(siteMap.StartURL)
-	// for i := 0; i < urlLength; i++ {
-	if fc != nil {
-		for startURL := range fc {
-			// startURL := siteMap.StartURL[i]
-			linkOutput := make(map[string]interface{})
-			fmt.Println("URL:", startURL)
-			for _, selector := range siteMap.Selectors {
-				if parent == selector.ParentSelectors[0] {
-					var doc *goquery.Document
+		var doc *goquery.Document
 
-					if config.JavaScript {
-						doc = emulateURL(startURL)
-					} else {
-						doc = crawlURL(startURL)
-					}
+		if config.JavaScript {
+			doc = emulateURL(job.startURL)
+		} else {
+			doc = crawlURL(job.startURL)
+		}
 
-					if doc == nil {
-						continue
-					}
-
-					if selector.Type == "SelectorText" {
-						resultText := SelectorText(doc, &selector)
-						// fmt.Printf("text resultText = %v", resultText)
-						if len(resultText) != 0 {
-							if len(resultText) == 1 {
-								linkOutput[selector.ID] = resultText[0]
-							} else {
-								linkOutput[selector.ID] = resultText
-							}
-						}
-					} else if selector.Type == "SelectorLink" {
-						links := SelectorLink(doc, &selector, startURL)
-						// fmt.Printf("Links = %v", links)
-						if HasElem(selector.ParentSelectors, selector.ID) {
-							for _, link := range links {
-								if !HasElem(siteMap.StartURL, link) {
-									siteMap.StartURL = append(siteMap.StartURL, link)
-								}
-							}
-
+		if doc == nil {
+			continue
+		}
+		fmt.Printf("Worker %d take a job URL : %s\n", workerID, job.startURL)
+		linkOutput := make(map[string]interface{})
+		for _, selector := range job.siteMap.Selectors {
+			if job.parent == selector.ParentSelectors[0] {
+				if selector.Type == "SelectorText" {
+					resultText := SelectorText(doc, &selector)
+					if len(resultText) != 0 {
+						if len(resultText) == 1 {
+							linkOutput[selector.ID] = resultText[0]
 						} else {
-							childSelector := getChildSelector(&selector)
-							if childSelector == true {
-								linkOutput[selector.ID] = links
-							} else {
-								newSiteMap := getSiteMap(links, &selector)
-								// fmt.Printf("newSiteMap = %+v", newSiteMap)
-								result := scraper(newSiteMap, selector.ID)
-								// fmt.Printf("result = %+v", result)
-								linkOutput[selector.ID] = result
-							}
+							linkOutput[selector.ID] = resultText
 						}
-					} else if selector.Type == "SelectorElementAttribute" {
-						resultText := SelectorElementAttribute(doc, &selector)
-						linkOutput[selector.ID] = resultText
-					} else if selector.Type == "SelectorImage" {
-						resultText := SelectorImage(doc, &selector)
-						if len(resultText) != 0 {
-							if len(resultText) == 1 {
-								linkOutput[selector.ID] = resultText[0]
-							} else {
-								linkOutput[selector.ID] = resultText
-							}
-						}
-					} else if selector.Type == "SelectorElement" {
-						resultText := SelectorElement(doc, &selector, startURL)
-						linkOutput[selector.ID] = resultText
-					} else if selector.Type == "SelectorTable" {
-						resultText := SelectorTable(doc, &selector)
-						linkOutput[selector.ID] = resultText
 					}
+				} else if selector.Type == "SelectorLink" {
+					links := SelectorLink(doc, &selector, job.startURL)
+					// fmt.Printf("Links = %v", links)
+					if HasElem(selector.ParentSelectors, selector.ID) {
+						for _, link := range links {
+							if !HasElem(job.siteMap.StartURL, link) {
+								job.siteMap.StartURL = append(job.siteMap.StartURL, link)
+							}
+						}
+					} else {
+						childSelector := getChildSelector(&selector)
+						if childSelector == true {
+							linkOutput[selector.ID] = links
+						} else {
+							newSiteMap := getSiteMap(links, &selector)
+							result := scraper(newSiteMap, selector.ID)
+							linkOutput[selector.ID] = result
+						}
+					}
+				} else if selector.Type == "SelectorElementAttribute" {
+					resultText := SelectorElementAttribute(doc, &selector)
+					linkOutput[selector.ID] = resultText
+				} else if selector.Type == "SelectorImage" {
+					resultText := SelectorImage(doc, &selector)
+					if len(resultText) != 0 {
+						if len(resultText) == 1 {
+							linkOutput[selector.ID] = resultText[0]
+						} else {
+							linkOutput[selector.ID] = resultText
+						}
+					}
+				} else if selector.Type == "SelectorElement" {
+					resultText := SelectorElement(doc, &selector, job.startURL)
+					linkOutput[selector.ID] = resultText
+				} else if selector.Type == "SelectorTable" {
+					resultText := SelectorTable(doc, &selector)
+					linkOutput[selector.ID] = resultText
 				}
 			}
-			//fmt.Printf("linkoutput = %v", linkOutput)
-			if len(linkOutput) != 0 {
-				if parent == "_root" {
+		}
+		job.linkOutput = linkOutput
+		results <- job
+	}
+	fmt.Printf("Worker %d Stopped\n", workerID)
+}
+
+func scraper(siteMap *Scraping, parent string) map[string]interface{} {
+	output := make(map[string]interface{})
+	var wg sync.WaitGroup
+
+	jobs := make(chan WorkerJob, 10)
+	results := make(chan WorkerJob, 10)
+	outputChannel := make(chan map[string]interface{})
+	// 3 Workers
+	for x := 1; x <= numberOfWorkers; x++ {
+		wg.Add(1)
+		go worker(x, jobs, results, &wg)
+	}
+
+	// go saveDataToFile(results, outputChannel)
+	go func() {
+		fc := getURL(siteMap.StartURL)
+		if fc != nil {
+			for startURL := range fc {
+				// fmt.Println("URL:", startURL)
+
+				workerjob := WorkerJob{
+					parent:   parent,
+					startURL: startURL,
+					siteMap:  siteMap,
+				}
+
+				jobs <- workerjob
+			}
+			close(jobs)
+		}
+	}()
+
+	go func() {
+		pageOutput := make(map[string]interface{})
+		for job := range results {
+			if len(job.linkOutput) != 0 {
+				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
 						fmt.Printf("Error while reading %s file\n", outputFile)
 						os.Exit(1)
 					}
-
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					if err != nil {
 						fmt.Printf("Failed to unmarshal %s file\n", outputFile)
 						os.Exit(1)
 					}
-					data[startURL] = linkOutput
+					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
 						fmt.Println(err.Error())
 						os.Exit(1)
 					}
-					// fmt.Println(file)
+
 					_ = ioutil.WriteFile(outputFile, file, 0644)
 				} else {
-					output[startURL] = linkOutput
+					pageOutput[job.startURL] = job.linkOutput
 				}
 			}
 		}
-	}
+		outputChannel <- pageOutput
+	}()
+
+	// close(jobs)
+	// close(outputChannel)
+	wg.Wait()
+	close(results)
+	output = <-outputChannel
 	return output
 }
 
@@ -584,5 +616,4 @@ func main() {
 	readSettingsJSON()
 
 	_ = scraper(siteMap, "_root")
-
 }
