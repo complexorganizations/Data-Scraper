@@ -33,6 +33,7 @@ You can finally run the scraper.
 - JavaScript rendering ***Google Chrome (Required)***
 - Dynamic applications
 - Proxy support
+- Docker support
 - Exports to JSON|CSV|XML ***(Coming Soon)***
 
 ---
