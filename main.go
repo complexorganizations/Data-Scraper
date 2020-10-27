@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 	"runtime/debug"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -64,9 +65,20 @@ type Config struct {
 
 // To function properly, a lot of memory is needed to clean up files.
 func clearCache() {
-	// temp files
-	os.RemoveAll(os.TempDir())
-	debug.FreeOSMemory()
+	operatingSystem := runtime.GOOS
+	switch operatingSystem {
+	case "windows":
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+	case "darwin":
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+	case "linux":
+		os.RemoveAll(os.TempDir())
+		debug.FreeOSMemory()
+	default:
+		fmt.Println("Error: The func is not supported in your OS.")
+	}
 }
 
 func readSettingsJSON() {
