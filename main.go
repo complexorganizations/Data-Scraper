@@ -91,31 +91,25 @@ func clearCache() {
 	}
 }
 
+// read the settings json
 func readSettingsJSON() {
-	// open the file and read the file
 	data, err := ioutil.ReadFile(settingsConfig)
-	// define data struture, json data
 	var settings Config
 	err = json.Unmarshal(data, &settings)
-	// log any errors
 	if err != nil {
 		log.Println(err)
 	}
-	// set config to settings
 	config = &settings
 }
 
+// read the scraping json
 func readSiteMap() *Scraping {
-	// open the file and read the file
 	data, err := ioutil.ReadFile(scrapingConfig)
-	// define data struture, json data
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
-	// log any errors
 	if err != nil {
 		log.Println(err)
 	}
-	// return a value
 	return &scrape
 }
 
