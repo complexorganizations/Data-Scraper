@@ -60,6 +60,8 @@ Why not use a browser extension to scrape a website?
 
 ---
 ### Concurrency
+Most modern apps have rate limits.
+
 | Workers         | Requests           |
 | --------------  | ------------------ |
 | 1               | 300/min            |
