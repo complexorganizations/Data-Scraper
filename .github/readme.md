@@ -62,6 +62,16 @@ Why not use a browser extension to scrape a website?
 - The problem with browser extensions is that they are slow, and when it comes to large scraping projects it turns into a nightmare.
 
 ---
+### Concurrency
+| Workers         | Requests           |
+| --------------  | ------------------ |
+| 1               | 200/min            |
+| 2               | 500/min            |
+| 3               | 1000/min           |
+| 4               | 1300/min           |
+| 5               | 1500/min           |
+
+---
 ### Author
 
 * Name: Prajwal Koirala
