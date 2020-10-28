@@ -44,7 +44,7 @@ How do i use this?
 - Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper.
 
 How fast is this?
-- On our test, its about =>3k request a minute.
+- On our test, its more than 3,000 request per minute.
 
 How many domains can it scrape?
 - This will scrape as many domains as you like. ***NO LIMITS***
