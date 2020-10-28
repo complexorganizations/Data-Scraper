@@ -528,7 +528,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 		job.linkOutput = linkOutput
 		results <- job
 	}
-	fmt.Printf("Worker %d Stopped\n", workerID)
+	//fmt.Println("Stopped Worker:", workerID)
 }
 
 func scraper(siteMap *Scraping, parent string) map[string]interface{} {
