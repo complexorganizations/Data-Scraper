@@ -34,6 +34,7 @@ const (
 	settingsConfig = "settings.json"
 	scrapingConfig = "scraping.json"
 	outputFile     = "output.json"
+	//logFile        = "logging.log"
 )
 
 // Selectors is struct to Marshal selector
@@ -58,6 +59,7 @@ type Scraping struct {
 // Config setting struct
 type Config struct {
 	JavaScript    bool
+	Logging       bool
 	Proxy         bool
 	ProxyLists    []string
 	RotatingProxy bool
