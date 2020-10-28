@@ -1,6 +1,4 @@
-- [x] Build a proper crawler.
-- [x] Support pagination.
-- [x] Add Proxy Support
-- [ ] Add Support For Different Formats.
-- [x] JavaScript rendering (Headless Chromium)
-- [x] Concurrency
+- [ ] Support XML|CSV Format
+- [ ] Optimizations
+- [ ] Remove RotatingProxy
+- [ ] code cleanup
