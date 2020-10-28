@@ -56,7 +56,7 @@ How do i configure the scraper?
 - Open the settings file `settings.json` and change the scraper settings there.
 
 Can this scrape apps written in JavaScript?
-- Yes, this can scrape apps written in JS.
+- Yes, this can scrape apps written in JS. ***Google Chrome (Required)***
 
 Why not use a browser extension to scrape a website?
 - The problem with browser extensions is that they are slow, and when it comes to large scraping projects it turns into a nightmare.
