@@ -472,7 +472,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 		if doc == nil {
 			continue
 		}
-		fmt.Printf("Worker %d take a job URL : %s\n", workerID, job.startURL)
+		fmt.Printf("Worker %d took the URL: %s\n", workerID, job.startURL)
 		linkOutput := make(map[string]interface{})
 		for _, selector := range job.siteMap.Selectors {
 			if job.parent == selector.ParentSelectors[0] {
