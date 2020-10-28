@@ -43,9 +43,6 @@ You can finally run the scraper.
 How do i use this?
 - Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper.
 
-How fast is this?
-- On our test, its more than 3,000 request per minute.
-
 How many domains can it scrape?
 - This will scrape as many domains as you like. ***NO LIMITS***
 
@@ -70,6 +67,7 @@ Why not use a browser extension to scrape a website?
 | 10              | 3500/min           |
 | 25              | 7500/min           |
 | 50              | 15000/min          |
+| 100             | 30000/min          |
 
 ---
 ### Author
