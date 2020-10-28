@@ -35,7 +35,7 @@ You can finally run the scraper.
 - Dynamic applications
 - Proxy support
 - Docker support
-- Exports to JSON|CSV|XML ***(Coming Soon)***
+- Exports to JSON
 
 ---
 ### Q&A
