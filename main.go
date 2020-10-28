@@ -458,7 +458,7 @@ func getURL(urls []string) <-chan string {
 
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
-	fmt.Printf("Worker %d started\n", workerID)
+	// fmt.Printf("Worker %d started\n", workerID)
 	for job := range jobs {
 
 		var doc *goquery.Document
