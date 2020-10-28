@@ -1,6 +1,6 @@
 - [x] Build a proper crawler.
 - [x] Support pagination.
-- [ ] Add Proxy Support
+- [x] Add Proxy Support
 - [ ] Add Support For Different Formats.
 - [x] JavaScript rendering (Headless Chromium)
-- [ ] Concurrency
+- [x] Concurrency
