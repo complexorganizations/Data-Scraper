@@ -144,7 +144,7 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr("href")
 		if !ok {
-			fmt.Println("HREF has not been found")
+			fmt.Println("Error: HREF has not been found.")
 		}
 
 		links = append(links, toFixedURL(href, baseURL))
@@ -162,7 +162,7 @@ func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []stri
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr(selector.ExtractAttribute)
 		if !ok {
-			fmt.Println("HREF has not been found")
+			fmt.Println("Error: HREF has not been found.")
 		}
 
 		links = append(links, href)
@@ -189,13 +189,13 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 				} else if elementSelector.Type == "SelectorImage" {
 					resultText, ok := s.Find(elementSelector.Selector).Attr("src")
 					if !ok {
-						fmt.Println("HREF has not been found")
+						fmt.Println("Error: HREF has not been found.")
 					}
 					elementoutput[elementSelector.ID] = resultText
 				} else if elementSelector.Type == "SelectorLink" {
 					resultText, ok := s.Find(elementSelector.Selector).Attr("href")
 					if !ok {
-						fmt.Println("HREF has not been found")
+						fmt.Println("Error: HREF has not been found.")
 					}
 					elementoutput[elementSelector.ID] = resultText
 				}
@@ -219,7 +219,7 @@ func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
 		if !ok {
-			fmt.Println("HREF has not been found")
+			fmt.Println("Error: HREF has not been found.")
 		}
 		srcs = append(srcs, src)
 		if selector.Multiple == false {
@@ -572,13 +572,13 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
-						fmt.Printf("Error while reading %s file\n", outputFile)
+						fmt.Printf("Error: Cant read %s file.\n", outputFile)
 						os.Exit(1)
 					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					if err != nil {
-						fmt.Printf("Failed to unmarshal %s file\n", outputFile)
+						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
 						os.Exit(1)
 					}
 					data[job.startURL] = job.linkOutput
