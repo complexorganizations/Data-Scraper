@@ -62,6 +62,7 @@ type Config struct {
 	LoggingErrors bool
 	Proxy         bool
 	ProxyLists    []string
+	RotatingProxy bool
 	Export        string
 }
 
