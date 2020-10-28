@@ -27,7 +27,7 @@ import (
 var (
 	config          *Config
 	proxyIndex      = 0
-	numberOfWorkers = 15
+	numberOfWorkers = 10
 )
 
 const (
@@ -59,10 +59,9 @@ type Scraping struct {
 // Config setting struct
 type Config struct {
 	JavaScript    bool
-	Logging       bool
+	LoggingErrors bool
 	Proxy         bool
 	ProxyLists    []string
-	RotatingProxy bool
 	Export        string
 }
 
