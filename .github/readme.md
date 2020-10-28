@@ -65,11 +65,11 @@ Why not use a browser extension to scrape a website?
 ### Concurrency
 | Workers         | Requests           |
 | --------------  | ------------------ |
-| 1               | 200/min            |
-| 2               | 500/min            |
-| 3               | 1000/min           |
-| 4               | 1300/min           |
-| 5               | 1500/min           |
+| 1               | 300/min            |
+| 5               | 1750/min           |
+| 10              | 3500/min           |
+| 25              | 7500/min           |
+| 50              | 15000/min          |
 
 ---
 ### Author
