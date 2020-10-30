@@ -5,8 +5,7 @@ COPY main.go .
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-COPY scraping.json .
 COPY settings.json .
-COPY output.json .
+COPY scraping.json .
 RUN go build
 CMD ["./data-scraper"]
