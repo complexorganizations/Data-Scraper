@@ -12,11 +12,9 @@
         "Captcha": {
             "GoogleCloudSpeech": "YOUR_API_KEY"
         },
-        "Proxy": {
-            "ProxyList": [
+        "Proxy": [
                 "socks5://127.0.0.1:8080"
-            ]
-        },
+        ],
         "Export": {
             "Type": "Json"
         }
