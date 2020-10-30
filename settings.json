@@ -1,7 +1,10 @@
 {
   "JavaScript": false,
+  "JavaScriptEngine": [
+    "GoogleChrome"
+  ],
   "Captcha": false,
-  "CloudSpeech": [
+  "GoogleCloudSpeech": [
     "sample_api_key_here"
   ],
   "Proxy": false,
