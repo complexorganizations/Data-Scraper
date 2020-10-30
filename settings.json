@@ -1,16 +1,19 @@
 {
-    "JavaScript": false,
-    "Captcha": false,
-    "CloudSpeech": [
-        "sample_api_key_here"
-    ],
-    "Proxy": false,
-    "ProxyLists": [
-        "socks5://127.0.0.1:8080"
-    ],
-    "Log": false,
-    "LogLevel": [
-        "Info",
-    ],
-    "Export": "JSON"
+  "JavaScript": false,
+  "Captcha": false,
+  "CloudSpeech": [
+    "sample_api_key_here"
+  ],
+  "Proxy": false,
+  "ProxyLists": [
+    "socks5://127.0.0.1:8080"
+  ],
+  "Log": false,
+  "LogLevel": [
+    "Info"
+  ],
+  "Export": false,
+  "ExportType": [
+    "Json"
+  ]
 }
