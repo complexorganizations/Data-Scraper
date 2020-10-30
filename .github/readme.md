@@ -11,11 +11,18 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Than lets configure the scraper, open the `settings.json`
 ```
-JavaScript: true,false
-Proxy: true,false
-ProxyLists: ["socks5://127.0.0.1:8080","http://localhost:8080"]
-RotatingProxy: true,false
-Export: "json","csv","xml"
+{
+  "Log": false
+  "JavaScript": false
+  "Captcha": false
+  "Export": "Json"
+  "Proxy": [
+    false
+  ],
+  "UserAgent": [
+    false
+  ]
+}
 ```
 After configuring the scraper you can copy your scraper rules to `scraping.json`
 ```
