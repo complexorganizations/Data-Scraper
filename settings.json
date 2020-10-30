@@ -1,8 +1,11 @@
 {
   "JavaScript": false,
+  "JavaScriptEngine": [	
+    "GoogleChrome"	
+  ],
   "Captcha": false,
   "GoogleCloudSpeech": [
-    "sample_api_key_here"
+    "YOUR_API_KEY"
   ],
   "Proxy": false,
   "ProxyLists": [
@@ -12,5 +15,8 @@
   "LogLevel": [
     "Info"	
   ],
-  "Export": "JSON" 
+  "Export": true,
+  "ExportType": [	
+    "Json"	
+  ]
 }
