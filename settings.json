@@ -9,5 +9,8 @@
     "socks5://127.0.0.1:8080"
   ],
   "Log": false,
+  "LogLevel": [
+    "Info"	
+  ],
   "Export": "JSON" 
 }
