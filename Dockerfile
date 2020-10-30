@@ -9,4 +9,4 @@ COPY scraping.json .
 COPY settings.json .
 COPY output.json .
 RUN go build
-CMD ["./Data-Scraper"]
+CMD ["./data-scraper"]
