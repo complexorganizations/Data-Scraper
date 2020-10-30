@@ -33,9 +33,9 @@ You can finally run the scraper.
 - Concurrency scraping
 - JavaScript rendering ***Google Chrome (Required)***
 - Dynamic applications
-- Proxy support ***Comming Soon***
-- Docker support ***Comming Soon***
-- Tor support ***Comming Soon***
+- Proxy support
+- Docker support
+- Tor support
 - Captcha support ***Comming Soon***
 - Exports to JSON|XML|CSV ***Comming Soon***
 
