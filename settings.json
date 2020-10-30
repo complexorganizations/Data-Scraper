@@ -1,12 +1,12 @@
-    {
-        "Log": false,
-        "JavaScript": false,
-        "Captcha": false,
-        "Export": "Json",
-        "Proxy": [
-            false
-        ],
-        "UserAgent": [
-            false
-        ]
-    }
+{
+  "Log": false,
+  "JavaScript": false,
+  "Captcha": false,
+  "Export": "Json",
+  "Proxy": [
+    false
+  ],
+  "UserAgent": [
+    false
+  ]
+}
