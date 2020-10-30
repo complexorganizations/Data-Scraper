@@ -7,7 +7,7 @@ Data Scraper is a super fast crawler, scraper used to scrape and extract data fr
 
 Lets first use `git` to download this repo
 ```
-git clone https://github.com/complexorganizations/Data-Scraper.git
+git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Than lets configure the scraper, open the `settings.json`
 ```
