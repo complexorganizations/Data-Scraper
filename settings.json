@@ -1,7 +1,7 @@
 {
   "JavaScript": false,
   "JavaScriptEngine": [	
-    "GoogleChrome"	
+    "Chromium"	
   ],
   "Captcha": false,
   "GoogleCloudSpeech": [
