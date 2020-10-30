@@ -1,8 +1,5 @@
 {
   "JavaScript": false,
-  "JavaScriptEngine": [
-    "GoogleChrome"
-  ],
   "Captcha": false,
   "GoogleCloudSpeech": [
     "sample_api_key_here"
@@ -12,11 +9,5 @@
     "socks5://127.0.0.1:8080"
   ],
   "Log": false,
-  "LogLevel": [
-    "Info"
-  ],
-  "Export": false,
-  "ExportType": [
-    "Json"
-  ]
+  "Export": "JSON" 
 }
