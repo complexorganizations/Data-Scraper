@@ -61,7 +61,7 @@ type Scraping struct {
 // Config setting struct
 type Config struct {
 	JavaScript    bool
-	LoggingErrors bool
+	Log           bool
 	Proxy         bool
 	ProxyLists    []string
 	RotatingProxy bool
