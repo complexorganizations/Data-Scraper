@@ -38,7 +38,6 @@ You can finally run the scraper.
 - Tor support
 - Logging support ***Comming Soon***
 - Captcha support ***Comming Soon***
-- Scheduler ***Comming Soon***
 - Exports to JSON|XML|CSV ***Comming Soon***
 
 ---
