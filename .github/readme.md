@@ -37,6 +37,7 @@ You can finally run the scraper.
 - Docker support
 - Tor support
 - Captcha support ***Comming Soon***
+- Scheduler ***Comming Soon***
 - Exports to JSON|XML|CSV ***Comming Soon***
 
 ---
