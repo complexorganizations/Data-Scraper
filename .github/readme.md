@@ -70,6 +70,8 @@ Most modern apps have rate limits.
 | 25              | 7500/min           |
 | 50              | 15000/min          |
 | 100             | 30000/min          |
+| 500             | 150000/min         |
+| 1000            | 300000/min         |
 
 ---
 ### Author
