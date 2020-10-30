@@ -23,7 +23,7 @@ After configuring the scraper you can copy your scraper rules to `scraping.json`
 ```
 You can finally run the scraper.
 ```
-./Data-Scraper
+./data-scraper
 ```
 
 ---
