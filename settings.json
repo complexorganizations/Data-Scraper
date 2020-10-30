@@ -1,22 +1,22 @@
 {
-  "JavaScript": false,
-  "JavaScriptEngine": [	
-    "Chromium"	
-  ],
-  "Captcha": false,
-  "GoogleCloudSpeech": [
-    "YOUR_API_KEY"
-  ],
-  "Proxy": false,
-  "ProxyLists": [
-    "socks5://127.0.0.1:8080"
-  ],
-  "Log": false,
-  "LogLevel": [
-    "Info"	
-  ],
-  "Export": true,
-  "ExportType": [	
-    "Json"	
-  ]
+	"JavaScript": false,
+	"JavaScriptEngine": [
+		"Chromium"
+	],
+	"Captcha": false,
+	"GoogleCloudSpeech": [
+		"YOUR_API_KEY"
+	],
+	"Proxy": false,
+	"ProxyLists": [
+		"socks5://127.0.0.1:8080"
+	],
+	"Log": false,
+	"LogLevel": [
+		"Info"
+	],
+	"Export": true,
+	"ExportType": [
+		"Json"
+	]
 }
