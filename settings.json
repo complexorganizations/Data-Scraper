@@ -3,7 +3,7 @@
   "JavaScript": false,
   "Captcha": false,
   "Workers": 10,
-  "Export": "output.json",
+  "Export": "Json",
   "Proxy": [
     false
   ]
