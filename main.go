@@ -104,10 +104,12 @@ func readSettingsJSON() {
 		if err != nil {
 			log.SetOutput(logFile)
 			log.Println(err)
+			os.Exit()
 		}
 	} else {
 		if err != nil {
 			log.Println(err)
+			os.Exit()
 		}
 	}
 }
