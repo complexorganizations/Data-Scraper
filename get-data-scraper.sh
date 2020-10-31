@@ -18,8 +18,6 @@ function dist-check() {
     # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
-    # shellcheck disable=SC2034
-    DISTRO_VERSION=$VERSION_ID
   fi
 }
 
