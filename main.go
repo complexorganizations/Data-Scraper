@@ -121,8 +121,19 @@ func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
-	if err != nil {
-		log.Println(err)
+	if config.Log {
+		if err != nil {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+	} else {
+		if err != nil {
+			log.Println(err)
+			os.Exit(0)
+		}
 	}
 	return &scrape
 }
