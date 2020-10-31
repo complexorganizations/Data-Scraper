@@ -32,7 +32,7 @@ You can finally run the scraper.
 - Proxy support
 - Docker support
 - Tor support
-- Logging support ***Coming Soon***
+- Logging support
 - Captcha support ***Coming Soon***
 - Exports to JSON|XML|CSV ***Coming Soon***
 
