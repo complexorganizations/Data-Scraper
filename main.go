@@ -29,7 +29,7 @@ import (
 var (
 	config          *Config
 	proxyIndex      = 0
-	numberOfWorkers = 25
+	numberOfWorkers = 10
 )
 
 const (
