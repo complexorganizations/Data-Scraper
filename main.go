@@ -63,6 +63,7 @@ type Config struct {
 	Log        bool
 	JavaScript bool
 	Captcha    string
+	Workers    int
 	Export     string
 	Proxy      []string
 }
