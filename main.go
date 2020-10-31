@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"encoding/xml"
-	"encoding/csv"
+	//"encoding/xml"
+	//"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -23,7 +23,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
-	"golang.org/x/net/proxy"
+	//"golang.org/x/net/proxy"
 )
 
 var (
