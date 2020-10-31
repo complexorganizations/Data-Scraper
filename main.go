@@ -29,7 +29,7 @@ import (
 var (
 	config          *Config
 	proxyIndex      = 0
-	numberOfWorkers = 10
+	numberOfWorkers = 25
 )
 
 const (
@@ -147,7 +147,6 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 		if !ok {
 			fmt.Println("Error: HREF has not been found.")
 		}
-
 		links = append(links, toFixedURL(href, baseURL))
 		if selector.Multiple == false {
 			return false
@@ -297,7 +296,6 @@ func crawlURL(href string) *goquery.Document {
 	response, err := netClient.Get(href)
 	if err != nil {
 		log.Println(err)
-		return nil
 	}
 	defer response.Body.Close()
 
@@ -408,7 +406,6 @@ func emulateURL(url string) *goquery.Document {
 
 	if err != nil {
 		log.Println(err)
-		return nil
 	}
 
 	r := strings.NewReader(body)
@@ -573,20 +570,17 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
-						fmt.Printf("Error: Cant read %s file.\n", outputFile)
-						os.Exit(1)
+						log.Println(err)
 					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					if err != nil {
-						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
-						os.Exit(1)
+						log.Println(err)
 					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
+						log.Println(err)
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)
