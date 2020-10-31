@@ -58,7 +58,7 @@ Why not use a browser extension to scrape a website?
 - The problem with browser extensions is that they are slow, and when it comes to large scraping projects it turns into a nightmare.
 
 Why is this app so small?
-- This app is designed to be small and run in the background.
+- Small but extremely strong, this app is designed to run in the background.
 
 ---
 ### Concurrency
