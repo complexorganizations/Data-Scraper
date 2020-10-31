@@ -65,7 +65,6 @@ type Config struct {
 	Captcha    string
 	Export     string
 	Proxy      []string
-	UserAgent  []string
 }
 
 // WorkerJob struct defination
@@ -100,10 +99,10 @@ func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
 	var settings Config
 	err = json.Unmarshal(data, &settings)
+	config = &settings
 	if err != nil {
 		log.Println(err)
 	}
-	config = &settings
 }
 
 // read the scraping json
