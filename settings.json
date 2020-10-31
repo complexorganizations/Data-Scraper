@@ -1,26 +1,10 @@
 {
-	"JavaScript": false,
-	"JavaScriptEngine": [
-		"Chromium"
-	],
-	"Captcha": false,
-	"CaptchaEngine": [
-		"YOUR_API_KEY"
-	],
-	"Proxy": false,
-	"ProxyLists": [
-		"socks5://127.0.0.1:8080"
-	],
-	"Log": false,
-	"LogLevel": [
-		"Info"
-	],
-	"UserAgent": false,
-	"UserAgentLists": [
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
-	],
-	"Export": true,
-	"ExportType": [
-		"Json"
-	]
+    "JavaScript": false,
+    "LoggingErrors": false,
+    "Proxy": false,
+    "ProxyLists": [
+        "socks5://127.0.0.1:8080",
+        "http://localhost:8080"
+    ],
+    "Export": "json"
 }
