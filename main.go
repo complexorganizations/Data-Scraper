@@ -305,15 +305,23 @@ func crawlURL(href string) *goquery.Document {
 	}
 
 	response, err := netClient.Get(href)
-	if err != nil {
-		log.Println(err)
-	}
 	defer response.Body.Close()
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		log.Println(err)
+	if config.Log {
+		if err != nil {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+	} else {
+		if err != nil {
+			log.Println(err)
+			os.Exit(0)
+		}
 	}
 
 	return doc
@@ -321,13 +329,21 @@ func crawlURL(href string) *goquery.Document {
 
 func toFixedURL(href, baseURL string) string {
 	uri, err := url.Parse(href)
-	if err != nil {
-		return ""
-	}
 
 	base, err := url.Parse(baseURL)
-	if err != nil {
-		return ""
+	if config.Log {
+		if err != nil {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+	} else {
+		if err != nil {
+			log.Println(err)
+			os.Exit(0)
+		}
 	}
 
 	toFixedURI := base.ResolveReference(uri)
@@ -415,16 +431,23 @@ func emulateURL(url string) *goquery.Document {
 		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
 	)
 
-	if err != nil {
-		log.Println(err)
-	}
-
 	r := strings.NewReader(body)
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
-	if err != nil {
-		log.Println(err)
+	if config.Log {
+		if err != nil {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+	} else {
+		if err != nil {
+			log.Println(err)
+			os.Exit(0)
+		}
 	}
 
 	return doc
@@ -580,18 +603,23 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
-					if err != nil {
-						log.Println(err)
-					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
-					if err != nil {
-						log.Println(err)
-					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
-					if err != nil {
-						log.Println(err)
+					if config.Log {
+						if err != nil {
+							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+							defer file.Close()
+							log.SetOutput(file)
+							log.Println(err)
+							os.Exit(0)
+						}
+					} else {
+						if err != nil {
+							log.Println(err)
+							os.Exit(0)
+						}
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)
