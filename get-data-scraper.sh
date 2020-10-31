@@ -99,6 +99,8 @@ function take-user-input() {
     case $USER_OPTIONS in
     1)
       git pull /etc/data-scraper
+      go build /etc/data-scraper
+      chmod +x /etc/data-scraper/data-scraper
       ;;
     2)
       rm -rf /etc/data-scraper
