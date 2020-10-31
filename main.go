@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	// "encoding/xml"
-	// "encoding/csv"
+	//"encoding/xml"
+	//"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -23,7 +23,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
-	// "golang.org/x/net/proxy"
+	//"golang.org/x/net/proxy"
 )
 
 var (
@@ -36,7 +36,7 @@ const (
 	settingsConfig = "settings.json"
 	scrapingConfig = "scraping.json"
 	outputFile     = "output.json"
-	//logFile        = "logging.log"
+	logFile        = "logging.log"
 )
 
 // Selectors is struct to Marshal selector
@@ -60,12 +60,11 @@ type Scraping struct {
 
 // Config setting struct
 type Config struct {
-	JavaScript    bool
-	Log           bool
-	Proxy         bool
-	ProxyLists    []string
-	RotatingProxy bool
-	Export        string
+	Log        bool
+	JavaScript bool
+	Captcha    string
+	Export     string
+	Proxy      []string
 }
 
 // WorkerJob struct defination
@@ -100,10 +99,21 @@ func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
 	var settings Config
 	err = json.Unmarshal(data, &settings)
-	if err != nil {
-		log.Println(err)
-	}
 	config = &settings
+	if config.Log {
+		if err != nil {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+	} else {
+		if err != nil {
+			log.Println(err)
+			os.Exit(0)
+		}
+	}
 }
 
 // read the scraping json
@@ -148,7 +158,6 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 		if !ok {
 			fmt.Println("Error: HREF has not been found.")
 		}
-
 		links = append(links, toFixedURL(href, baseURL))
 		if selector.Multiple == false {
 			return false
@@ -298,7 +307,6 @@ func crawlURL(href string) *goquery.Document {
 	response, err := netClient.Get(href)
 	if err != nil {
 		log.Println(err)
-		return nil
 	}
 	defer response.Body.Close()
 
@@ -409,7 +417,6 @@ func emulateURL(url string) *goquery.Document {
 
 	if err != nil {
 		log.Println(err)
-		return nil
 	}
 
 	r := strings.NewReader(body)
@@ -574,20 +581,17 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
-						fmt.Printf("Error: Cant read %s file.\n", outputFile)
-						os.Exit(1)
+						log.Println(err)
 					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					if err != nil {
-						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
-						os.Exit(1)
+						log.Println(err)
 					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
+						log.Println(err)
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)

@@ -11,11 +11,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Than lets configure the scraper, open the `settings.json`
 ```
-JavaScript: true,false
-Proxy: true,false
-ProxyLists: ["socks5://127.0.0.1:8080","http://localhost:8080"]
-RotatingProxy: true,false
-Export: "json","csv","xml"
+{"Log":false,"JavaScript":false,"Captcha":false,"Export":"Json","Proxy":[false]}
 ```
 After configuring the scraper you can copy your scraper rules to `scraping.json`
 ```
@@ -36,10 +32,9 @@ You can finally run the scraper.
 - Proxy support
 - Docker support
 - Tor support
-- Logging support ***Comming Soon***
-- Captcha support ***Comming Soon***
-- Scheduler ***Comming Soon***
-- Exports to JSON|XML|CSV ***Comming Soon***
+- Logging support ***Coming Soon***
+- Captcha support ***Coming Soon***
+- Exports to JSON|XML|CSV ***Coming Soon***
 
 ---
 ### Q&A
@@ -61,6 +56,9 @@ Can this scrape apps written in JavaScript?
 
 Why not use a browser extension to scrape a website?
 - The problem with browser extensions is that they are slow, and when it comes to large scraping projects it turns into a nightmare.
+
+Why is this app so minimalist?
+- Minimalist but extremely strong, this app is designed to run in the background.
 
 ---
 ### Concurrency

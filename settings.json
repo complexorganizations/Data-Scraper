@@ -1,10 +1,9 @@
 {
-    "JavaScript": false,
-    "LoggingErrors": false,
-    "Proxy": false,
-    "ProxyLists": [
-        "socks5://127.0.0.1:8080",
-        "http://localhost:8080"
-    ],
-    "Export": "json"
+  "Log": false,
+  "JavaScript": false,
+  "Captcha": false,
+  "Export": "Json",
+  "Proxy": [
+    false
+  ]
 }
