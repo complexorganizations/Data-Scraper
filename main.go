@@ -102,14 +102,16 @@ func readSettingsJSON() {
 	config = &settings
 	if config.Log {
 		if err != nil {
-			log.SetOutput(logFile)
+			file := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
 			log.Println(err)
-			os.Exit()
+			os.Exit(0)
 		}
 	} else {
 		if err != nil {
 			log.Println(err)
-			os.Exit()
+			os.Exit(0)
 		}
 	}
 }
