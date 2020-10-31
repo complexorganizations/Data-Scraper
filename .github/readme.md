@@ -18,9 +18,6 @@ Than lets configure the scraper, open the `settings.json`
   "Export": "Json"
   "Proxy": [
     false
-  ],
-  "UserAgent": [
-    false
   ]
 }
 ```
