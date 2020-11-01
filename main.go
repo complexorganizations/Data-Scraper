@@ -101,8 +101,8 @@ func readSettingsJSON() {
 	var settings Config
 	err = json.Unmarshal(data, &settings)
 	config = &settings
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -122,8 +122,8 @@ func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -285,20 +285,22 @@ func crawlURL(href string) *goquery.Document {
 		InsecureSkipVerify: false,
 	}
 	// if proxy is set use for transport
-	if config.Proxy {
-		var proxyString string
+	if config.Proxy[0] != "false" {
 
-		if config.RotatingProxy {
-			if proxyIndex <= len(config.ProxyLists) {
-				proxyString = config.ProxyLists[proxyIndex]
-				proxyIndex = proxyIndex + 1
-			} else {
-				proxyString = config.ProxyLists[0]
-				proxyIndex = 0
-			}
-		} else {
-			proxyString = config.ProxyLists[0]
-		}
+		proxyString := config.Proxy[0]
+
+		// CHANGED dennis6p
+		// if config.RotatingProxy {
+		// 	if proxyIndex <= len(config.ProxyLists) {
+		// 		proxyString = config.ProxyLists[proxyIndex]
+		// 		proxyIndex = proxyIndex + 1
+		// 	} else {
+		// 		proxyString = config.ProxyLists[0]
+		// 		proxyIndex = 0
+		// 	}
+		// } else {
+		// 	proxyString = config.ProxyLists[0]
+		// }
 
 		proxyURL, _ := url.Parse(proxyString)
 
@@ -317,12 +319,8 @@ func crawlURL(href string) *goquery.Document {
 	}
 
 	response, err := netClient.Get(href)
-	defer response.Body.Close()
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(response.Body)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -335,6 +333,10 @@ func crawlURL(href string) *goquery.Document {
 			os.Exit(0)
 		}
 	}
+	defer response.Body.Close()
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(response.Body)
 
 	return doc
 }
@@ -343,8 +345,8 @@ func toFixedURL(href, baseURL string) string {
 	uri, err := url.Parse(href)
 
 	base, err := url.Parse(baseURL)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -357,7 +359,6 @@ func toFixedURL(href, baseURL string) string {
 			os.Exit(0)
 		}
 	}
-
 	toFixedURI := base.ResolveReference(uri)
 
 	return toFixedURI.String()
@@ -405,25 +406,26 @@ func HasElem(s interface{}, elem interface{}) bool {
 }
 
 func emulateURL(url string) *goquery.Document {
-	var proxyString string
 	var opts []func(*chromedp.ExecAllocator)
 
-	if config.Proxy {
-		if config.RotatingProxy {
-			if proxyIndex <= len(config.ProxyLists) {
-				proxyString = config.ProxyLists[proxyIndex]
-				proxyIndex = proxyIndex + 1
-			} else {
-				proxyString = config.ProxyLists[0]
-				proxyIndex = 0
-			}
-		} else {
-			proxyString = config.ProxyLists[0]
-		}
+	if config.Proxy[0] != "false" {
 
-		opts = append(chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.ProxyServer(proxyString),
-		)
+		// CHANGED - dennis6p
+		// if config.RotatingProxy {
+		// 	if proxyIndex <= len(config.ProxyLists) {
+		// 		proxyString = config.ProxyLists[proxyIndex]
+		// 		proxyIndex = proxyIndex + 1
+		// 	} else {
+		// 		proxyString = config.ProxyLists[0]
+		// 		proxyIndex = 0
+		// 	}
+		// } else {
+		// 	proxyString = config.ProxyLists[0]
+		// }
+		proxyString := config.Proxy[0]
+		proxyServer := chromedp.ProxyServer(proxyString)
+		fmt.Println(proxyServer)
+		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
 	}
@@ -447,8 +449,8 @@ func emulateURL(url string) *goquery.Document {
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -619,8 +621,8 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
-					if config.Log {
-						if err != nil {
+					if err != nil {
+						if config.Log {
 							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 							defer file.Close()
 							log.SetOutput(file)
