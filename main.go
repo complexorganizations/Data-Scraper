@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+
 	//"encoding/xml"
 	//"encoding/csv"
 	"fmt"
@@ -62,7 +63,7 @@ type Scraping struct {
 type Config struct {
 	Log        bool
 	JavaScript bool
-	Captcha    string
+	Captcha    bool // set to boolean or bool instead of string
 	Proxy      []string
 }
 
@@ -107,7 +108,6 @@ func readSettingsJSON() {
 			log.Println(err)
 			os.Exit(0)
 		}
-	} else {
 		log.Println(err)
 		os.Exit(0)
 	}
@@ -126,7 +126,6 @@ func readSiteMap() *Scraping {
 			log.Println(err)
 			os.Exit(0)
 		}
-	} else {
 		log.Println(err)
 		os.Exit(0)
 	}
@@ -279,7 +278,7 @@ func crawlURL(href string) *goquery.Document {
 		InsecureSkipVerify: false,
 	}
 	// if proxy is set use for transport
-	if config.Proxy[0] != "false" {
+	if len(config.Proxy) > 0 {
 
 		proxyString := config.Proxy[0]
 
@@ -313,6 +312,7 @@ func crawlURL(href string) *goquery.Document {
 	}
 
 	response, err := netClient.Get(href)
+
 	if err != nil {
 		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -321,10 +321,13 @@ func crawlURL(href string) *goquery.Document {
 			log.Println(err)
 			os.Exit(0)
 		}
-	} else {
 		log.Println(err)
 		os.Exit(0)
 	}
+
+	// bodyBytes, err := ioutil.ReadAll(response.Body)
+	// fmt.Println(string(bodyBytes))
+
 	defer response.Body.Close()
 
 	// Load the HTML document
@@ -605,21 +608,21 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
+					if err != nil {
+						fmt.Printf("Error: Cant read %s file.\n", outputFile)
+						os.Exit(1)
+					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
+					if err != nil {
+						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
+						os.Exit(1)
+					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						if config.Log {
-							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-							defer file.Close()
-							log.SetOutput(file)
-							log.Println(err)
-							os.Exit(0)
-						}
-					} else {
-						log.Println(err)
-						os.Exit(0)
+						fmt.Println(err.Error())
+						os.Exit(1)
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)
