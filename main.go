@@ -62,7 +62,7 @@ type Scraping struct {
 type Config struct {
 	Log        bool
 	JavaScript bool
-	Captcha    bool // set to boolean or bool instead of string
+	Captcha    bool
 	Proxy      []string
 }
 
