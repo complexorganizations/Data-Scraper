@@ -387,7 +387,7 @@ func HasElem(s interface{}, elem interface{}) bool {
 func emulateURL(url string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
 
-	if config.Proxy[0] != "false" {
+	if len(config.Proxy) > 0 {
 
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
