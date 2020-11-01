@@ -101,8 +101,8 @@ func readSettingsJSON() {
 	var settings Config
 	err = json.Unmarshal(data, &settings)
 	config = &settings
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -122,8 +122,8 @@ func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -319,8 +319,8 @@ func crawlURL(href string) *goquery.Document {
 	}
 
 	response, err := netClient.Get(href)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -345,8 +345,8 @@ func toFixedURL(href, baseURL string) string {
 	uri, err := url.Parse(href)
 
 	base, err := url.Parse(baseURL)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -449,8 +449,8 @@ func emulateURL(url string) *goquery.Document {
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
-	if config.Log {
-		if err != nil {
+	if err != nil {
+		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -621,8 +621,8 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
-					if config.Log {
-						if err != nil {
+					if err != nil {
+						if config.Log {
 							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 							defer file.Close()
 							log.SetOutput(file)
