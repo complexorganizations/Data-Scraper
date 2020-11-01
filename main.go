@@ -281,19 +281,6 @@ func crawlURL(href string) *goquery.Document {
 
 		proxyString := config.Proxy[0]
 
-		// CHANGED dennis6p
-		// if config.RotatingProxy {
-		// 	if proxyIndex <= len(config.ProxyLists) {
-		// 		proxyString = config.ProxyLists[proxyIndex]
-		// 		proxyIndex = proxyIndex + 1
-		// 	} else {
-		// 		proxyString = config.ProxyLists[0]
-		// 		proxyIndex = 0
-		// 	}
-		// } else {
-		// 	proxyString = config.ProxyLists[0]
-		// }
-
 		proxyURL, _ := url.Parse(proxyString)
 
 		transport = &http.Transport{
@@ -402,18 +389,6 @@ func emulateURL(url string) *goquery.Document {
 
 	if config.Proxy[0] != "false" {
 
-		// CHANGED - dennis6p
-		// if config.RotatingProxy {
-		// 	if proxyIndex <= len(config.ProxyLists) {
-		// 		proxyString = config.ProxyLists[proxyIndex]
-		// 		proxyIndex = proxyIndex + 1
-		// 	} else {
-		// 		proxyString = config.ProxyLists[0]
-		// 		proxyIndex = 0
-		// 	}
-		// } else {
-		// 	proxyString = config.ProxyLists[0]
-		// }
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
 		// fmt.Println(proxyServer)
