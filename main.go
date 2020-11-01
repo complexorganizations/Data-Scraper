@@ -110,10 +110,8 @@ func readSettingsJSON() {
 			os.Exit(0)
 		}
 	} else {
-		if err != nil {
-			log.Println(err)
-			os.Exit(0)
-		}
+		log.Println(err)
+		os.Exit(0)
 	}
 }
 
@@ -131,10 +129,8 @@ func readSiteMap() *Scraping {
 			os.Exit(0)
 		}
 	} else {
-		if err != nil {
-			log.Println(err)
-			os.Exit(0)
-		}
+		log.Println(err)
+		os.Exit(0)
 	}
 	return &scrape
 }
@@ -328,10 +324,8 @@ func crawlURL(href string) *goquery.Document {
 			os.Exit(0)
 		}
 	} else {
-		if err != nil {
-			log.Println(err)
-			os.Exit(0)
-		}
+		log.Println(err)
+		os.Exit(0)
 	}
 	defer response.Body.Close()
 
@@ -354,10 +348,8 @@ func toFixedURL(href, baseURL string) string {
 			os.Exit(0)
 		}
 	} else {
-		if err != nil {
-			log.Println(err)
-			os.Exit(0)
-		}
+		log.Println(err)
+		os.Exit(0)
 	}
 	toFixedURI := base.ResolveReference(uri)
 
@@ -458,10 +450,8 @@ func emulateURL(url string) *goquery.Document {
 			os.Exit(0)
 		}
 	} else {
-		if err != nil {
-			log.Println(err)
-			os.Exit(0)
-		}
+		log.Println(err)
+		os.Exit(0)
 	}
 
 	return doc
@@ -630,10 +620,8 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 							os.Exit(0)
 						}
 					} else {
-						if err != nil {
-							log.Println(err)
-							os.Exit(0)
-						}
+						log.Println(err)
+						os.Exit(0)
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)
