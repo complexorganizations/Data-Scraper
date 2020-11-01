@@ -607,23 +607,21 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
-					if err != nil {
-						fmt.Printf("Error: Cant read %s file.\n", outputFile)
-						os.Exit(1)
-					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
-					if err != nil {
-						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
-						os.Exit(1)
-					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
+						if config.Log {
+							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+							defer file.Close()
+							log.SetOutput(file)
+							log.Println(err)
+							os.Exit(0)
+						}
+						log.Println(err)
+						os.Exit(0)
 					}
-
 					_ = ioutil.WriteFile(outputFile, file, 0644)
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
