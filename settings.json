@@ -1,8 +1,6 @@
 {
-    "Log": false,
-    "JavaScript": false,
-    "Captcha": false,
-    "Proxy": [
-        
-    ]
+  "Log": false,
+  "JavaScript": false,
+  "Captcha": false,
+  "Proxy": []
 }
