@@ -101,13 +101,13 @@ func readSettingsJSON() {
 	err = json.Unmarshal(data, &settings)
 	config = &settings
 	if err != nil {
-		// if config.Log {
-		// 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		// 	defer file.Close()
-		// 	log.SetOutput(file)
-		// 	log.Println(err)
-		// 	os.Exit(0)
-		// }
+		if config.Log {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
 		log.Println(err)
 		os.Exit(0)
 	}
@@ -119,13 +119,13 @@ func readSiteMap() *Scraping {
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
 	if err != nil {
-		// if config.Log {
-		// 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		// 	defer file.Close()
-		// 	log.SetOutput(file)
-		// 	log.Println(err)
-		// 	os.Exit(0)
-		// }
+		if config.Log {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
 		log.Println(err)
 		os.Exit(0)
 	}
@@ -608,21 +608,21 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
+					if err != nil {
+						fmt.Printf("Error: Cant read %s file.\n", outputFile)
+						os.Exit(1)
+					}
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
+					if err != nil {
+						fmt.Printf("Error: Failed to unmarshal %s file.\n", outputFile)
+						os.Exit(1)
+					}
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						if config.Log {
-							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-							defer file.Close()
-							log.SetOutput(file)
-							log.Println(err)
-							os.Exit(0)
-						}
-					} else {
-						log.Println(err)
-						os.Exit(0)
+						fmt.Println(err.Error())
+						os.Exit(1)
 					}
 
 					_ = ioutil.WriteFile(outputFile, file, 0644)
