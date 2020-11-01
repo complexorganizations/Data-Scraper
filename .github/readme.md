@@ -24,10 +24,10 @@ You can finally run the scraper.
 
 ---
 ### Features
-- Unlimited scraping ***NO LIMITS***
+- Unlimited scraping
 - Distributed scraping
 - Concurrency scraping
-- JavaScript rendering ***Google Chrome (Required)***
+- JavaScript rendering
 - Dynamic applications
 - Proxy support
 - Docker support
