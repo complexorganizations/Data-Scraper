@@ -416,7 +416,7 @@ func emulateURL(url string) *goquery.Document {
 		// }
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
-		fmt.Println(proxyServer)
+		// fmt.Println(proxyServer)
 		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
