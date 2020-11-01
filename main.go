@@ -285,20 +285,22 @@ func crawlURL(href string) *goquery.Document {
 		InsecureSkipVerify: false,
 	}
 	// if proxy is set use for transport
-	if config.Proxy {
-		var proxyString string
+	if config.Proxy[0] != "false" {
 
-		if config.RotatingProxy {
-			if proxyIndex <= len(config.ProxyLists) {
-				proxyString = config.ProxyLists[proxyIndex]
-				proxyIndex = proxyIndex + 1
-			} else {
-				proxyString = config.ProxyLists[0]
-				proxyIndex = 0
-			}
-		} else {
-			proxyString = config.ProxyLists[0]
-		}
+		proxyString := config.Proxy[0]
+
+		// CHANGED dennis6p
+		// if config.RotatingProxy {
+		// 	if proxyIndex <= len(config.ProxyLists) {
+		// 		proxyString = config.ProxyLists[proxyIndex]
+		// 		proxyIndex = proxyIndex + 1
+		// 	} else {
+		// 		proxyString = config.ProxyLists[0]
+		// 		proxyIndex = 0
+		// 	}
+		// } else {
+		// 	proxyString = config.ProxyLists[0]
+		// }
 
 		proxyURL, _ := url.Parse(proxyString)
 
@@ -317,10 +319,6 @@ func crawlURL(href string) *goquery.Document {
 	}
 
 	response, err := netClient.Get(href)
-	defer response.Body.Close()
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if config.Log {
 		if err != nil {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -335,6 +333,10 @@ func crawlURL(href string) *goquery.Document {
 			os.Exit(0)
 		}
 	}
+	defer response.Body.Close()
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(response.Body)
 
 	return doc
 }
@@ -357,7 +359,6 @@ func toFixedURL(href, baseURL string) string {
 			os.Exit(0)
 		}
 	}
-
 	toFixedURI := base.ResolveReference(uri)
 
 	return toFixedURI.String()
@@ -405,25 +406,26 @@ func HasElem(s interface{}, elem interface{}) bool {
 }
 
 func emulateURL(url string) *goquery.Document {
-	var proxyString string
 	var opts []func(*chromedp.ExecAllocator)
 
-	if config.Proxy {
-		if config.RotatingProxy {
-			if proxyIndex <= len(config.ProxyLists) {
-				proxyString = config.ProxyLists[proxyIndex]
-				proxyIndex = proxyIndex + 1
-			} else {
-				proxyString = config.ProxyLists[0]
-				proxyIndex = 0
-			}
-		} else {
-			proxyString = config.ProxyLists[0]
-		}
+	if config.Proxy[0] != "false" {
 
-		opts = append(chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.ProxyServer(proxyString),
-		)
+		// CHANGED - dennis6p
+		// if config.RotatingProxy {
+		// 	if proxyIndex <= len(config.ProxyLists) {
+		// 		proxyString = config.ProxyLists[proxyIndex]
+		// 		proxyIndex = proxyIndex + 1
+		// 	} else {
+		// 		proxyString = config.ProxyLists[0]
+		// 		proxyIndex = 0
+		// 	}
+		// } else {
+		// 	proxyString = config.ProxyLists[0]
+		// }
+		proxyString := config.Proxy[0]
+		proxyServer := chromedp.ProxyServer(proxyString)
+		fmt.Println(proxyServer)
+		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
 	}
