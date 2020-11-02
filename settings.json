@@ -1,6 +1,7 @@
 {
   "Log": false,
   "JavaScript": false,
+  "Workers": 10,
   "Captcha": [],
   "Proxy": []
 }
