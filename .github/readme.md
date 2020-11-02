@@ -11,7 +11,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Than lets configure the scraper, open the `settings.json`
 ```
-{"Log":false,"JavaScript":false,"Captcha":false,"Proxy":[false]}
+{"Log":false,"JavaScript":false,"Captcha":false,"Proxy":[]}
 ```
 After configuring the scraper you can copy your scraper rules to `scraping.json`
 ```
