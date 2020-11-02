@@ -26,8 +26,8 @@ import (
 )
 
 var (
-	config          *Config
-	proxyIndex      = 0
+	config     *Config
+	proxyIndex = 0
 )
 
 const (
@@ -333,7 +333,6 @@ func toFixedURL(href, baseURL string) string {
 			log.Println(err)
 			os.Exit(0)
 		}
-	} else {
 		log.Println(err)
 		os.Exit(0)
 	}
@@ -423,7 +422,6 @@ func emulateURL(url string) *goquery.Document {
 			log.Println(err)
 			os.Exit(0)
 		}
-	} else {
 		log.Println(err)
 		os.Exit(0)
 	}
