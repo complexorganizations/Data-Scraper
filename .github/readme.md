@@ -25,15 +25,15 @@ You can finally run the scraper.
 ---
 ### Features
 - Unlimited scraping
-- Distributed scraping
-- Concurrency scraping
-- JavaScript rendering
-- Dynamic applications
-- Proxy support
-- Docker support
-- Tor support
-- Logging support
-- Captcha support ***Coming Soon***
+- Distributed
+- Concurrency
+- JavaScript Rendering
+- Dynamic Applications
+- Proxy
+- Docker
+- Tor
+- Logging
+- Captcha ***Coming Soon***
 - Exports to JSON|XML|CSV ***Coming Soon***
 
 ---
