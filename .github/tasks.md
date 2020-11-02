@@ -5,3 +5,4 @@
 - [ ] Make a proxy validator, if the proxy is not valid go to the next one and let the users know. (if its a single proxy and its invalid than exit the script.)
 - [ ] Make a url validator, if the url isnt valid than don't scrape the url
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
+- [ ] Code Optimization, Code Cleanup
