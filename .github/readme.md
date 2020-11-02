@@ -29,9 +29,8 @@ You can finally run the scraper.
 - Concurrency
 - JavaScript Rendering
 - Dynamic Applications
-- Proxy
+- Proxy (HTTP|HTTPS)
 - Docker
-- Tor
 - Logging
 - Captcha ***Coming Soon***
 - Exports to JSON|XML|CSV ***Coming Soon***
