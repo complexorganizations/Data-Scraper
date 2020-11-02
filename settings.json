@@ -2,6 +2,7 @@
   "Log": false,
   "JavaScript": false,
   "Workers": 10,
+  "Export": "json",
   "Captcha": [],
   "Proxy": []
 }
