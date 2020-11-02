@@ -27,8 +27,7 @@ You can finally run the scraper.
 - Unlimited (Scraping|Screenshot|Parsing)
 - Distributed
 - Concurrency
-- JavaScript Rendering
-- Dynamic Applications
+- Dynamic Applications (JavaScript|ASP)
 - Proxy (HTTP|HTTPS)
 - Docker
 - Logging
