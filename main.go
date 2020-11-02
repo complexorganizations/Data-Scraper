@@ -28,7 +28,6 @@ import (
 var (
 	config          *Config
 	proxyIndex      = 0
-	numberOfWorkers = 10
 )
 
 const (
@@ -61,6 +60,7 @@ type Scraping struct {
 type Config struct {
 	Log        bool
 	JavaScript bool
+	Workers    int
 	Captcha    []string
 	Proxy      []string
 }
@@ -551,7 +551,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	results := make(chan WorkerJob, 10)
 	outputChannel := make(chan map[string]interface{})
 	// 3 Workers
-	for x := 1; x <= numberOfWorkers; x++ {
+	for x := 1; x <= config.Workers; x++ {
 		wg.Add(1)
 		go worker(x, jobs, results, &wg)
 	}
