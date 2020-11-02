@@ -1,7 +1,8 @@
 {
   "Log": false,
   "JavaScript": false,
-  "Export": "json",
+  "Export": false,
+  "Screenshot": false,
   "Workers": 10,
   "Captcha": [],
   "Proxy": []
