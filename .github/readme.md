@@ -24,7 +24,7 @@ You can finally run the scraper.
 
 ---
 ### Features
-- Unlimited scraping
+- Unlimited (Scraping|Screenshot|Parsing)
 - Distributed
 - Concurrency
 - JavaScript Rendering
