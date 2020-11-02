@@ -23,7 +23,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
-	//"golang.org/x/net/proxy"
 )
 
 var (
