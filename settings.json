@@ -1,8 +1,8 @@
 {
   "Log": false,
   "JavaScript": false,
-  "Workers": 10,
   "Export": "json",
+  "Workers": 10,
   "Captcha": [],
   "Proxy": []
 }
