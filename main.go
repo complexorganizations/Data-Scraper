@@ -34,7 +34,7 @@ const (
 	settingsConfig = "settings.json"
 	scrapingConfig = "scraping.json"
 	outputFile     = "output.json"
-	logFile        = "logging.log"
+	logFile        = "logs.log"
 )
 
 // Selectors is struct to Marshal selector
