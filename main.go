@@ -19,7 +19,6 @@ import (
 	"strings"
 	"sync"
 
-	// change from 3rd party packages to golang packages
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
