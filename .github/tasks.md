@@ -1,8 +1,5 @@
 - [ ] Support JSON|XML|CSV Format
-- [ ] Change chromedp to standard golang package. (JavaScript Rendering)
-- [ ] Change goquery to a standard golang package.
-- [ ] Change regexp to a standard golang package.
-- [ ] Make a proxy validator, if the proxy is not valid go to the next one and let the users know. (if its a single proxy and its invalid than exit the script.)
 - [ ] Make a url validator, if the url isnt valid than don't scrape the url
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
-- [ ] Code Optimization, Code Cleanup
+- [ ] Code Optimization
+- [ ] Code Cleanup
