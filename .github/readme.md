@@ -38,7 +38,7 @@ You can finally run the scraper.
 ### Q&A
 
 How do i use this?
-- Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper.
+- Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper. ***Update: Developing your own solution to generate the scraper.json***
 
 How many domains can it scrape?
 - This will scrape as many domains as you like. ***NO LIMITS***
