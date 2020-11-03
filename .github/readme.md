@@ -29,6 +29,7 @@ You can finally run the scraper.
 - Concurrency
 - Dynamic Applications (JavaScript|ASP)
 - Proxy (HTTP|HTTPS)
+- Obfuscation ***Coming Soon***
 - Docker
 - Logging
 - Captcha ***Coming Soon***
