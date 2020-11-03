@@ -1,5 +1,6 @@
 - [ ] Support JSON|XML|CSV Format
 - [ ] Make a url validator, if the url isnt valid than don't scrape the url
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
+- [ ] Screenshot of all the pages the crawler visits.
 - [ ] Code Optimization
 - [ ] Code Cleanup
