@@ -32,7 +32,7 @@ You can finally run the scraper.
 - Docker
 - Logging
 - Captcha ***Coming Soon***
-- Exports to JSON|XML|CSV ***Coming Soon***
+- Exports (json|xml|csv) ***Coming Soon***
 
 ---
 ### Q&A
