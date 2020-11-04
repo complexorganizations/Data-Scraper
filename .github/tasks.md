@@ -4,3 +4,4 @@
 - [ ] Code Optimization
 - [ ] Code Cleanup
 - [ ] Support JSON|XML|CSV format (settings.json)
+- [ ] Support screenshots
