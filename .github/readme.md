@@ -38,13 +38,13 @@ You can finally run the scraper.
 ### Q&A
 
 How do i use this?
-- Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper. ***Update: Developing your own solution to generate the scraper.json***
+- Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper. ***Update: Developing your own solution to generate the sitemap.json***
 
 How many domains can it scrape?
 - This will scrape as many domains as you like. ***NO LIMITS***
 
 How do i change what it scrapes?
-- You can change what the scraper scrapes using `scraping.json`
+- You can change what the scraper scrapes using `sitemap.json`
 
 How do i configure the scraper?
 - Open the settings file `settings.json` and change the scraper settings there.
