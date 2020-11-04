@@ -31,7 +31,7 @@ var (
 
 const (
 	settingsConfig = "settings.json"
-	scrapingConfig = "scraping.json"
+	scrapingConfig = "sitemap.json"
 	outputFile     = "output.json"
 	logFile        = "logs.log"
 )
