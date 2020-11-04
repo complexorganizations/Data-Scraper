@@ -59,7 +59,6 @@ type Scraping struct {
 type Config struct {
 	Log         bool
 	JavaScript  bool
-	Export      bool
 	Workers     int
 	Captcha     []string
 	Proxy       []string
