@@ -1,6 +1,6 @@
 {
-  "Log": false,
-  "JavaScript": false,
+  "Log": true,
+  "JavaScript": true,
   "Workers": 10,
   "Captcha": [],
   "Proxy": []
