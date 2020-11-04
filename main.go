@@ -63,7 +63,6 @@ type Config struct {
 	Workers     int
 	Captcha     []string
 	Proxy       []string
-	UserAgent   []string
 }
 
 // WorkerJob struct defination
