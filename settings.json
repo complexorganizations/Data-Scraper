@@ -1,7 +1,6 @@
 {
   "Log": false,
   "JavaScript": false,
-  "Obfuscation": false,
   "Export": false,
   "Workers": 10,
   "Captcha": [],
