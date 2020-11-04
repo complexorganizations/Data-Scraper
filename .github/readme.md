@@ -24,15 +24,15 @@ You can finally run the scraper.
 
 ---
 ### Features
-- Unlimited (Scraping|Screenshot|Parsing)
+- Unlimited [Crawling|Scraping|Parsing|Screenshot]
 - Distributed
 - Concurrency
-- Dynamic Applications (JavaScript|ASP)
-- Proxy (HTTP|HTTPS)
+- Dynamic Applications [JavaScript|ASP|AJAX]
+- Proxy [HTTP|HTTPS]
 - Docker
 - Logging
 - Captcha ***Coming Soon***
-- Exports (json|xml|csv) ***Coming Soon***
+- Exports [JSON|XML|CSV] ***Coming Soon***
 
 ---
 ### Q&A
