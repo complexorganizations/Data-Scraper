@@ -4,6 +4,5 @@
   "Export": false,
   "Workers": 10,
   "Captcha": [],
-  "Proxy": [],
-  "UserAgent": []
+  "Proxy": []
 }
