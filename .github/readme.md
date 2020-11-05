@@ -11,7 +11,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Than lets configure the scraper, open the `settings.json`
 ```
-{"Log":true,"JavaScript":true,"Workers":10,"Captcha":[],"Proxy":[]}
+{"Log":false,"JavaScript":false,"Workers":25,"UserAgents":[],"Captcha":[],"Proxy":[]}
 ```
 After configuring the scraper you can copy your scraper rules to `sitemap.json`
 ```
