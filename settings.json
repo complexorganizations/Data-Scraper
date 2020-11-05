@@ -1,5 +1,4 @@
 {
-  "Gui": false,
   "Log": false,
   "JavaScript": false,
   "Workers": 25,
