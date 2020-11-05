@@ -57,12 +57,12 @@ type Scraping struct {
 
 // Config setting struct
 type Config struct {
-	Log         bool
-	JavaScript  bool
-	Workers     int
-	UserAgents  []string
-	Captcha     []string
-	Proxy       []string
+	Log        bool
+	JavaScript bool
+	Workers    int
+	UserAgents []string
+	Captcha    []string
+	Proxy      []string
 }
 
 // WorkerJob struct defination
