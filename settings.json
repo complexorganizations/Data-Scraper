@@ -2,6 +2,7 @@
   "Log": true,
   "JavaScript": true,
   "Workers": 25,
+  "UserAgents": [],
   "Captcha": [],
   "Proxy": []
 }
