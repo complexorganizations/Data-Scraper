@@ -60,6 +60,7 @@ type Config struct {
 	Log         bool
 	JavaScript  bool
 	Workers     int
+	UserAgents  []string
 	Captcha     []string
 	Proxy       []string
 }
