@@ -1,7 +1,8 @@
 - [ ] Make a url validator, if the url isnt valid than don't scrape the url
-- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it (settings.json)
-- [ ] Screenshot of all the pages the crawler visits. (settings.json)
+- [ ] Support custom user agents (sitemap.json)
+- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it (sitemap.json)
+- [ ] Screenshot of all the pages the crawler visits. (sitemap.json)
+- [ ] Support JSON|XML|CSV format (sitemap.json)
+- [ ] Support screenshots (sitemap.json)
 - [ ] Code Optimization
 - [ ] Code Cleanup
-- [ ] Support JSON|XML|CSV format (settings.json)
-- [ ] Support screenshots
