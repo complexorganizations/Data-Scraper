@@ -1,8 +1,8 @@
-- [ ] Make a url validator, if the url isnt valid than don't scrape the url
+- [ ] Make a url validator, if the url isnt valid than don't scrape the url (settings.json)
 - [ ] Support custom user agents (sitemap.json)
-- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it (sitemap.json)
+- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it (settings.json)
 - [ ] Screenshot of all the pages the crawler visits. (sitemap.json)
 - [ ] Support JSON|XML|CSV format (sitemap.json)
 - [ ] Support screenshots (sitemap.json)
-- [ ] Code Optimization
-- [ ] Code Cleanup
+- [ ] Code Optimization (main.go)
+- [ ] Code Cleanup (main.go)
