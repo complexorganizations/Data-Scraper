@@ -11,11 +11,10 @@ Lets first use `git` to download this repo
 ```
 git clone https://github.com/complexorganizations/data-scraper.git
 ```
-Than lets configure the scraper, open the `settings.json`
+Lets configure the scraper, open the `sitemap.json`
 ```
 {"Log":false,"JavaScript":false,"Workers":25,"UserAgents":[],"Captcha":[],"Proxy":[]}
 ```
-After configuring the scraper you can copy your scraper rules to `sitemap.json`
 ```
 {"_id":"prajwalkoirala.com","startUrl":["https://www.prajwalkoirala.com"],"selectors":[{"id":"name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1","multiple":false,"regex":"","delay":0},{"id":"picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img","multiple":false,"delay":0}]}
 ```
