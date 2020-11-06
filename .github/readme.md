@@ -33,20 +33,20 @@ You can finally run the scraper.
 - Proxy [HTTP|HTTPS]
 - Docker
 - Logging
-- Captcha ***Coming Soon***
-- Exports [JSON|XML|CSV] ***Coming Soon***
+- Captcha
+- Exports [JSON|XML|CSV]
 
 ---
 ### Q&A
 
 How do i use this?
-- Download the [webscraper](https://webscraper.io/) extension, develop the scraper using the extension, export the scraper json rules after creating the scraper. ***Update: Developing your own solution to generate the sitemap.json***
+- Use the GUI to build the `sitemap.json` and than use the scraper to start scraping.
 
 How many domains can it scrape?
-- This will scrape as many domains as you like. ***NO LIMITS***
+- This will scrape as many domains as you like.
 
 How do i change what it scrapes?
-- You can change what the scraper scrapes using `sitemap.json`
+- You can change what the scraper scrapes by generating new `sitemap.json`
 
 How do i configure the scraper?
 - Open the settings file `settings.json` and change the scraper settings there.
