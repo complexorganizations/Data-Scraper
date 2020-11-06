@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	config     *Config
+	// config     *Config
 	// proxyIndex = 0
 )
 
@@ -96,7 +96,7 @@ func clearCache() {
 // read the settings json
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
-	var settings Config
+	var settings config
 	err = json.Unmarshal(data, &settings)
 	config = &settings
 	if err != nil {
