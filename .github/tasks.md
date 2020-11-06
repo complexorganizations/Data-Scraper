@@ -4,6 +4,5 @@
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
 - [ ] Screenshots
 - [ ] Support JSON|XML|CSV format
-- [ ] Support screenshots
 - [ ] Code Optimization
 - [ ] Code Cleanup
