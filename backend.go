@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	config     *Config
+	config *Config
 	// proxyIndex = 0
 )
 
@@ -50,8 +50,8 @@ type Selectors struct {
 
 // Scraping is struct to Marshal scraping file
 type Scraping struct {
-	StartURL  []string
-	ID        string `json:"_id,omitempty"`
+	StartURL   []string
+	ID         string `json:"_id,omitempty"`
 	Log        bool
 	JavaScript bool
 	Workers    int
@@ -59,7 +59,7 @@ type Scraping struct {
 	UserAgents []string
 	Captcha    []string
 	Proxy      []string
-	Selectors []Selectors
+	Selectors  []Selectors
 }
 
 // WorkerJob struct defination
