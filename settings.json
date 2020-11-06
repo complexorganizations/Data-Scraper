@@ -1,7 +1,7 @@
 {
   "Log": false,
   "JavaScript": false,
-  "Workers": 25,
+  "Workers": 10,
   "Export": "JSON",
   "UserAgents": [],
   "Captcha": [],
