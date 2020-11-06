@@ -56,7 +56,7 @@ type Scraping struct {
 }
 
 // Config setting struct
-type Config struct {
+type config struct {
 	Log        bool
 	JavaScript bool
 	Workers    int
