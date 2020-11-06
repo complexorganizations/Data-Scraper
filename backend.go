@@ -51,7 +51,7 @@ type Selectors struct {
 // Scraping is struct to Marshal scraping file
 type Scraping struct {
 	StartURL   []string
-	ID         string `json:"_id,omitempty"`
+	ID         string
 	Log        bool
 	JavaScript bool
 	Workers    int
