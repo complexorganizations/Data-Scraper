@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	// config     *Config
+	config     *Config
 	// proxyIndex = 0
 )
 
@@ -56,7 +56,7 @@ type Scraping struct {
 }
 
 // Config setting struct
-type config struct {
+type Config struct {
 	Log        bool
 	JavaScript bool
 	Workers    int
@@ -96,7 +96,7 @@ func clearCache() {
 // read the settings json
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
-	var settings config
+	var settings Config
 	err = json.Unmarshal(data, &settings)
 	config = &settings
 	if err != nil {
