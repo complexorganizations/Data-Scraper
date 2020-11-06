@@ -29,7 +29,7 @@ You can finally run the scraper.
 - Unlimited [Crawling|Scraping|Parsing|Screenshot]
 - Distributed
 - Concurrency
-- Dynamic Applications [JavaScript|ASP|AJAX]
+- Dynamic Applications [JavaScript|ASP|AJAX|PHP]
 - Proxy [HTTP|HTTPS]
 - Docker
 - Logging
