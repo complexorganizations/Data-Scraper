@@ -26,7 +26,6 @@ import (
 
 var (
 	config     *Config
-	// proxyIndex = 0
 )
 
 const (
