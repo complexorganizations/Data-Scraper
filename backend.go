@@ -52,11 +52,6 @@ type Selectors struct {
 type Scraping struct {
 	StartURL  []string
 	ID        string `json:"_id,omitempty"`
-	Selectors []Selectors
-}
-
-// Config setting struct
-type Config struct {
 	Log        bool
 	JavaScript bool
 	Workers    int
@@ -64,6 +59,7 @@ type Config struct {
 	UserAgents []string
 	Captcha    []string
 	Proxy      []string
+	Selectors []Selectors
 }
 
 // WorkerJob struct defination
@@ -93,32 +89,13 @@ func clearCache() {
 	}
 }
 
-// read the settings json
-func readSettingsJSON() {
-	data, err := ioutil.ReadFile(settingsConfig)
-	var settings Config
-	err = json.Unmarshal(data, &settings)
-	config = &settings
-	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
-		os.Exit(0)
-	}
-}
-
 // read the scraping json
 func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
 	if err != nil {
-		if config.Log {
+		if Scraping.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -273,13 +250,13 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 func crawlURL(href string) *goquery.Document {
 	var transport *http.Transport
 
-	tls := &tls.Config{
+	tls := &tls.Scraping{
 		InsecureSkipVerify: false,
 	}
 	// if proxy is set use for transport
-	if len(config.Proxy) > 0 {
+	if len(Scraping.Proxy) > 0 {
 
-		proxyString := config.Proxy[0]
+		proxyString := Scraping.Proxy[0]
 
 		proxyURL, _ := url.Parse(proxyString)
 
@@ -300,7 +277,7 @@ func crawlURL(href string) *goquery.Document {
 	response, err := netClient.Get(href)
 
 	if err != nil {
-		if config.Log {
+		if Scraping.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -327,7 +304,7 @@ func toFixedURL(href, baseURL string) string {
 
 	base, err := url.Parse(baseURL)
 	if err != nil {
-		if config.Log {
+		if Scraping.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -386,9 +363,9 @@ func HasElem(s interface{}, elem interface{}) bool {
 func emulateURL(url string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
 
-	if len(config.Proxy) > 0 {
+	if len(Scraping.Proxy) > 0 {
 
-		proxyString := config.Proxy[0]
+		proxyString := Scraping.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
 		// fmt.Println(proxyServer)
 		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
@@ -416,7 +393,7 @@ func emulateURL(url string) *goquery.Document {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
-		if config.Log {
+		if Scraping.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 			defer file.Close()
 			log.SetOutput(file)
@@ -474,7 +451,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 
 		var doc *goquery.Document
 
-		if config.JavaScript {
+		if Scraping.JavaScript {
 			doc = emulateURL(job.startURL)
 		} else {
 			doc = crawlURL(job.startURL)
@@ -550,7 +527,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	results := make(chan WorkerJob, 10)
 	outputChannel := make(chan map[string]interface{})
 	// 3 Workers
-	for x := 1; x <= config.Workers; x++ {
+	for x := 1; x <= Scraping.Workers; x++ {
 		wg.Add(1)
 		go worker(x, jobs, results, &wg)
 	}
@@ -585,7 +562,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					data[job.startURL] = job.linkOutput
 					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
-						if config.Log {
+						if Scraping.Log {
 							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 							defer file.Close()
 							log.SetOutput(file)
