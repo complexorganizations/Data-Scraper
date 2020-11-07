@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	config     *Config
+	config *Config
 )
 
 const (
@@ -269,7 +269,7 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 	return table
 }
 
-func crawlURL(href string) *goquery.Document {
+func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 
 	tls := &tls.Config{
@@ -296,8 +296,22 @@ func crawlURL(href string) *goquery.Document {
 		Transport: transport,
 	}
 
-	response, err := netClient.Get(href)
+	//response, err := netClient.Get(href)
+	req, err := http.NewRequest(http.MethodGet, href, nil)
+	req.Header.Set("User-Agent", userAgent)
+	if err != nil {
+		if config.Log {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+		log.Println(err)
+		os.Exit(0)
+	}
 
+	response, err := netClient.Do(req)
 	if err != nil {
 		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -317,7 +331,6 @@ func crawlURL(href string) *goquery.Document {
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(response.Body)
-
 	return doc
 }
 
@@ -382,7 +395,7 @@ func HasElem(s interface{}, elem interface{}) bool {
 	return false
 }
 
-func emulateURL(url string) *goquery.Document {
+func emulateURL(url, userAgent string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
 
 	if len(config.Proxy) > 0 {
@@ -394,6 +407,8 @@ func emulateURL(url string) *goquery.Document {
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
 	}
+
+	opts = append(opts, chromedp.UserAgent(userAgent))
 
 	// create context
 	bctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -469,74 +484,77 @@ func getURL(urls []string) <-chan string {
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	// fmt.Printf("Worker %d started\n", workerID)
-	for job := range jobs {
+	for _, userAgent := range config.UserAgents {
 
-		var doc *goquery.Document
+		for job := range jobs {
 
-		if config.JavaScript {
-			doc = emulateURL(job.startURL)
-		} else {
-			doc = crawlURL(job.startURL)
-		}
+			var doc *goquery.Document
 
-		if doc == nil {
-			continue
-		}
-		fmt.Println("URL:", job.startURL)
-		linkOutput := make(map[string]interface{})
-		for _, selector := range job.siteMap.Selectors {
-			if job.parent == selector.ParentSelectors[0] {
-				if selector.Type == "SelectorText" {
-					resultText := SelectorText(doc, &selector)
-					if len(resultText) != 0 {
-						if len(resultText) == 1 {
-							linkOutput[selector.ID] = resultText[0]
-						} else {
-							linkOutput[selector.ID] = resultText
-						}
-					}
-				} else if selector.Type == "SelectorLink" {
-					links := SelectorLink(doc, &selector, job.startURL)
-					// fmt.Printf("Links = %v", links)
-					if HasElem(selector.ParentSelectors, selector.ID) {
-						for _, link := range links {
-							if !HasElem(job.siteMap.StartURL, link) {
-								job.siteMap.StartURL = append(job.siteMap.StartURL, link)
+			if config.JavaScript {
+				doc = emulateURL(job.startURL, userAgent)
+			} else {
+				doc = crawlURL(job.startURL, userAgent)
+			}
+
+			if doc == nil {
+				continue
+			}
+			fmt.Println("URL:", job.startURL)
+			linkOutput := make(map[string]interface{})
+			for _, selector := range job.siteMap.Selectors {
+				if job.parent == selector.ParentSelectors[0] {
+					if selector.Type == "SelectorText" {
+						resultText := SelectorText(doc, &selector)
+						if len(resultText) != 0 {
+							if len(resultText) == 1 {
+								linkOutput[selector.ID] = resultText[0]
+							} else {
+								linkOutput[selector.ID] = resultText
 							}
 						}
-					} else {
-						childSelector := getChildSelector(&selector)
-						if childSelector == true {
-							linkOutput[selector.ID] = links
+					} else if selector.Type == "SelectorLink" {
+						links := SelectorLink(doc, &selector, job.startURL)
+						// fmt.Printf("Links = %v", links)
+						if HasElem(selector.ParentSelectors, selector.ID) {
+							for _, link := range links {
+								if !HasElem(job.siteMap.StartURL, link) {
+									job.siteMap.StartURL = append(job.siteMap.StartURL, link)
+								}
+							}
 						} else {
-							newSiteMap := getSiteMap(links, &selector)
-							result := scraper(newSiteMap, selector.ID)
-							linkOutput[selector.ID] = result
+							childSelector := getChildSelector(&selector)
+							if childSelector == true {
+								linkOutput[selector.ID] = links
+							} else {
+								newSiteMap := getSiteMap(links, &selector)
+								result := scraper(newSiteMap, selector.ID)
+								linkOutput[selector.ID] = result
+							}
 						}
-					}
-				} else if selector.Type == "SelectorElementAttribute" {
-					resultText := SelectorElementAttribute(doc, &selector)
-					linkOutput[selector.ID] = resultText
-				} else if selector.Type == "SelectorImage" {
-					resultText := SelectorImage(doc, &selector)
-					if len(resultText) != 0 {
-						if len(resultText) == 1 {
-							linkOutput[selector.ID] = resultText[0]
-						} else {
-							linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorElementAttribute" {
+						resultText := SelectorElementAttribute(doc, &selector)
+						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorImage" {
+						resultText := SelectorImage(doc, &selector)
+						if len(resultText) != 0 {
+							if len(resultText) == 1 {
+								linkOutput[selector.ID] = resultText[0]
+							} else {
+								linkOutput[selector.ID] = resultText
+							}
 						}
+					} else if selector.Type == "SelectorElement" {
+						resultText := SelectorElement(doc, &selector, job.startURL)
+						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorTable" {
+						resultText := SelectorTable(doc, &selector)
+						linkOutput[selector.ID] = resultText
 					}
-				} else if selector.Type == "SelectorElement" {
-					resultText := SelectorElement(doc, &selector, job.startURL)
-					linkOutput[selector.ID] = resultText
-				} else if selector.Type == "SelectorTable" {
-					resultText := SelectorTable(doc, &selector)
-					linkOutput[selector.ID] = resultText
 				}
 			}
+			job.linkOutput = linkOutput
+			results <- job
 		}
-		job.linkOutput = linkOutput
-		results <- job
 	}
 	//fmt.Println("Stopped Worker:", workerID)
 }
