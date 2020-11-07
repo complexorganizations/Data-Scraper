@@ -11,10 +11,11 @@ Lets first use `git` to download this repo
 ```
 git clone https://github.com/complexorganizations/data-scraper.git
 ```
-Lets configure the scraper, open the `sitemap.json`
+Lets generate the config.
 ```
-{"Log":false,"JavaScript":false,"Workers":25,"UserAgents":[],"Captcha":[],"Proxy":[]}
+./data-scraper
 ```
+Here is a sample config, either build your own or use this one as an example. `sitemap.json`
 ```
 {"_id":"prajwalkoirala.com","startUrl":["https://www.prajwalkoirala.com"],"selectors":[{"id":"name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1","multiple":false,"regex":"","delay":0},{"id":"picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img","multiple":false,"delay":0}]}
 ```
@@ -48,7 +49,7 @@ How do i change what it scrapes?
 - You can change what the scraper scrapes by generating new `sitemap.json`
 
 How do i configure the scraper?
-- Open the settings file `sitemap.json` and change the scraper settings there.
+- Open the scraper and generate the `sitemap.json` file. 
 
 Can this scrape apps written in JavaScript?
 - Yes, this can scrape apps written in JS. ***Google Chrome (Required)***
@@ -61,6 +62,9 @@ Why is this app so minimalist?
 
 Can this solve reCAPTCHA?
 - Yeah, recaptcha can be solved using Google cloud voice, vision API's.
+
+Should i manually try and change the `sitemap.json` file?
+- No, You should not.
 
 ---
 ### Concurrency
