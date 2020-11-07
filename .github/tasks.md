@@ -1,8 +1,7 @@
-- [ ] Support custom user agents
 - [ ] Make a URL validator, if the url isn't valid than don't scrape the URL
 - [ ] Support JSON|XML|CSV format
+- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
 - [ ] Create a sitemap generator
 - [ ] Screenshots
-- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
 - [ ] Code Optimization
 - [ ] Code Cleanup
