@@ -59,6 +59,9 @@ Why not use a browser extension to scrape a website?
 Why is this app so minimalist?
 - Minimalist but extremely strong, this app is designed to run in the background.
 
+Can this solve reCAPTCHA?
+- Yeah, recaptcha can be solved using Google cloud voice, vision API's.
+
 ---
 ### Concurrency
 Most modern apps and system have rate limits.
