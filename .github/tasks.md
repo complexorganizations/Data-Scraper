@@ -1,5 +1,5 @@
 - [ ] Support custom user agents
-- [ ] Make a url validator, if the url isnt valid than don't scrape the url
+- [ ] Make a url validator, if the url isn't valid than don't scrape the url
 - [ ] Support JSON|XML|CSV format
 - [ ] Create a sitemap generator
 - [ ] Screenshots
