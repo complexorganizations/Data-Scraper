@@ -11,7 +11,7 @@ Lets first use `git` to download this repo
 ```
 git clone https://github.com/complexorganizations/data-scraper.git
 ```
-Lets generate the config.
+Lets generate the sitemap & config. `sitemap.json`
 ```
 ./data-scraper
 ```
@@ -65,6 +65,9 @@ Can this solve reCAPTCHA?
 
 Should i manually try and change the `sitemap.json` file?
 - No, You should not.
+
+How can i open the GUI again?
+- In the config file `sitemap.json`, ONLY CHANGE `"Gui": false` to `"Gui": true`
 
 ---
 ### Concurrency
