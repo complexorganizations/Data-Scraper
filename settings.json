@@ -3,7 +3,9 @@
   "JavaScript": false,
   "Workers": 10,
   "Export": "JSON",
-  "UserAgents": [],
+  "UserAgents": [
+    "Mozilla/5.0 (X11; CrOS x86_64 13421.73.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.112 Safari/537.36"
+  ],
   "Captcha": [],
   "Proxy": []
 }
