@@ -74,7 +74,7 @@ type WorkerJob struct {
 	linkOutput map[string]interface{}
 }
 
-// To function properly, a lot of memory is needed to clean up files.
+// All the device memory is needed, so all the temp files are removed.
 func clearCache() {
 	operatingSystem := runtime.GOOS
 	switch operatingSystem {
@@ -92,7 +92,8 @@ func clearCache() {
 	}
 }
 
-// read the settings json
+// Reading the settings json
+// Future Update: Merge all of the Jsons into one.
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
 	var settings Config
@@ -111,7 +112,6 @@ func readSettingsJSON() {
 	}
 }
 
-// read the scraping json
 func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
@@ -269,6 +269,7 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 	return table
 }
 
+// This is so golang can scrape the app.
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 
