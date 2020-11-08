@@ -27,6 +27,7 @@ import (
 
 var (
 	config       *Config
+	outputFile          = "output.json"
 	IP           string = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
 	URLSchema    string = `((ftp|tcp|udp|wss?|https?):\/\/)`
 	URLUsername  string = `(\S+(:\S*)?@)`
@@ -40,7 +41,6 @@ var (
 const (
 	settingsConfig = "settings.json"
 	scrapingConfig = "sitemap.json"
-	outputFile     = "output.json"
 	logFile        = "logs.log"
 )
 
@@ -650,8 +650,6 @@ func validURL(str string) bool {
 
 	strTemp := str
 	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
-		// support no indicated urlscheme but with colon for port number
-		// http:// is appended so url.Parse will succeed, strTemp used so it does not impact rxURL.MatchString
 		strTemp = "http://" + str
 	}
 	u, err := url.Parse(strTemp)
@@ -667,11 +665,26 @@ func validURL(str string) bool {
 	return regexURL.MatchString(str)
 }
 
+//outputResult set output file name and temp output file basend on settings.json
+func outputResult() {
+	userFormat := strings.ToLower(config.Export)
+	var allowedFormat = map[string]bool{
+		"csv":  true,
+		"xml":  true,
+		"json": true,
+	}
+
+	if allowedFormat[userFormat] {
+		outputFile = fmt.Sprintf("output.%s", userFormat)
+	}
+
+	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
+}
+
 func main() {
 	clearCache()
-	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
 	siteMap := readSiteMap()
 	readSettingsJSON()
-
+	outputResult()
 	_ = scraper(siteMap, "_root")
 }
