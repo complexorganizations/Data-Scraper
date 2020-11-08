@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/csv"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -598,10 +600,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
-					var data map[string]interface{}
-					err = json.Unmarshal(out, &data)
-					data[job.startURL] = job.linkOutput
-					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
 						if config.Log {
 							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -613,7 +611,71 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						log.Println(err)
 						os.Exit(0)
 					}
-					_ = ioutil.WriteFile(outputFile, file, 0644)
+
+					var data map[string]interface{}
+					err = json.Unmarshal(out, &data)
+					data[job.startURL] = job.linkOutput
+
+					switch config.Export {
+					case "xml":
+						output, err := xml.MarshalIndent(data, "", " ")
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+
+						_ = ioutil.WriteFile(outputFile, output, 0644)
+
+					case "csv":
+						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+
+						csvWriter := csv.NewWriter(csvFile)
+						rows := [][]string{}
+
+						for i, v := range data {
+							rows = append(rows, []string{i, fmt.Sprint(v)})
+						}
+
+						for _, row := range rows {
+							_ = csvWriter.Write(row)
+						}
+
+						csvWriter.Flush()
+
+						csvFile.Close()
+					default:
+						output, err := json.MarshalIndent(data, "", " ")
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+						_ = ioutil.WriteFile(outputFile, output, 0644)
+					}
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
 				}
