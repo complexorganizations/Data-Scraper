@@ -309,7 +309,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		log.Println(err)
 		os.Exit(0)
 	}
-	
+
 	if len(userAgent) > 0 {
 		req.Header.Set("User-Agent", userAgent)
 	}
@@ -490,13 +490,13 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 	defer wg.Done()
 	// fmt.Printf("Worker %d started\n", workerID)
 	userAgents := config.UserAgents
-	 
+
 	if len(userAgents) == 0 {
-		userAgents = append (userAgents,"")
+		userAgents = append(userAgents, "")
 	}
 
-	for count :=0; count < len(userAgents); count++ {
-		
+	for count := 0; count < len(userAgents); count++ {
+
 		userAgent := userAgents[count]
 
 		for job := range jobs {
