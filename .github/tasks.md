@@ -1,7 +1,7 @@
-- [ ] Make a URL validator, if the url isn't valid than don't scrape the URL
-- [ ] Support JSON|XML|CSV format
-- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to try and solve it
-- [ ] Create a sitemap generator
-- [ ] Screenshots
+- [ ] Use the func `url.ParseRequestURI` to validate all URL before going to them.
+- [ ] support JSON|XML|CSV format as outputs.
+- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it.
+- [ ] Create a sitemap generator GUI.
+- [ ] Support Screenshots, If the user says true on a screenshot element than take a screenshot.
 - [ ] Code Optimization
 - [ ] Code Cleanup
