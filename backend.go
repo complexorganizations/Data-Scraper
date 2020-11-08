@@ -88,7 +88,7 @@ func clearCache() {
 		os.RemoveAll(os.TempDir())
 		debug.FreeOSMemory()
 	default:
-		fmt.Println("Error: The func is not supported in your OS.")
+		fmt.Println("Error: Temporary files can't be deleted.")
 	}
 }
 
