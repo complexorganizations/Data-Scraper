@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"regexp"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -24,16 +23,8 @@ import (
 )
 
 var (
-	config       *Config
-	outputFile          = "output.json"
-	IP           string = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
-	URLSchema    string = `((ftp|tcp|udp|wss?|https?):\/\/)`
-	URLUsername  string = `(\S+(:\S*)?@)`
-	URLPath      string = `((\/|\?|#)[^\s]*)`
-	URLPort      string = `(:(\d{1,5}))`
-	URLIP        string = `([1-9]\d?|1\d\d|2[01]\d|22[0-3]|24\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-5]))`
-	URLSubdomain string = `((www\.)|([a-zA-Z0-9]+([-_\.]?[a-zA-Z0-9])*[a-zA-Z0-9]\.[a-zA-Z0-9]+))`
-	URL                 = `^` + URLSchema + `?` + URLUsername + `?` + `((` + URLIP + `|(\[` + IP + `\])|(([a-zA-Z0-9]([a-zA-Z0-9-_]+)?[a-zA-Z0-9]([-\.][a-zA-Z0-9]+)*)|(` + URLSubdomain + `?))?(([a-zA-Z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-zA-Z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-zA-Z\x{00a1}-\x{ffff}]{1,}))?))\.?` + URLPort + `?` + URLPath + `?$`
+	config     *Config
+	outputFile = "output.json"
 )
 
 const (
@@ -639,31 +630,25 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	return output
 }
 
-func validURL(str string) bool {
-	regexURL := regexp.MustCompile(URL)
-
-	if str == "" {
-		return false
-	}
-
-	strTemp := str
-	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
-		strTemp = "http://" + str
-	}
-	u, err := url.Parse(strTemp)
+func validURL(uri string) bool {
+	_, err := url.ParseRequestURI(uri)
 	if err != nil {
+		if config.Log {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+			os.Exit(0)
+		}
+		log.Println(err)
+		os.Exit(0)
 		return false
 	}
-	if strings.HasPrefix(u.Host, ".") {
-		return false
-	}
-	if u.Host == "" && (u.Path != "" && !strings.Contains(u.Path, ".")) {
-		return false
-	}
-	return regexURL.MatchString(str)
+
+	return true
 }
 
-//outputResult set output file name and temp output file basend on settings.json
+//outputResult set output file name and temp output file based on settings.json
 func outputResult() {
 	userFormat := strings.ToLower(config.Export)
 	var allowedFormat = map[string]bool{
