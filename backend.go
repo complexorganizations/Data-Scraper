@@ -297,9 +297,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		Transport: transport,
 	}
 
-	//response, err := netClient.Get(href)
 	req, err := http.NewRequest(http.MethodGet, href, nil)
-	req.Header.Set("User-Agent", userAgent)
 	if err != nil {
 		if config.Log {
 			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -310,6 +308,10 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		}
 		log.Println(err)
 		os.Exit(0)
+	}
+	
+	if len(userAgent) > 0 {
+		req.Header.Set("User-Agent", userAgent)
 	}
 
 	response, err := netClient.Do(req)
@@ -409,7 +411,9 @@ func emulateURL(url, userAgent string) *goquery.Document {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
 	}
 
-	opts = append(opts, chromedp.UserAgent(userAgent))
+	if len(userAgent) > 0 {
+		opts = append(opts, chromedp.UserAgent(userAgent))
+	}
 
 	// create context
 	bctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -485,7 +489,15 @@ func getURL(urls []string) <-chan string {
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	// fmt.Printf("Worker %d started\n", workerID)
-	for _, userAgent := range config.UserAgents {
+	userAgents := config.UserAgents
+	 
+	if len(userAgents) == 0 {
+		userAgents = append (userAgents,"")
+	}
+
+	for count :=0; count < len(userAgents); count++ {
+		
+		userAgent := userAgents[count]
 
 		for job := range jobs {
 
