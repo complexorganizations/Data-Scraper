@@ -61,7 +61,7 @@ type Config struct {
 	Workers    int
 	Export     string
 	UserAgents []string
-	Captcha    []string
+	Captcha    string
 	Proxy      []string
 }
 
