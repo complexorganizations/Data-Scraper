@@ -25,7 +25,8 @@ import (
 )
 
 var (
-	config *Config
+	config     *Config
+	outputFile = "output.json"
 )
 
 const (
