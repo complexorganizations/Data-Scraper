@@ -5,6 +5,6 @@
   "Workers": 10,
   "Export": "JSON",
   "UserAgents": [],
-  "Captcha": "YOUR_API_KEY",
+  "Captcha": [],
   "Proxy": []
 }
