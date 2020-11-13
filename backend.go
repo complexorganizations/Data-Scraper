@@ -728,9 +728,9 @@ func validURL(uri string) bool {
 func outputResult() {
 	userFormat := strings.ToLower(config.Export)
 	var allowedFormat = map[string]bool{
-		"csv":  true,
-		"xml":  true,
-		"json": true,
+		"CSV":  true,
+		"XML":  true,
+		"JSON": true,
 	}
 
 	if allowedFormat[userFormat] {
