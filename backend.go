@@ -631,7 +631,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					data[job.startURL] = job.linkOutput
 
 					switch config.Export {
-					case "xml":
+					case "XML":
 						output, err := xml.MarshalIndent(data, "", " ")
 						if err != nil {
 							if config.Log {
@@ -647,7 +647,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 
 						_ = ioutil.WriteFile(outputFile, output, 0644)
 
-					case "csv":
+					case "CSV":
 						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
 							if config.Log {
@@ -675,7 +675,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						csvWriter.Flush()
 
 						csvFile.Close()
-					case "json":
+					case "JSON":
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
 							if config.Log {
