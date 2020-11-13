@@ -19,5 +19,5 @@ jobs:
         run: go run .
       - name: Build Test
         run: go build -v .
-      - name: Run the app
-        run: go run .
+      - name: Run the build
+        run: ./data-scraper
