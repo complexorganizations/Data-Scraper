@@ -26,7 +26,7 @@ import (
 
 var (
 	config     *Config
-	outputFile = "output.json"
+	outputFile = "output"
 )
 
 const (
@@ -675,7 +675,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						csvWriter.Flush()
 
 						csvFile.Close()
-					default:
+					case "json":
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
 							if config.Log {
@@ -689,6 +689,8 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 							os.Exit(0)
 						}
 						_ = ioutil.WriteFile(outputFile, output, 0644)
+					default:
+						fmt.Println("Please choose a output format")
 					}
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
