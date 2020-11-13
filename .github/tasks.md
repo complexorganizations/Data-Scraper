@@ -2,5 +2,5 @@
 - [x] support JSON|XML|CSV format as outputs.
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it.
 - [ ] Create a sitemap generator GUI.
-- [ ] Support Screenshots, If the user says true on a screenshot element than take a screenshot.
 - [ ] Rewrite the entire app.
+- [ ] Support Screenshots, If the user says true on a screenshot element than take a screenshot.
