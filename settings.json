@@ -3,8 +3,8 @@
   "Log": false,
   "JavaScript": false,
   "Workers": 10,
-  "Export": "JSON",
+  "Export": "",
   "UserAgents": [],
-  "Captcha": "YOUR_API_KEY",
+  "Captcha": "",
   "Proxy": []
 }
