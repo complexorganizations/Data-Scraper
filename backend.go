@@ -62,7 +62,7 @@ type Config struct {
 	Workers    int
 	Export     string
 	UserAgents []string
-	Captcha    []string
+	Captcha    string
 	Proxy      []string
 }
 
@@ -113,7 +113,6 @@ func readSettingsJSON() {
 	}
 }
 
-// read the scraping json
 func readSiteMap() *Scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
 	var scrape Scraping
@@ -271,6 +270,7 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 	return table
 }
 
+// This is so golang can scrape the app.
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 
@@ -595,7 +595,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if !validURL(startURL) {
 					continue
 				}
-
 				workerjob := WorkerJob{
 					parent:   parent,
 					startURL: startURL,
@@ -724,7 +723,7 @@ func validURL(uri string) bool {
 	return true
 }
 
-//outputResult set output file name and temp output file based on settings.json
+// outputResult set output file name and temp output file based on settings.json
 func outputResult() {
 	userFormat := strings.ToLower(config.Export)
 	var allowedFormat = map[string]bool{
