@@ -11,10 +11,6 @@ Lets first use `git` to download this repo
 ```
 git clone https://github.com/complexorganizations/data-scraper.git
 ```
-Lets generate the sitemap & config. `sitemap.json`
-```
-./data-scraper
-```
 Here is a sample config, either build your own or use this one as an example. `sitemap.json`
 ```
 {"_id":"prajwalkoirala.com","startUrl":["https://www.prajwalkoirala.com"],"selectors":[{"id":"name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1","multiple":false,"regex":"","delay":0},{"id":"picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img","multiple":false,"delay":0}]}
