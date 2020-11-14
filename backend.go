@@ -480,8 +480,6 @@ func getURL(urls []string) <-chan string {
 				c <- urlLink
 			}
 		}
-		// close(c) sets the status of the channel c to false
-		// and is needed by the for/range loop to end
 		close(c)
 	}()
 	return c
