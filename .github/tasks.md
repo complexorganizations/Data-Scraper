@@ -1,5 +1,5 @@
 - [x] Use the func `url.ParseRequestURI` to validate all URL before going to them.
-- [ ] support JSON|XML|CSV format as outputs.
+- [x] support JSON|XML|CSV format as outputs.
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it.
 - [ ] Create a sitemap generator GUI.
 - [ ] Rewrite the entire app.
