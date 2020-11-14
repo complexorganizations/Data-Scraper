@@ -592,7 +592,9 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		if fc != nil {
 			for startURL := range fc {
 				// fmt.Println("URL:", startURL)
-
+				if !validURL(startURL) {
+					continue
+				}
 				workerjob := WorkerJob{
 					parent:   parent,
 					startURL: startURL,
@@ -641,6 +643,22 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	close(results)
 	output = <-outputChannel
 	return output
+}
+
+func validURL(uri string) bool {
+	_, err := url.ParseRequestURI(uri)
+	if err != nil {
+		if config.Log {
+			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			defer file.Close()
+			log.SetOutput(file)
+			log.Println(err)
+		}
+		log.Println(err)
+		return false
+	}
+
+	return true
 }
 
 func main() {
