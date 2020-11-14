@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"crypto/tls"
-	// "encoding/csv"
+	"encoding/csv"
 	"encoding/json"
-	// "encoding/xml"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -26,7 +26,7 @@ import (
 
 var (
 	config     *Config
-	outputFile = "output.json"
+	outputFile = "output"
 )
 
 const (
@@ -613,10 +613,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
-					var data map[string]interface{}
-					err = json.Unmarshal(out, &data)
-					data[job.startURL] = job.linkOutput
-					file, err := json.MarshalIndent(data, "", " ")
 					if err != nil {
 						if config.Log {
 							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -628,7 +624,73 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						log.Println(err)
 						os.Exit(0)
 					}
-					_ = ioutil.WriteFile(outputFile, file, 0644)
+
+					var data map[string]interface{}
+					err = json.Unmarshal(out, &data)
+					data[job.startURL] = job.linkOutput
+
+					switch config.Export {
+					case "xml":
+						output, err := xml.MarshalIndent(data, "", " ")
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+
+						_ = ioutil.WriteFile(outputFile, output, 0644)
+
+					case "csv":
+						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+
+						csvWriter := csv.NewWriter(csvFile)
+						rows := [][]string{}
+
+						for i, v := range data {
+							rows = append(rows, []string{i, fmt.Sprint(v)})
+						}
+
+						for _, row := range rows {
+							_ = csvWriter.Write(row)
+						}
+
+						csvWriter.Flush()
+
+						csvFile.Close()
+					case "json":
+						output, err := json.MarshalIndent(data, "", " ")
+						if err != nil {
+							if config.Log {
+								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+								defer file.Close()
+								log.SetOutput(file)
+								log.Println(err)
+								os.Exit(0)
+							}
+							log.Println(err)
+							os.Exit(0)
+						}
+						_ = ioutil.WriteFile(outputFile, output, 0644)
+					default:
+						fmt.Println("Error: Please choose a output format.")
+					}
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
 				}
@@ -661,11 +723,26 @@ func validURL(uri string) bool {
 	return true
 }
 
+// outputResult set output file name and temp output file based on settings.json
+func outputResult() {
+	userFormat := strings.ToLower(config.Export)
+	var allowedFormat = map[string]bool{
+		"csv":  true,
+		"xml":  true,
+		"json": true,
+	}
+
+	if allowedFormat[userFormat] {
+		outputFile = fmt.Sprintf("output.%s", userFormat)
+	}
+
+	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
+}
+
 func main() {
 	clearCache()
-	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
 	siteMap := readSiteMap()
 	readSettingsJSON()
-
+	outputResult()
 	_ = scraper(siteMap, "_root")
 }
