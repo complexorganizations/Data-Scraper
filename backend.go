@@ -367,7 +367,7 @@ func getSiteMap(startURL []string, selector *Selectors) *Scraping {
 
 func getChildSelector(selector *Selectors) bool {
 	baseSiteMap := readSiteMap()
-	var count int = 0
+	count := 0
 	for _, childSelector := range baseSiteMap.Selectors {
 		if selector.ID == childSelector.ParentSelectors[0] {
 			count++
@@ -717,7 +717,7 @@ func validURL(uri string) bool {
 // outputResult set output file name and temp output file based on settings.json
 func outputResult() {
 	userFormat := strings.ToLower(config.Export)
-	var allowedFormat = map[string]bool{
+	allowedFormat := map[string]bool{
 		"csv":  true,
 		"xml":  true,
 		"json": true,
