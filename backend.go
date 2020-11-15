@@ -95,7 +95,6 @@ func logErrors(error error) {
 		defer file.Close()
 		log.SetOutput(file)
 		log.Println(err)
-		os.Exit(0)
 	}
 }
 
@@ -569,14 +568,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
-						if config.Log {
-							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-							defer file.Close()
-							log.SetOutput(file)
-							log.Println(err)
-							os.Exit(0)
-						}
-						log.Println(err)
+						logErrors(err)
 						os.Exit(0)
 					}
 
@@ -588,14 +580,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					case "xml":
 						output, err := xml.MarshalIndent(data, "", " ")
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logErrors(err)
 							os.Exit(0)
 						}
 
@@ -603,14 +588,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					case "csv":
 						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logErrors(err)
 							os.Exit(0)
 						}
 
@@ -631,14 +609,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					case "json":
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logErrors(err)
 							os.Exit(0)
 						}
 						_ = ioutil.WriteFile(outputFile, output, 0644)
