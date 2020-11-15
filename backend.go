@@ -213,7 +213,6 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 			return false
 		}
 		return true
-
 	})
 	return elementoutputList
 }
@@ -256,7 +255,6 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 	})
 	table["header"] = headings
 	table["rows"] = rows
-
 	return table
 }
 
@@ -269,11 +267,8 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	}
 	// if proxy is set use for transport
 	if len(config.Proxy) > 0 {
-
 		proxyString := config.Proxy[0]
-
 		proxyURL, _ := url.Parse(proxyString)
-
 		transport = &http.Transport{
 			TLSClientConfig: tlsConfig,
 			Proxy:           http.ProxyURL(proxyURL),
@@ -325,7 +320,6 @@ func toFixedURL(href, baseURL string) string {
 }
 
 func getSiteMap(startURL []string, selector *Selectors) *Scraping {
-
 	baseSiteMap := readSiteMap()
 	newSiteMap := new(Scraping)
 	newSiteMap.ID = selector.ID
@@ -366,7 +360,6 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
 
 	if len(config.Proxy) > 0 {
-
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
 		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
@@ -430,7 +423,6 @@ func getURL(urls []string) <-chan string {
 				for x := int1; x <= int2; x++ {
 					c <- fmt.Sprintf("%s%d", val2, x)
 				}
-
 			} else {
 				c <- urlLink
 			}
@@ -449,13 +441,9 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 	}
 
 	for count := 0; count < len(userAgents); count++ {
-
 		userAgent := userAgents[count]
-
 		for job := range jobs {
-
 			var doc *goquery.Document
-
 			if config.JavaScript {
 				doc = emulateURL(job.startURL, userAgent)
 			} else {
@@ -548,7 +536,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					startURL: startURL,
 					siteMap:  siteMap,
 				}
-
 				jobs <- workerjob
 			}
 			close(jobs)
