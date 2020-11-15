@@ -81,13 +81,10 @@ func clearCache() {
 	switch operatingSystem {
 	case "windows":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	case "darwin":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	case "linux":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	default:
 		fmt.Println("Error: Temporary files can't be deleted.")
 	}
