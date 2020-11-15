@@ -14,7 +14,6 @@ import (
 	"os"
 	"reflect"
 	"runtime"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -66,7 +65,7 @@ type Config struct {
 	Proxy      []string
 }
 
-// WorkerJob struct defination
+// WorkerJob struct definition
 type WorkerJob struct {
 	startURL string
 	parent   string
@@ -81,15 +80,22 @@ func clearCache() {
 	switch operatingSystem {
 	case "windows":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	case "darwin":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	case "linux":
 		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
 	default:
 		fmt.Println("Error: Temporary files can't be deleted.")
+	}
+}
+
+func logErrors(error error) {
+	if config.Log {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		defer file.Close()
+		log.SetOutput(file)
+		log.Println(err)
+		os.Exit(0)
 	}
 }
 
@@ -101,14 +107,7 @@ func readSettingsJSON() {
 	err = json.Unmarshal(data, &settings)
 	config = &settings
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 }
@@ -118,14 +117,7 @@ func readSiteMap() *Scraping {
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 	return &scrape
@@ -300,14 +292,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 
 	req, err := http.NewRequest(http.MethodGet, href, nil)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 
@@ -317,14 +302,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 
 	response, err := netClient.Do(req)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 
@@ -340,14 +318,7 @@ func toFixedURL(href, baseURL string) string {
 
 	base, err := url.Parse(baseURL)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 	toFixedURI := base.ResolveReference(uri)
@@ -430,14 +401,7 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logErrors(err)
 		os.Exit(0)
 	}
 
