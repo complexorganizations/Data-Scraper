@@ -66,7 +66,7 @@ type Config struct {
 	Proxy      []string
 }
 
-// WorkerJob struct defination
+// WorkerJob struct definition
 type WorkerJob struct {
 	startURL string
 	parent   string
@@ -75,18 +75,35 @@ type WorkerJob struct {
 	linkOutput map[string]interface{}
 }
 
+func logError(error error) {
+	if config.Log {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		log.SetOutput(file)
+		if err != nil {
+			fmt.Println("Cannot open log file, printing to stderr:")
+			log.SetOutput(os.Stderr)
+		}
+
+		log.Println(error)
+
+		if err == nil {
+			err = file.Close()
+			if err != nil {
+				_, _ = fmt.Fprintln(os.Stderr, "Cannot close log file")
+			}
+		}
+	}
+}
+
 // All the device memory is needed, so all the temp files are removed.
 func clearCache() {
 	operatingSystem := runtime.GOOS
 	switch operatingSystem {
-	case "windows":
-		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
-	case "darwin":
-		os.RemoveAll(os.TempDir())
-		debug.FreeOSMemory()
-	case "linux":
-		os.RemoveAll(os.TempDir())
+	case "windows", "darwin", "linux":
+		err := os.RemoveAll(os.TempDir())
+		if err != nil {
+			logError(err)
+		}
 		debug.FreeOSMemory()
 	default:
 		fmt.Println("Error: Temporary files can't be deleted.")
@@ -94,21 +111,14 @@ func clearCache() {
 }
 
 // Reading the settings json
-// Future Update: Merge all of the Jsons into one.
+// TODO: Merge all of the Jsons into one.
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
 	var settings Config
 	err = json.Unmarshal(data, &settings)
 	config = &settings
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 }
@@ -118,14 +128,7 @@ func readSiteMap() *Scraping {
 	var scrape Scraping
 	err = json.Unmarshal(data, &scrape)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 	return &scrape
@@ -274,9 +277,10 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 
-	tls := &tls.Config{
+	tlsConfig := &tls.Config{
 		InsecureSkipVerify: false,
 	}
+
 	// if proxy is set use for transport
 	if len(config.Proxy) > 0 {
 
@@ -285,12 +289,12 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		proxyURL, _ := url.Parse(proxyString)
 
 		transport = &http.Transport{
-			TLSClientConfig: tls,
+			TLSClientConfig: tlsConfig,
 			Proxy:           http.ProxyURL(proxyURL),
 		}
 	} else {
 		transport = &http.Transport{
-			TLSClientConfig: tls,
+			TLSClientConfig: tlsConfig,
 		}
 	}
 
@@ -300,14 +304,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 
 	req, err := http.NewRequest(http.MethodGet, href, nil)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 
@@ -317,21 +314,17 @@ func crawlURL(href, userAgent string) *goquery.Document {
 
 	response, err := netClient.Do(req)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 
-	defer response.Body.Close()
-
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(response.Body)
+
+	err = response.Body.Close()
+	if err != nil {
+		logError(err)
+	}
 	return doc
 }
 
@@ -340,14 +333,7 @@ func toFixedURL(href, baseURL string) string {
 
 	base, err := url.Parse(baseURL)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 	toFixedURI := base.ResolveReference(uri)
@@ -430,14 +416,7 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-			os.Exit(0)
-		}
-		log.Println(err)
+		logError(err)
 		os.Exit(0)
 	}
 
@@ -606,14 +585,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if job.parent == "_root" {
 					out, err := ioutil.ReadFile(outputFile)
 					if err != nil {
-						if config.Log {
-							file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-							defer file.Close()
-							log.SetOutput(file)
-							log.Println(err)
-							os.Exit(0)
-						}
-						log.Println(err)
+						logError(err)
 						os.Exit(0)
 					}
 
@@ -625,14 +597,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					case "xml":
 						output, err := xml.MarshalIndent(data, "", " ")
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logError(err)
 							os.Exit(0)
 						}
 
@@ -640,14 +605,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					case "csv":
 						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logError(err)
 							os.Exit(0)
 						}
 
@@ -664,23 +622,19 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 
 						csvWriter.Flush()
 
-						csvFile.Close()
+						err = csvFile.Close()
+						if err != nil {
+							logError(err)
+						}
 					case "json":
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
-							if config.Log {
-								file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-								defer file.Close()
-								log.SetOutput(file)
-								log.Println(err)
-								os.Exit(0)
-							}
-							log.Println(err)
+							logError(err)
 							os.Exit(0)
 						}
 						_ = ioutil.WriteFile(outputFile, output, 0644)
 					default:
-						fmt.Println("Error: Please choose a output format.")
+						fmt.Println("Error: Please choose an output format.")
 					}
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
@@ -701,13 +655,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 func validURL(uri string) bool {
 	_, err := url.ParseRequestURI(uri)
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-		}
-		log.Println(err)
+		logError(err)
 		return false
 	}
 
@@ -730,9 +678,9 @@ func outputResult() {
 }
 
 func main() {
+	readSettingsJSON()
 	clearCache()
 	siteMap := readSiteMap()
-	readSettingsJSON()
 	outputResult()
 	_ = scraper(siteMap, "_root")
 }
