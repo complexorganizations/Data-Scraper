@@ -89,6 +89,7 @@ func clearCache() {
 	}
 }
 
+// log all errors here.
 func logErrors(error error) {
 	if config.Log {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -264,7 +265,7 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 
-	tls := &tls.Config{
+	tlsConfig := &tls.Config{
 		InsecureSkipVerify: false,
 	}
 	// if proxy is set use for transport
@@ -275,12 +276,12 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		proxyURL, _ := url.Parse(proxyString)
 
 		transport = &http.Transport{
-			TLSClientConfig: tls,
+			TLSClientConfig: tlsConfig,
 			Proxy:           http.ProxyURL(proxyURL),
 		}
 	} else {
 		transport = &http.Transport{
-			TLSClientConfig: tls,
+			TLSClientConfig: tlsConfig,
 		}
 	}
 
