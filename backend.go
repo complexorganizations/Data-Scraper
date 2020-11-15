@@ -189,7 +189,6 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 		for _, elementSelector := range baseSiteMap.Selectors {
 			if selector.ID == elementSelector.ParentSelectors[0] {
 				if elementSelector.Type == "SelectorText" {
-					// resultText := SelectorText(s, elementSelector)
 					resultText := s.Find(elementSelector.Selector).Text()
 					elementoutput[elementSelector.ID] = resultText
 				} else if elementSelector.Type == "SelectorImage" {
@@ -370,7 +369,6 @@ func emulateURL(url, userAgent string) *goquery.Document {
 
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
-		// fmt.Println(proxyServer)
 		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
@@ -444,7 +442,6 @@ func getURL(urls []string) <-chan string {
 
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
-	// fmt.Printf("Worker %d started\n", workerID)
 	userAgents := config.UserAgents
 
 	if len(userAgents) == 0 {
@@ -483,7 +480,6 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 						}
 					} else if selector.Type == "SelectorLink" {
 						links := SelectorLink(doc, &selector, job.startURL)
-						// fmt.Printf("Links = %v", links)
 						if HasElem(selector.ParentSelectors, selector.ID) {
 							for _, link := range links {
 								if !HasElem(job.siteMap.StartURL, link) {
@@ -525,7 +521,6 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 			results <- job
 		}
 	}
-	//fmt.Println("Stopped Worker:", workerID)
 }
 
 func scraper(siteMap *Scraping, parent string) map[string]interface{} {
@@ -541,12 +536,10 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		go worker(x, jobs, results, &wg)
 	}
 
-	// go saveDataToFile(results, outputChannel)
 	go func() {
 		fc := getURL(siteMap.StartURL)
 		if fc != nil {
 			for startURL := range fc {
-				// fmt.Println("URL:", startURL)
 				if !validURL(startURL) {
 					continue
 				}
@@ -625,8 +618,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		outputChannel <- pageOutput
 	}()
 
-	// close(jobs)
-	// close(outputChannel)
 	wg.Wait()
 	close(results)
 	output = <-outputChannel
