@@ -575,8 +575,8 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	output := make(map[string]interface{})
 	var wg sync.WaitGroup
 
-	jobs := make(chan WorkerJob, 10)
-	results := make(chan WorkerJob, 10)
+	jobs := make(chan WorkerJob, config.Workers)
+	results := make(chan WorkerJob, config.Workers)
 	outputChannel := make(chan map[string]interface{})
 	// 3 Workers
 	for x := 1; x <= config.Workers; x++ {
@@ -643,7 +643,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						}
 
 						_ = ioutil.WriteFile(outputFile, output, 0644)
-
 					case "csv":
 						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
