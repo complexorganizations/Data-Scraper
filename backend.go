@@ -731,9 +731,8 @@ func outputResult() {
 
 	if allowedFormat[userFormat] {
 		outputFile = fmt.Sprintf("output.%s", userFormat)
+		_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
 	}
-
-	_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
 }
 
 func main() {
