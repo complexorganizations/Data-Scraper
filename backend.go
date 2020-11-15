@@ -663,14 +663,9 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 
 func validURL(uri string) bool {
 	_, err := url.ParseRequestURI(uri)
+
 	if err != nil {
-		if config.Log {
-			file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-			defer file.Close()
-			log.SetOutput(file)
-			log.Println(err)
-		}
-		log.Println(err)
+		logErrors(err)
 		return false
 	}
 
