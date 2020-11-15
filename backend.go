@@ -99,7 +99,6 @@ func logErrors(error error) {
 	}
 }
 
-// Reading the settings json
 // Future Update: Merge all of the Jsons into one.
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
