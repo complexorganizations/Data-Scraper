@@ -644,7 +644,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						}
 						_ = ioutil.WriteFile(outputFile, output, 0644)
 					default:
-						fmt.Println("Error: Please choose a output format.")
+						fmt.Println("Error: Please choose an output format.")
 					}
 				} else {
 					pageOutput[job.startURL] = job.linkOutput
