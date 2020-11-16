@@ -63,7 +63,7 @@ Should i manually try and change the `sitemap.json` file?
 - No, You should not.
 
 How can i open the GUI again?
-- In the config file `sitemap.json` `"Gui": true`
+- `"Gui": true`
 ---
 ### Concurrency
 Most modern apps and system have rate limits.
