@@ -13,7 +13,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Here is a sample config, either build your own or use this one as an example. `sitemap.json`
 ```
-{"_id":"prajwalkoirala.com","startUrl":["https://www.prajwalkoirala.com"],"selectors":[{"id":"name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1","multiple":false,"regex":"","delay":0},{"id":"picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img","multiple":false,"delay":0}]}
+Sitemap Here
 ```
 You can finally run the scraper.
 ```
