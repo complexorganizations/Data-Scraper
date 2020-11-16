@@ -170,7 +170,6 @@ func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []stri
 		if !ok {
 			fmt.Println("Error: HREF has not been found.")
 		}
-
 		links = append(links, href)
 		if selector.Multiple == false {
 			return false
@@ -261,7 +260,6 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 // This is so golang can scrape the app.
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
-
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: false,
 	}
@@ -278,25 +276,19 @@ func crawlURL(href, userAgent string) *goquery.Document {
 			TLSClientConfig: tlsConfig,
 		}
 	}
-
 	netClient := &http.Client{
 		Transport: transport,
 	}
-
 	req, err := http.NewRequest(http.MethodGet, href, nil)
-
 	if len(userAgent) > 0 {
 		req.Header.Set("User-Agent", userAgent)
 	}
-
 	response, err := netClient.Do(req)
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
-
 	defer response.Body.Close()
-
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	return doc
@@ -304,14 +296,12 @@ func crawlURL(href, userAgent string) *goquery.Document {
 
 func toFixedURL(href, baseURL string) string {
 	uri, err := url.Parse(href)
-
 	base, err := url.Parse(baseURL)
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
 	toFixedURI := base.ResolveReference(uri)
-
 	return toFixedURI.String()
 }
 
@@ -348,13 +338,11 @@ func HasElem(s interface{}, elem interface{}) bool {
 			}
 		}
 	}
-
 	return false
 }
 
 func emulateURL(url, userAgent string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
-
 	if len(config.Proxy) > 0 {
 		proxyString := config.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
@@ -362,46 +350,36 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	} else {
 		opts = append(chromedp.DefaultExecAllocatorOptions[:])
 	}
-
 	if len(userAgent) > 0 {
 		opts = append(opts, chromedp.UserAgent(userAgent))
 	}
-
 	// create context
 	bctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	ctx, _ := chromedp.NewContext(bctx)
 	defer cancel()
-
 	var err error
-
 	// run task list
 	var body string
-
 	err = chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
 	)
-
 	r := strings.NewReader(body)
-
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
-
 	return doc
 }
 
 // generator using a channel and a goroutine
 func getURL(urls []string) <-chan string {
-
 	// create a channel
 	c := make(chan string)
 	go func() {
 		re := regexp2.MustCompile(`(\[\d{1,10}-\d{1,10}\]$)`, 0)
-
 		for _, urlLink := range urls {
 			urlRange, _ := re.FindStringMatch(urlLink)
 			if urlRange != nil {
@@ -414,7 +392,6 @@ func getURL(urls []string) <-chan string {
 				// using ParseInt method
 				int1, _ := strconv.ParseInt(rang[0], 10, 64)
 				int2, _ := strconv.ParseInt(rang[1], 10, 64)
-
 				// Send url in channel
 				for x := int1; x <= int2; x++ {
 					c <- fmt.Sprintf("%s%d", val2, x)
@@ -431,11 +408,9 @@ func getURL(urls []string) <-chan string {
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	userAgents := config.UserAgents
-
 	if len(userAgents) == 0 {
 		userAgents = append(userAgents, "")
 	}
-
 	for count := 0; count < len(userAgents); count++ {
 		userAgent := userAgents[count]
 		for job := range jobs {
@@ -445,7 +420,6 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 			} else {
 				doc = crawlURL(job.startURL, userAgent)
 			}
-
 			if doc == nil {
 				continue
 			}
@@ -510,7 +484,6 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	output := make(map[string]interface{})
 	var wg sync.WaitGroup
-
 	jobs := make(chan WorkerJob, config.Workers)
 	results := make(chan WorkerJob, config.Workers)
 	outputChannel := make(chan map[string]interface{})
@@ -609,12 +582,10 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 
 func validURL(uri string) bool {
 	_, err := url.ParseRequestURI(uri)
-
 	if err != nil {
 		logErrors(err)
 		return false
 	}
-
 	return true
 }
 
@@ -626,7 +597,6 @@ func outputResult() {
 		"xml":  true,
 		"json": true,
 	}
-
 	if allowedFormat[userFormat] {
 		outputFile = fmt.Sprintf("output.%s", userFormat)
 		_ = ioutil.WriteFile(outputFile, []byte("{}"), 0644)
