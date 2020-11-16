@@ -48,7 +48,7 @@ How do i configure the scraper?
 - Open the scraper and generate the `sitemap.json` file. 
 
 Can this scrape apps written in JavaScript?
-- Yes, this can scrape apps written in JS. [`"JavaScript": true`] ***Google Chrome (Required)***
+- Yes, this can scrape apps written in JS. `"JavaScript": true` ***Google Chrome (Required)***
 
 Why not use a browser extension to scrape a website?
 - The problem with browser extensions is that they are slow, and when it comes to large scraping projects it turns into a nightmare.
@@ -63,7 +63,7 @@ Should i manually try and change the `sitemap.json` file?
 - No, You should not.
 
 How can i open the GUI again?
-- In the config file `sitemap.json` [`"Gui": true`]
+- In the config file `sitemap.json` `"Gui": true`
 ---
 ### Concurrency
 Most modern apps and system have rate limits.
