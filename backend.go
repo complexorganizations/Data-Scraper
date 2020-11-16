@@ -284,10 +284,6 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	}
 
 	req, err := http.NewRequest(http.MethodGet, href, nil)
-	if err != nil {
-		logErrors(err)
-		os.Exit(0)
-	}
 
 	if len(userAgent) > 0 {
 		req.Header.Set("User-Agent", userAgent)
