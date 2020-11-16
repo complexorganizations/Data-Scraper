@@ -263,7 +263,6 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: false,
 	}
-	// if proxy is set use for transport
 	if len(config.Proxy) > 0 {
 		proxyString := config.Proxy[0]
 		proxyURL, _ := url.Parse(proxyString)
@@ -289,7 +288,6 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		os.Exit(0)
 	}
 	defer response.Body.Close()
-	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	return doc
 }
@@ -492,7 +490,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		wg.Add(1)
 		go worker(x, jobs, results, &wg)
 	}
-
 	go func() {
 		fc := getURL(siteMap.StartURL)
 		if fc != nil {
@@ -510,7 +507,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 			close(jobs)
 		}
 	}()
-
 	go func() {
 		pageOutput := make(map[string]interface{})
 		for job := range results {
@@ -521,11 +517,9 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 						logErrors(err)
 						os.Exit(0)
 					}
-
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
-
 					switch config.Export {
 					case "xml":
 						output, err := xml.MarshalIndent(data, "", " ")
@@ -533,7 +527,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 							logErrors(err)
 							os.Exit(0)
 						}
-
 						_ = ioutil.WriteFile(outputFile, output, 0644)
 					case "csv":
 						csvFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -541,20 +534,15 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 							logErrors(err)
 							os.Exit(0)
 						}
-
 						csvWriter := csv.NewWriter(csvFile)
 						rows := [][]string{}
-
 						for i, v := range data {
 							rows = append(rows, []string{i, fmt.Sprint(v)})
 						}
-
 						for _, row := range rows {
 							_ = csvWriter.Write(row)
 						}
-
 						csvWriter.Flush()
-
 						csvFile.Close()
 					case "json":
 						output, err := json.MarshalIndent(data, "", " ")
@@ -573,7 +561,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 		}
 		outputChannel <- pageOutput
 	}()
-
 	wg.Wait()
 	close(results)
 	output = <-outputChannel
