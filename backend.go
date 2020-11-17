@@ -336,7 +336,7 @@ func getChildSelector(selector *selectors) bool {
 	return false
 }
 
-func HasElem(s interface{}, elem interface{}) bool {
+func hasElem(s interface{}, elem interface{}) bool {
 	arrV := reflect.ValueOf(s)
 	if arrV.Kind() == reflect.Slice {
 		for i := 0; i < arrV.Len(); i++ {
@@ -438,9 +438,9 @@ func worker(workerID int, jobs <-chan workerJob, results chan<- workerJob, wg *s
 						}
 					} else if selector.Type == "SelectorLink" {
 						links := selectorLink(doc, &selector, job.startURL)
-						if HasElem(selector.ParentSelectors, selector.ID) {
+						if hasElem(selector.ParentSelectors, selector.ID) {
 							for _, link := range links {
-								if !HasElem(job.siteMap.StartURL, link) {
+								if !hasElem(job.siteMap.StartURL, link) {
 									job.siteMap.StartURL = append(job.siteMap.StartURL, link)
 								}
 							}
