@@ -1,29 +1,44 @@
 {
-  "_id": "www.prajwalkoirala.com",
-  "startUrl": [
-    "https://www.prajwalkoirala.com"
-  ],
-  "selectors": [
-    {
-      "id": "name",
-      "type": "SelectorText",
-      "parentSelectors": [
-        "_root"
-      ],
-      "selector": "h1",
-      "multiple": false,
-      "regex": "",
-      "delay": 0
-    },
-    {
-      "id": "picture",
-      "type": "SelectorImage",
-      "parentSelectors": [
-        "_root"
-      ],
-      "selector": "img",
-      "multiple": false,
-      "delay": 0
-    }
-  ]
+  "Settings": {
+    "Gui": true,
+    "Log": true,
+    "JavaScript": false,
+    "Workers": 10,
+    "Export": "json",
+    "UserAgents": [],
+    "Captcha": "",
+    "Proxy": []
+  },
+  "Sitemap": {
+    "_id": "www.prajwalkoirala.com",
+    "startUrl": [
+      "https://www.prajwalkoirala.com"
+    ],
+    "selectors": [
+      {
+        "id": "name",
+        "type": "text",
+        "parentSelectors": [
+          "_root"
+        ],
+        "selector": "h1",
+        "multiple": false,
+        "regex": "",
+        "delay": 0,
+        "ExtractAttribute": ""
+      },
+      {
+        "id": "picture",
+        "type": "SelectorImage",
+        "parentSelectors": [
+          "_root"
+        ],
+        "selector": "img",
+        "multiple": false,
+        "regex": "",
+        "delay": 0,
+        "ExtractAttribute": ""
+      }
+    ]
+  }
 }
