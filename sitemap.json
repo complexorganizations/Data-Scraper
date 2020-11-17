@@ -17,7 +17,7 @@
     "selectors": [
       {
         "id": "name",
-        "type": "text",
+        "type": "SelectorText",
         "parentSelectors": [
           "_root"
         ],
