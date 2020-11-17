@@ -1,7 +1,7 @@
 {
   "Settings": {
     "Gui": false,
-    "Log": true,
+    "Log": false,
     "JavaScript": false,
     "Workers": 10,
     "Export": "json",
