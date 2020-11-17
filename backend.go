@@ -17,12 +17,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	//"math"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
-	//"github.com/chromedp/cdproto/emulation"
-	//"github.com/chromedp/cdproto/page"
 	"github.com/dlclark/regexp2"
 )
 
