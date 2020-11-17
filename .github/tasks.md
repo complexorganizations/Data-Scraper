@@ -1,3 +1,3 @@
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it.
-- [ ] Rewrite the entire app.
+- [ ] Fix the bugs for export to xml, csv, json
 - [ ] Support Screenshots, If the user says true on a screenshot element than take a screenshot.
