@@ -24,7 +24,8 @@ import (
 )
 
 var (
-	config     *Config
+	settings Settings
+	smap Scraping
 	outputFile = "output"
 )
 
@@ -35,32 +36,39 @@ const (
 )
 
 type Selectors struct {
-	ID               string
-	Type             string
-	ParentSelectors  []string
-	Selector         string
-	Multiple         bool
-	Regex            string
-	Delay            int
+	ID               string		`json:"id"`
+	Type             string		`json:"type"`
+	ParentSelectors  []string	`json:"parentSelectors"`
+	Selector         string		`json:"selector"`
+	Multiple         bool		`json:"multiple"`
+	Regex            string		`json:"regex"`
+	Delay            int		`json:"delay"`
 	ExtractAttribute string
 }
 
 type Scraping struct {
-	StartURL  []string
-	ID        string `json:"_id,omitempty"`
-	Selectors []Selectors
+	ID        string 		`json:"_id,omitempty"`
+	StartURL  []string		`json:"startUrl"`
+	Selectors []Selectors	`json:"selectors"`
 }
 
-type Config struct {
-	Gui        bool
-	Log        bool
+type Settings struct {
+	Gui bool
+	Log bool
 	JavaScript bool
-	Workers    int
-	Export     string
+	Workers int
+	Export string
 	UserAgents []string
-	Captcha    string
-	Proxy      []string
+	Captcha string
+	Proxy []string
 }
+
+
+type jsonType struct {
+	Settings Settings
+	Sitemap Scraping
+}
+
 
 type WorkerJob struct {
 	startURL string
@@ -85,7 +93,7 @@ func clearCache() {
 }
 
 func logErrors(error error) {
-	if config.Log {
+	if settings.Log {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		defer file.Close()
 		log.SetOutput(file)
@@ -93,14 +101,32 @@ func logErrors(error error) {
 	}
 }
 
-func readSettingsJSON() {
-	data, err := ioutil.ReadFile(settingsConfig)
-	var settings Config
-	err = json.Unmarshal(data, &settings)
-	config = &settings
+func readJSON() {
+	jsonData := jsonType{}
+	data, err := ioutil.ReadFile("./sitemap.json")
 	if err != nil {
-		logErrors(err)
-		os.Exit(0)
+		frontendLog(err)
+	}
+
+	err = json.Unmarshal(data, &jsonData)
+	if err != nil {
+		frontendLog(err)
+	}
+
+	smap = jsonData.Sitemap
+	settings = jsonData.Settings
+}
+
+func writeJSON() {
+	jsonData := jsonType{settings, smap}
+	dataJson, err := json.MarshalIndent(jsonData, "", "  ")
+	if err != nil {
+		frontendLog(err)
+	}
+
+	err = ioutil.WriteFile("./sitemap.json", dataJson, 0644)
+	if err != nil {
+		frontendLog(err)
 	}
 }
 
@@ -249,8 +275,8 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: false,
 	}
-	if len(config.Proxy) > 0 {
-		proxyString := config.Proxy[0]
+	if len(settings.Proxy) > 0 {
+		proxyString := settings.Proxy[0]
 		proxyURL, _ := url.Parse(proxyString)
 		transport = &http.Transport{
 			TLSClientConfig: tlsConfig,
@@ -326,8 +352,8 @@ func HasElem(s interface{}, elem interface{}) bool {
 
 func emulateURL(url, userAgent string) *goquery.Document {
 	var opts []func(*chromedp.ExecAllocator)
-	if len(config.Proxy) > 0 {
-		proxyString := config.Proxy[0]
+	if len(settings.Proxy) > 0 {
+		proxyString := settings.Proxy[0]
 		proxyServer := chromedp.ProxyServer(proxyString)
 		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
 	} else {
@@ -383,7 +409,7 @@ func getURL(urls []string) <-chan string {
 
 func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
-	userAgents := config.UserAgents
+	userAgents := settings.UserAgents
 	if len(userAgents) == 0 {
 		userAgents = append(userAgents, "")
 	}
@@ -391,7 +417,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 		userAgent := userAgents[count]
 		for job := range jobs {
 			var doc *goquery.Document
-			if config.JavaScript {
+			if settings.JavaScript {
 				doc = emulateURL(job.startURL, userAgent)
 			} else {
 				doc = crawlURL(job.startURL, userAgent)
@@ -460,10 +486,10 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	output := make(map[string]interface{})
 	var wg sync.WaitGroup
-	jobs := make(chan WorkerJob, config.Workers)
-	results := make(chan WorkerJob, config.Workers)
+	jobs := make(chan WorkerJob, settings.Workers)
+	results := make(chan WorkerJob, settings.Workers)
 	outputChannel := make(chan map[string]interface{})
-	for x := 1; x <= config.Workers; x++ {
+	for x := 1; x <= settings.Workers; x++ {
 		wg.Add(1)
 		go worker(x, jobs, results, &wg)
 	}
@@ -497,7 +523,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 					var data map[string]interface{}
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
-					switch config.Export {
+					switch settings.Export {
 					case "xml":
 						output, err := xml.MarshalIndent(data, "", " ")
 						if err != nil {
@@ -554,7 +580,7 @@ func validURL(uri string) bool {
 }
 
 func outputResult() {
-	userFormat := strings.ToLower(config.Export)
+	userFormat := strings.ToLower(settings.Export)
 	allowedFormat := map[string]bool{
 		"csv":  true,
 		"xml":  true,
@@ -566,10 +592,10 @@ func outputResult() {
 	}
 }
 
-func main() {
+func scrape() {
+	readJSON()
 	clearCache()
-	siteMap := readSiteMap()
-	readSettingsJSON()
+	siteMap := smap
 	outputResult()
-	_ = scraper(siteMap, "_root")
+	_ = scraper(&siteMap, "_root")
 }
