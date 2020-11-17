@@ -37,7 +37,6 @@ const (
 	logFile        = "logs.log"
 )
 
-// Selectors is struct to Marshal selector
 type Selectors struct {
 	ID               string
 	Type             string
@@ -49,14 +48,12 @@ type Selectors struct {
 	ExtractAttribute string
 }
 
-// Scraping is struct to Marshal scraping file
 type Scraping struct {
 	StartURL  []string
 	ID        string `json:"_id,omitempty"`
 	Selectors []Selectors
 }
 
-// Config setting struct
 type Config struct {
 	Gui        bool
 	Log        bool
@@ -68,7 +65,6 @@ type Config struct {
 	Proxy      []string
 }
 
-// WorkerJob struct definition
 type WorkerJob struct {
 	startURL string
 	parent   string
@@ -77,7 +73,6 @@ type WorkerJob struct {
 	linkOutput map[string]interface{}
 }
 
-// All the device memory is needed, so all the temp files are removed.
 func clearCache() {
 	operatingSystem := runtime.GOOS
 	switch operatingSystem {
@@ -92,7 +87,6 @@ func clearCache() {
 	}
 }
 
-// log all errors here.
 func logErrors(error error) {
 	if config.Log {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -102,7 +96,6 @@ func logErrors(error error) {
 	}
 }
 
-// Future Update: Merge all of the Jsons into one.
 func readSettingsJSON() {
 	data, err := ioutil.ReadFile(settingsConfig)
 	var settings Config
@@ -125,7 +118,6 @@ func readSiteMap() *Scraping {
 	return &scrape
 }
 
-// SelectorText get data text for html tag
 func SelectorText(doc *goquery.Document, selector *Selectors) []string {
 	var text []string
 	var matchText *regexp2.Match
@@ -148,7 +140,6 @@ func SelectorText(doc *goquery.Document, selector *Selectors) []string {
 	return text
 }
 
-// SelectorLink get data href for html tag
 func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []string {
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -165,7 +156,6 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 	return links
 }
 
-// SelectorElementAttribute get define attribute for html tag
 func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []string {
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -182,7 +172,6 @@ func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []stri
 	return links
 }
 
-// SelectorElement get child element of html selected element
 func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string) []interface{} {
 	baseSiteMap := readSiteMap()
 	var elementoutputList []interface{}
@@ -219,7 +208,6 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 	return elementoutputList
 }
 
-// SelectorImage get src of Image for html tag
 func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
 	var srcs []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -236,7 +224,6 @@ func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
 	return srcs
 }
 
-// SelectorTable get header and row data of table
 func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interface{} {
 	var headings, row []string
 	var rows [][]string
@@ -260,7 +247,6 @@ func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interf
 	return table
 }
 
-// This is so golang can scrape the app.
 func crawlURL(href, userAgent string) *goquery.Document {
 	var transport *http.Transport
 	tlsConfig := &tls.Config{
@@ -329,7 +315,6 @@ func getChildSelector(selector *Selectors) bool {
 	return false
 }
 
-// HasElem check element is present or not in parsed list
 func HasElem(s interface{}, elem interface{}) bool {
 	arrV := reflect.ValueOf(s)
 	if arrV.Kind() == reflect.Slice {
@@ -354,19 +339,16 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	if len(userAgent) > 0 {
 		opts = append(opts, chromedp.UserAgent(userAgent))
 	}
-	// create context
 	bctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	ctx, _ := chromedp.NewContext(bctx)
 	defer cancel()
 	var err error
-	// run task list
 	var body string
 	err = chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
 	)
 	r := strings.NewReader(body)
-	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		logErrors(err)
@@ -375,9 +357,7 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	return doc
 }
 
-// generator using a channel and a goroutine
 func getURL(urls []string) <-chan string {
-	// create a channel
 	c := make(chan string)
 	go func() {
 		re := regexp2.MustCompile(`(\[\d{1,10}-\d{1,10}\]$)`, 0)
@@ -390,10 +370,8 @@ func getURL(urls []string) <-chan string {
 					urlRange2 = strings.Replace(urlRange2, charc, "", -2)
 				}
 				rang := strings.Split(urlRange2, "-")
-				// using ParseInt method
 				int1, _ := strconv.ParseInt(rang[0], 10, 64)
 				int2, _ := strconv.ParseInt(rang[1], 10, 64)
-				// Send url in channel
 				for x := int1; x <= int2; x++ {
 					c <- fmt.Sprintf("%s%d", val2, x)
 				}
@@ -488,7 +466,6 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 	jobs := make(chan WorkerJob, config.Workers)
 	results := make(chan WorkerJob, config.Workers)
 	outputChannel := make(chan map[string]interface{})
-	// 3 Workers
 	for x := 1; x <= config.Workers; x++ {
 		wg.Add(1)
 		go worker(x, jobs, results, &wg)
@@ -579,7 +556,6 @@ func validURL(uri string) bool {
 	return true
 }
 
-// outputResult set output file name and temp output file based on settings.json
 func outputResult() {
 	userFormat := strings.ToLower(config.Export)
 	allowedFormat := map[string]bool{
