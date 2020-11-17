@@ -101,7 +101,7 @@ func logErrors(error error) {
 
 func readJSON() {
 	jsonData := jsonType{}
-	data, err := ioutil.ReadFile("./sitemap.json")
+	data, err := ioutil.ReadFile(scrapingConfig)
 	if err != nil {
 		frontendLog(err)
 	}
@@ -122,7 +122,7 @@ func writeJSON() {
 		frontendLog(err)
 	}
 
-	err = ioutil.WriteFile("./sitemap.json", dataJson, 0644)
+	err = ioutil.WriteFile(scrapingConfig, dataJson, 0644)
 	if err != nil {
 		frontendLog(err)
 	}
