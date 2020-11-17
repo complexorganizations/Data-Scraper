@@ -1,6 +1,6 @@
 {
   "Settings": {
-    "Gui": false,
+    "Gui": true,
     "Log": false,
     "JavaScript": false,
     "Workers": 10,
@@ -16,7 +16,7 @@
     ],
     "selectors": [
       {
-        "id": "name",
+        "id": "Name",
         "type": "SelectorText",
         "parentSelectors": [
           "_root"
@@ -28,7 +28,7 @@
         "ExtractAttribute": ""
       },
       {
-        "id": "picture",
+        "id": "Picture",
         "type": "SelectorImage",
         "parentSelectors": [
           "_root"
