@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-
 func frontendLog(err error) {
 	if settings.Log {
 		fmt.Println("Error: ", err)
@@ -81,7 +80,7 @@ func uiViewSitemap() string {
 			<head>
 				<title>Preview</title>
 				<style>
-					`+ globalStyles +`
+					` + globalStyles + `
 					body {
 						position: fixed;
 						top: 0;
@@ -107,17 +106,17 @@ func uiViewSitemap() string {
 						<th>Start URL</th>
 					</tr>
 					<tr>
-						<td>`+ smap.ID+`</td>
+						<td>` + smap.ID + `</td>
 						<td>`
 
 	for i, e := range smap.StartURL {
 		page += e
-		if i < len(smap.StartURL) - 1 {
+		if i < len(smap.StartURL)-1 {
 			page += ", "
 		}
 	}
 
-	page +=				`</td>
+	page += `</td>
 					</tr>
 				</table>
 				<div class="buttons">
@@ -179,7 +178,7 @@ func removeUserAgent(ui lorca.UI) {
 			ua.removeChild(ua.children[user_agent_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();") )
+	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func addProxy(ui lorca.UI) {
@@ -198,7 +197,7 @@ func removeProxy(ui lorca.UI) {
 			proxies.removeChild(proxies.children[proxy_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();") )
+	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func uiEditSettings() string {
@@ -207,7 +206,7 @@ func uiEditSettings() string {
 		<head>
 			<title>Edit settings</title>
 			<style>
-				`+ globalStyles + `
+				` + globalStyles + `
 				input {
 					display: block;
 				}
@@ -215,18 +214,18 @@ func uiEditSettings() string {
 		</head>
 		<body>
 			<table>
-				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" `+IfThenElse(settings.Gui, `checked`, "")+`></td></tr>
-				<tr><th>Log</th><td><input id="settings_log" type="checkbox" `+IfThenElse(settings.Log, `checked`, "")+`></td></tr>
-				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" `+IfThenElse(settings.JavaScript, `checked`, "")+`></td></tr>
-				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="`+strconv.Itoa(settings.Workers)+`"></td></tr>
+				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + IfThenElse(settings.Gui, `checked`, "") + `></td></tr>
+				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + IfThenElse(settings.Log, `checked`, "") + `></td></tr>
+				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + IfThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
+				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
 
 				<tr>
 					<th>Export</th>
 					<td>
 						<select id="settings_export">
-							<option value="json" `+ IfThenElse(settings.Export == "json", `selected="selected"`, "") +`>JSON</option>
-							<option value="xml" `+ IfThenElse(settings.Export == "xml", `selected="selected"`, "") +`>XML</option>
-							<option value="csv" `+ IfThenElse(settings.Export == "csv", `selected="selected"`, "") +`>CSV</option>
+							<option value="json" ` + IfThenElse(settings.Export == "json", `selected="selected"`, "") + `>JSON</option>
+							<option value="xml" ` + IfThenElse(settings.Export == "xml", `selected="selected"`, "") + `>XML</option>
+							<option value="csv" ` + IfThenElse(settings.Export == "csv", `selected="selected"`, "") + `>CSV</option>
 						</select>
 					</td>
 				<tr>
@@ -234,22 +233,22 @@ func uiEditSettings() string {
 					<td>
 						<div id="userAgents">`
 	for i, e := range settings.UserAgents {
-		page += `<input type="text" id="txt_useragent`+ strconv.Itoa(i + 1) +`" value="`+ e +`"></input>`
+		page += `<input type="text" id="txt_useragent` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
-	page +=			`	</div>
+	page += `	</div>
 						<button onclick=removeUserAgent()>-</button>
 						<button onclick=addUserAgent()>+</button>
 					</td>
 				</tr>
-				<tr><th>Captcha</th><td><input id="settings_captcha" type="text" value="`+settings.Captcha+`"></td></tr>
+				<tr><th>Captcha</th><td><input id="settings_captcha" type="text" value="` + settings.Captcha + `"></td></tr>
 				<tr>
 					<th>Proxy</th>
 					<td>
 						<div id="proxies">`
 	for i, e := range settings.Proxy {
-		page += `<input type="text" id="txt_proxy`+ strconv.Itoa(i + 1) +`" value="`+ e +`"></input>`
+		page += `<input type="text" id="txt_proxy` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
-	page +=			`	</div>
+	page += `	</div>
 						<button onclick=removeProxy()>-</button>
 						<button onclick=addProxy()>+</button>
 					</td>
@@ -259,9 +258,9 @@ func uiEditSettings() string {
 				<button onclick="saveSettings()">Save</button>
 			</div>
 			<script>
-				let user_agent_num = `+strconv.Itoa(len(settings.UserAgents))+`
+				let user_agent_num = ` + strconv.Itoa(len(settings.UserAgents)) + `
 				let ua = document.getElementById("userAgents");
-				let proxy_num = `+strconv.Itoa(len(settings.Proxy))+`
+				let proxy_num = ` + strconv.Itoa(len(settings.Proxy)) + `
 				let proxies = document.getElementById("proxies");
 				let el;
 			</script>
@@ -288,7 +287,7 @@ func removeSiteURL(ui lorca.UI) {
 			url_inputs.removeChild(url_inputs.children[url_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("url_num.toString();") )
+	fmt.Println(ui.Eval("url_num.toString();"))
 }
 
 func saveMap(ui lorca.UI) {
@@ -312,7 +311,7 @@ func uiEditMap() string {
 			<head>
 				<title>Edit sitemap</title>
 				<style>
-					`+ globalStyles +`
+					` + globalStyles + `
 					input, label {
 						display: block;
 					}
@@ -320,12 +319,12 @@ func uiEditMap() string {
 			</head>
 			<body>
 				<label for="txt_sitemap_id">Sitemap name: </label>
-				<input type="text" placeholder="Enter sitemap name" id="txt_sitemap_id" value="`+ smap.ID +`"></input>
+				<input type="text" placeholder="Enter sitemap name" id="txt_sitemap_id" value="` + smap.ID + `"></input>
 				<label for="urlInputs">Start URL: </label>
 				<div id="urlInputs">`
 
 	for i, e := range smap.StartURL {
-		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl`+ strconv.Itoa(i + 1) +`" value="`+ e +`"></input>`
+		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
 
 	page += `</div>
@@ -333,7 +332,7 @@ func uiEditMap() string {
 				<button onclick=addSiteURL()>+</button>
 				<button onclick=saveMap()>Save</button>
 				<script>
-					let url_num = `+strconv.Itoa(len(smap.StartURL))+`
+					let url_num = ` + strconv.Itoa(len(smap.StartURL)) + `
 					let url_inputs = document.getElementById("urlInputs");
 					let el;
 				</script>
@@ -361,7 +360,7 @@ func addSelector(ui lorca.UI) {
 	newSelector := Selectors{}
 	newSelector.ParentSelectors = []string{""}
 	smap.Selectors = append(smap.Selectors, newSelector)
-	err := ui.Load("data:text/html," + url.PathEscape(uiEditSelector(len(smap.Selectors) - 1)))
+	err := ui.Load("data:text/html," + url.PathEscape(uiEditSelector(len(smap.Selectors)-1)))
 	if err != nil {
 		frontendLog(err)
 	}
@@ -373,7 +372,7 @@ func uiViewSelectors() string {
 			<head>
 				<title>View selectors</title>
 				<style>
-					`+ globalStyles +`
+					` + globalStyles + `
 				</style>
 			</head>
 			<body>
@@ -391,31 +390,31 @@ func uiViewSelectors() string {
 
 	for i, e := range smap.Selectors {
 		page += `<tr>`
-		page += `<td>`+ e.ID+`</td>`
-		page += `<td>`+ e.Type+`</td>`
+		page += `<td>` + e.ID + `</td>`
+		page += `<td>` + e.Type + `</td>`
 
 		page += `<td>`
 		for i, el := range e.ParentSelectors {
 			page += el
-			if i < len(e.ParentSelectors) - 1 {
+			if i < len(e.ParentSelectors)-1 {
 				page += ", "
 			}
 		}
 		page += `</td>`
 
-		page += `<td>`+ e.Selector+`</td>`
+		page += `<td>` + e.Selector + `</td>`
 		if e.Multiple {
 			page += `<td> yes </td>`
 		} else {
 			page += `<td> no </td>`
 		}
-		page += `<td>`+ e.Regex+`</td>`
-		page += `<td>`+ strconv.Itoa(e.Delay) +`</td>`
-		page += `<td><button onclick="editSelector(`+ strconv.Itoa(i) +`)">Edit</button></td>`
+		page += `<td>` + e.Regex + `</td>`
+		page += `<td>` + strconv.Itoa(e.Delay) + `</td>`
+		page += `<td><button onclick="editSelector(` + strconv.Itoa(i) + `)">Edit</button></td>`
 		page += `</tr>`
 	}
 
-	page +=		`</table>
+	page += `</table>
 				<div class="buttons">
 					<button onclick=viewMap()>View sitemap</button>
 					<button onclick=addSelector()>Add selector</button>
@@ -481,7 +480,7 @@ func uiEditSelector(index int) string {
 			<head>
 				<title>Edit selectors</title>
 				<style>
-					`+ globalStyles +`
+					` + globalStyles + `
 					input{
 						display: block;
 					}
@@ -489,46 +488,46 @@ func uiEditSelector(index int) string {
 			</head>
 			<body>
 				<table>
-					<tr><th>id</th><td><input type ="text" id="map_id" value="`+el.ID+`"></td></tr>
+					<tr><th>id</th><td><input type ="text" id="map_id" value="` + el.ID + `"></td></tr>
 					<tr>
 						<th>type</th><td>
 						<select id="map_type">
-							<option value="text" `+ IfThenElse(el.Type == "text", `selected="selected"`, "") +`>Text</option>
-							<option value="link" `+ IfThenElse(el.Type == "link", `selected="selected"`, "") +`>Link</option>
-							<option value="popupLink" `+ IfThenElse(el.Type == "popupLink", `selected="selected"`, "") +`>Popup link</option>
-							<option value="image" `+ IfThenElse(el.Type == "image", `selected="selected"`, "") +`>Image</option>
-							<option value="table" `+ IfThenElse(el.Type == "table", `selected="selected"`, "") +`>Table</option>
-							<option value="attribute" `+ IfThenElse(el.Type == "attribute", `selected="selected"`, "") +`>Element attribute</option>
-							<option value="html" `+ IfThenElse(el.Type == "html", `selected="selected"`, "") +`>HTML</option>
-							<option value="element" `+ IfThenElse(el.Type == "element", `selected="selected"`, "") +`>Element</option>
-							<option value="scroll" `+ IfThenElse(el.Type == "scroll", `selected="selected"`, "") +`>Element scroll down</option>
-							<option value="grouped" `+ IfThenElse(el.Type == "grouped", `selected="selected"`, "") +`>Grouped</option>
-							<option value="xml" `+ IfThenElse(el.Type == "xml", `selected="selected"`, "") +`>Sitemap.xml links</option>
+							<option value="text" ` + IfThenElse(el.Type == "text", `selected="selected"`, "") + `>Text</option>
+							<option value="link" ` + IfThenElse(el.Type == "link", `selected="selected"`, "") + `>Link</option>
+							<option value="popupLink" ` + IfThenElse(el.Type == "popupLink", `selected="selected"`, "") + `>Popup link</option>
+							<option value="image" ` + IfThenElse(el.Type == "image", `selected="selected"`, "") + `>Image</option>
+							<option value="table" ` + IfThenElse(el.Type == "table", `selected="selected"`, "") + `>Table</option>
+							<option value="attribute" ` + IfThenElse(el.Type == "attribute", `selected="selected"`, "") + `>Element attribute</option>
+							<option value="html" ` + IfThenElse(el.Type == "html", `selected="selected"`, "") + `>HTML</option>
+							<option value="element" ` + IfThenElse(el.Type == "element", `selected="selected"`, "") + `>Element</option>
+							<option value="scroll" ` + IfThenElse(el.Type == "scroll", `selected="selected"`, "") + `>Element scroll down</option>
+							<option value="grouped" ` + IfThenElse(el.Type == "grouped", `selected="selected"`, "") + `>Grouped</option>
+							<option value="xml" ` + IfThenElse(el.Type == "xml", `selected="selected"`, "") + `>Sitemap.xml links</option>
 						</select>
 					</tr>
 					<tr>
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
-								<option value="_root"`+ IfThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") +`>_root</option>`
+								<option value="_root"` + IfThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") + `>_root</option>`
 
 	for _, e := range smap.Selectors {
 		if e.ID != el.ID {
-			page += `<option value="`+e.ID+`" `+ IfThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") +`>`+e.ID+`</option>`
+			page += `<option value="` + e.ID + `" ` + IfThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") + `>` + e.ID + `</option>`
 		}
 	}
 
-	page +=					`</select>
+	page += `</select>
 						</td>
 					</tr>
-					<tr><th>selector</th><td><input type="text" id="map_selector" value="`+el.Selector+`"><button onclick=selectElement(`+strconv.Itoa(index)+`)>Select</button></td></tr>
-					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + IfThenElse(el.Multiple, `checked"`, "") +`></td></tr>
-					<tr><th>regex</th><td><input type="text" id="map_regex" value="`+ el.Regex +`"></td></tr>
-					<tr><th>delay</th><td><input type="number" id="map_delay" value="`+ strconv.Itoa(el.Delay) +`"></td></tr>
+					<tr><th>selector</th><td><input type="text" id="map_selector" value="` + el.Selector + `"><button onclick=selectElement(` + strconv.Itoa(index) + `)>Select</button></td></tr>
+					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + IfThenElse(el.Multiple, `checked"`, "") + `></td></tr>
+					<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>
+					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(el.Delay) + `"></td></tr>
 				</table>
 				<div class="buttons">
-					<button onclick=deleteSelector(`+ strconv.Itoa(index)+`)>Delete</button>
-					<button onclick=saveSelector(`+ strconv.Itoa(index)+`)>Save</button>
+					<button onclick=deleteSelector(` + strconv.Itoa(index) + `)>Delete</button>
+					<button onclick=saveSelector(` + strconv.Itoa(index) + `)>Save</button>
 				</div>
 			</body>
 		</html>
@@ -570,7 +569,7 @@ func uiSelectElement(index int) string {
 					ui.appendChild(choice_label);
 					let accept_button = document.createElement("button");
 					accept_button.style.fontFamily = "sans-serif";
-					accept_button.onclick = () => selectedElement(`+ strconv.Itoa(index) +`, identifier);
+					accept_button.onclick = () => selectedElement(` + strconv.Itoa(index) + `, identifier);
 					accept_button.innerHTML = "Accept choice";
 					ui.appendChild(accept_button);
 					ui.style.position = "fixed";
@@ -624,7 +623,6 @@ func uiSelectElement(index int) string {
 			</script>` +
 			page[insertIndex:]
 
-
 	return page
 }
 
@@ -649,79 +647,79 @@ func main() {
 		frontendLog(err)
 	}
 
-	err = ui.Bind("runScraper", func() {runScraper(ui)})
+	err = ui.Bind("runScraper", func() { runScraper(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("editSettings", func() {editSettings(ui)})
+	err = ui.Bind("editSettings", func() { editSettings(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("editSitemap", func() {editSitemap(ui)})
+	err = ui.Bind("editSitemap", func() { editSitemap(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("saveSettings", func() {saveSettings(ui)})
+	err = ui.Bind("saveSettings", func() { saveSettings(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("addUserAgent", func() {addUserAgent(ui)})
+	err = ui.Bind("addUserAgent", func() { addUserAgent(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("removeUserAgent", func() {removeUserAgent(ui)})
+	err = ui.Bind("removeUserAgent", func() { removeUserAgent(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("addProxy", func() {addProxy(ui)})
+	err = ui.Bind("addProxy", func() { addProxy(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("removeProxy", func() {removeProxy(ui)})
+	err = ui.Bind("removeProxy", func() { removeProxy(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("addSiteURL", func() {addSiteURL(ui)})
+	err = ui.Bind("addSiteURL", func() { addSiteURL(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("removeSiteURL", func() {removeSiteURL(ui)})
+	err = ui.Bind("removeSiteURL", func() { removeSiteURL(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("saveMap", func() {saveMap(ui)})
+	err = ui.Bind("saveMap", func() { saveMap(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("viewSelectors", func() {viewSelectors(ui)})
+	err = ui.Bind("viewSelectors", func() { viewSelectors(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("editSelector", func(i int) {editSelector(ui, i)})
+	err = ui.Bind("editSelector", func(i int) { editSelector(ui, i) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("deleteSelector", func(i int) {deleteSelector(ui, i)})
+	err = ui.Bind("deleteSelector", func(i int) { deleteSelector(ui, i) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("saveSelector", func(i int) {saveSelector(ui, i)})
+	err = ui.Bind("saveSelector", func(i int) { saveSelector(ui, i) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("addSelector", func() {addSelector(ui)})
+	err = ui.Bind("addSelector", func() { addSelector(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("viewMap", func() {viewMap(ui)})
+	err = ui.Bind("viewMap", func() { viewMap(ui) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("selectElement", func(i int) {selectElement(ui, i)})
+	err = ui.Bind("selectElement", func(i int) { selectElement(ui, i) })
 	if err != nil {
 		frontendLog(err)
 	}
-	err = ui.Bind("selectedElement", func(i int, str string) {selectedElement(ui, i, str)})
+	err = ui.Bind("selectedElement", func(i int, str string) { selectedElement(ui, i, str) })
 	if err != nil {
 		frontendLog(err)
 	}

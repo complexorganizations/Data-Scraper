@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	settings Settings
-	smap Scraping
+	settings   Settings
+	smap       Scraping
 	outputFile = "output"
 )
 
@@ -36,39 +36,37 @@ const (
 )
 
 type Selectors struct {
-	ID               string		`json:"id"`
-	Type             string		`json:"type"`
-	ParentSelectors  []string	`json:"parentSelectors"`
-	Selector         string		`json:"selector"`
-	Multiple         bool		`json:"multiple"`
-	Regex            string		`json:"regex"`
-	Delay            int		`json:"delay"`
+	ID               string   `json:"id"`
+	Type             string   `json:"type"`
+	ParentSelectors  []string `json:"parentSelectors"`
+	Selector         string   `json:"selector"`
+	Multiple         bool     `json:"multiple"`
+	Regex            string   `json:"regex"`
+	Delay            int      `json:"delay"`
 	ExtractAttribute string
 }
 
 type Scraping struct {
-	ID        string 		`json:"_id,omitempty"`
-	StartURL  []string		`json:"startUrl"`
-	Selectors []Selectors	`json:"selectors"`
+	ID        string      `json:"_id,omitempty"`
+	StartURL  []string    `json:"startUrl"`
+	Selectors []Selectors `json:"selectors"`
 }
 
 type Settings struct {
-	Gui bool
-	Log bool
+	Gui        bool
+	Log        bool
 	JavaScript bool
-	Workers int
-	Export string
+	Workers    int
+	Export     string
 	UserAgents []string
-	Captcha string
-	Proxy []string
+	Captcha    string
+	Proxy      []string
 }
-
 
 type jsonType struct {
 	Settings Settings
-	Sitemap Scraping
+	Sitemap  Scraping
 }
-
 
 type WorkerJob struct {
 	startURL string
