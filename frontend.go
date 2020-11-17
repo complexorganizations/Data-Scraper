@@ -493,17 +493,18 @@ func uiEditSelector(index int) string {
 					<tr>
 						<th>type</th><td>
 						<select id="map_type">
-							<option value="Text" ` + IfThenElse(el.Type == "SelectorText", `selected="selected"`, "") + `>Text</option>
-							<option value="Link" ` + IfThenElse(el.Type == "SelectorLink", `selected="selected"`, "") + `>Link</option>
-							<option value="Popup Link" ` + IfThenElse(el.Type == "SelectorPopupLink", `selected="selected"`, "") + `>Popup link</option>
-							<option value="Image" ` + IfThenElse(el.Type == "SelectorImage", `selected="selected"`, "") + `>Image</option>
-							<option value="Table" ` + IfThenElse(el.Type == "table", `selected="selected"`, "") + `>Table</option>
-							<option value="Element attribute" ` + IfThenElse(el.Type == "SelectorImage", `selected="selected"`, "") + `>Element attribute</option>
-							<option value="HTML" ` + IfThenElse(el.Type == "html", `selected="selected"`, "") + `>HTML</option>
-							<option value="Element" ` + IfThenElse(el.Type == "element", `selected="selected"`, "") + `>Element</option>
-							<option value="Element scroll down" ` + IfThenElse(el.Type == "scroll", `selected="selected"`, "") + `>Element scroll down</option>
-							<option value="Grouped" ` + IfThenElse(el.Type == "grouped", `selected="selected"`, "") + `>Grouped</option>
-							<option value="Sitemap.xml Links" ` + IfThenElse(el.Type == "xml", `selected="selected"`, "") + `>Sitemap.xml links</option>
+							<option value="SelectorText" `+ IfThenElse(el.Type == "SelectorText", `selected`, "") +`>Text</option>
+							<option value="SelectorLink" `+ IfThenElse(el.Type == "SelectorLink", `selected`, "") +`>Link</option>
+							<option value="SelectorPopupLink" `+ IfThenElse(el.Type == "SelectorPopupLink", `selected`, "") +`>Popup link</option>
+							<option value="SelectorImage" `+ IfThenElse(el.Type == "SelectorImage", `selected`, "") +`>Image</option>
+							<option value="SelectorTable" `+ IfThenElse(el.Type == "SelectorTable", `selected`, "") +`>Table</option>
+							<option value="SelectorElementAttribute" `+ IfThenElse(el.Type == "SelectorElementAttribute", `selected`, "") +`>Element attribute</option>
+							<option value="SelectorHTML" `+ IfThenElse(el.Type == "SelectorHTML", `selected`, "") +`>HTML</option>
+							<option value="SelectorElement" `+ IfThenElse(el.Type == "SelectorElement", `selected`, "") +`>Element</option>
+							<option value="SelectorElementScroll" `+ IfThenElse(el.Type == "SelectorElementScroll", `selected`, "") +`>Element scroll down</option>
+							<option value="SelectorElementClick" `+ IfThenElse(el.Type == "SelectorElementClick", `selected`, "") +`>Element click</option>
+							<option value="SelectorGroup" `+ IfThenElse(el.Type == "SelectorGroup", `selected`, "") +`>Grouped</option>
+							<option value="SelectorSitemapXmlLink" `+ IfThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") +`>Sitemap.xml links</option>
 						</select>
 					</tr>
 					<tr>
