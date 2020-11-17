@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	settings   Settings
-	smap       Scraping
+	settings   settingsT
+	smap       scraping
 	outputFile = "output"
 )
 
@@ -35,7 +35,7 @@ const (
 	logFile        = "logs.log"
 )
 
-type Selectors struct {
+type selectors struct {
 	ID               string   `json:"id"`
 	Type             string   `json:"type"`
 	ParentSelectors  []string `json:"parentSelectors"`
@@ -46,13 +46,13 @@ type Selectors struct {
 	ExtractAttribute string
 }
 
-type Scraping struct {
+type scraping struct {
 	ID        string      `json:"_id,omitempty"`
 	StartURL  []string    `json:"startUrl"`
-	Selectors []Selectors `json:"selectors"`
+	Selectors []selectors `json:"selectors"`
 }
 
-type Settings struct {
+type settingsT struct {
 	Gui        bool
 	Log        bool
 	JavaScript bool
@@ -64,14 +64,14 @@ type Settings struct {
 }
 
 type jsonType struct {
-	Settings Settings
-	Sitemap  Scraping
+	Settings settingsT
+	Sitemap  scraping
 }
 
-type WorkerJob struct {
+type workerJob struct {
 	startURL string
 	parent   string
-	siteMap  *Scraping
+	siteMap  *scraping
 	// doc        *goquery.Document
 	linkOutput map[string]interface{}
 }
@@ -117,20 +117,20 @@ func readJSON() {
 
 func writeJSON() {
 	jsonData := jsonType{settings, smap}
-	dataJson, err := json.MarshalIndent(jsonData, "", "  ")
+	dataJSON, err := json.MarshalIndent(jsonData, "", "  ")
 	if err != nil {
 		frontendLog(err)
 	}
 
-	err = ioutil.WriteFile("./sitemap.json", dataJson, 0644)
+	err = ioutil.WriteFile("./sitemap.json", dataJSON, 0644)
 	if err != nil {
 		frontendLog(err)
 	}
 }
 
-func readSiteMap() *Scraping {
+func readSiteMap() *scraping {
 	data, err := ioutil.ReadFile(scrapingConfig)
-	var scrape Scraping
+	var scrape scraping
 	err = json.Unmarshal(data, &scrape)
 	if err != nil {
 		logErrors(err)
@@ -139,7 +139,7 @@ func readSiteMap() *Scraping {
 	return &scrape
 }
 
-func SelectorText(doc *goquery.Document, selector *Selectors) []string {
+func selectorText(doc *goquery.Document, selector *selectors) []string {
 	var text []string
 	var matchText *regexp2.Match
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -161,7 +161,7 @@ func SelectorText(doc *goquery.Document, selector *Selectors) []string {
 	return text
 }
 
-func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []string {
+func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr("href")
@@ -177,7 +177,7 @@ func SelectorLink(doc *goquery.Document, selector *Selectors, baseURL string) []
 	return links
 }
 
-func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []string {
+func selectorElementAttribute(doc *goquery.Document, selector *selectors) []string {
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		href, ok := s.Attr(selector.ExtractAttribute)
@@ -193,7 +193,7 @@ func SelectorElementAttribute(doc *goquery.Document, selector *Selectors) []stri
 	return links
 }
 
-func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string) []interface{} {
+func selectorElement(doc *goquery.Document, selector *selectors, startURL string) []interface{} {
 	baseSiteMap := readSiteMap()
 	var elementoutputList []interface{}
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -229,7 +229,7 @@ func SelectorElement(doc *goquery.Document, selector *Selectors, startURL string
 	return elementoutputList
 }
 
-func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
+func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	var srcs []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
@@ -245,7 +245,7 @@ func SelectorImage(doc *goquery.Document, selector *Selectors) []string {
 	return srcs
 }
 
-func SelectorTable(doc *goquery.Document, selector *Selectors) map[string]interface{} {
+func selectorTable(doc *goquery.Document, selector *selectors) map[string]interface{} {
 	var headings, row []string
 	var rows [][]string
 	table := make(map[string]interface{})
@@ -313,16 +313,16 @@ func toFixedURL(href, baseURL string) string {
 	return toFixedURI.String()
 }
 
-func getSiteMap(startURL []string, selector *Selectors) *Scraping {
+func getSiteMap(startURL []string, selector *selectors) *scraping {
 	baseSiteMap := readSiteMap()
-	newSiteMap := new(Scraping)
+	newSiteMap := new(scraping)
 	newSiteMap.ID = selector.ID
 	newSiteMap.StartURL = startURL
 	newSiteMap.Selectors = baseSiteMap.Selectors
 	return newSiteMap
 }
 
-func getChildSelector(selector *Selectors) bool {
+func getChildSelector(selector *selectors) bool {
 	baseSiteMap := readSiteMap()
 	count := 0
 	for _, childSelector := range baseSiteMap.Selectors {
@@ -405,7 +405,7 @@ func getURL(urls []string) <-chan string {
 	return c
 }
 
-func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *sync.WaitGroup) {
+func worker(workerID int, jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	userAgents := settings.UserAgents
 	if len(userAgents) == 0 {
@@ -428,7 +428,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 			for _, selector := range job.siteMap.Selectors {
 				if job.parent == selector.ParentSelectors[0] {
 					if selector.Type == "SelectorText" {
-						resultText := SelectorText(doc, &selector)
+						resultText := selectorText(doc, &selector)
 						if len(resultText) != 0 {
 							if len(resultText) == 1 {
 								linkOutput[selector.ID] = resultText[0]
@@ -437,7 +437,7 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 							}
 						}
 					} else if selector.Type == "SelectorLink" {
-						links := SelectorLink(doc, &selector, job.startURL)
+						links := selectorLink(doc, &selector, job.startURL)
 						if HasElem(selector.ParentSelectors, selector.ID) {
 							for _, link := range links {
 								if !HasElem(job.siteMap.StartURL, link) {
@@ -455,10 +455,10 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 							}
 						}
 					} else if selector.Type == "SelectorElementAttribute" {
-						resultText := SelectorElementAttribute(doc, &selector)
+						resultText := selectorElementAttribute(doc, &selector)
 						linkOutput[selector.ID] = resultText
 					} else if selector.Type == "SelectorImage" {
-						resultText := SelectorImage(doc, &selector)
+						resultText := selectorImage(doc, &selector)
 						if len(resultText) != 0 {
 							if len(resultText) == 1 {
 								linkOutput[selector.ID] = resultText[0]
@@ -467,10 +467,10 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 							}
 						}
 					} else if selector.Type == "SelectorElement" {
-						resultText := SelectorElement(doc, &selector, job.startURL)
+						resultText := selectorElement(doc, &selector, job.startURL)
 						linkOutput[selector.ID] = resultText
 					} else if selector.Type == "SelectorTable" {
-						resultText := SelectorTable(doc, &selector)
+						resultText := selectorTable(doc, &selector)
 						linkOutput[selector.ID] = resultText
 					}
 				}
@@ -481,11 +481,11 @@ func worker(workerID int, jobs <-chan WorkerJob, results chan<- WorkerJob, wg *s
 	}
 }
 
-func scraper(siteMap *Scraping, parent string) map[string]interface{} {
+func scraper(siteMap *scraping, parent string) map[string]interface{} {
 	output := make(map[string]interface{})
 	var wg sync.WaitGroup
-	jobs := make(chan WorkerJob, settings.Workers)
-	results := make(chan WorkerJob, settings.Workers)
+	jobs := make(chan workerJob, settings.Workers)
+	results := make(chan workerJob, settings.Workers)
 	outputChannel := make(chan map[string]interface{})
 	for x := 1; x <= settings.Workers; x++ {
 		wg.Add(1)
@@ -498,7 +498,7 @@ func scraper(siteMap *Scraping, parent string) map[string]interface{} {
 				if !validURL(startURL) {
 					continue
 				}
-				workerjob := WorkerJob{
+				workerjob := workerJob{
 					parent:   parent,
 					startURL: startURL,
 					siteMap:  siteMap,
