@@ -495,7 +495,7 @@ func uiEditSelector(index int) string {
 						<select id="map_type">
 							<option value="Text" ` + IfThenElse(el.Type == "SelectorText", `selected="selected"`, "") + `>Text</option>
 							<option value="Link" ` + IfThenElse(el.Type == "SelectorLink", `selected="selected"`, "") + `>Link</option>
-							<option value="Popup Link" ` + IfThenElse(el.Type == "SelectorPopupLink", `selected="selected"`, "") + `>Popup link</option>
+							<option value="Popup Link" ` + IfThenElse(el.Type == "SelectorPopupLink", `selected="selected"`, "") + `>Popup Link</option>
 							<option value="Image" ` + IfThenElse(el.Type == "SelectorImage", `selected="selected"`, "") + `>Image</option>
 							<option value="Table" ` + IfThenElse(el.Type == "table", `selected="selected"`, "") + `>Table</option>
 							<option value="Element attribute" ` + IfThenElse(el.Type == "SelectorImage", `selected="selected"`, "") + `>Element attribute</option>
@@ -503,7 +503,7 @@ func uiEditSelector(index int) string {
 							<option value="Element" ` + IfThenElse(el.Type == "element", `selected="selected"`, "") + `>Element</option>
 							<option value="Element scroll down" ` + IfThenElse(el.Type == "scroll", `selected="selected"`, "") + `>Element scroll down</option>
 							<option value="Grouped" ` + IfThenElse(el.Type == "grouped", `selected="selected"`, "") + `>Grouped</option>
-							<option value="Sitemap.xml Links" ` + IfThenElse(el.Type == "xml", `selected="selected"`, "") + `>Sitemap.xml links</option>
+							<option value="Sitemap.xml links" ` + IfThenElse(el.Type == "xml", `selected="selected"`, "") + `>Sitemap.xml links</option>
 						</select>
 					</tr>
 					<tr>
