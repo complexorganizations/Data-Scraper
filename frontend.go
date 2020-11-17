@@ -629,11 +629,11 @@ func uiSelectElement(index int) string {
 }
 
 func runScraper(ui lorca.UI) {
+	scrape()
 	err := ui.Close()
 	if err != nil {
 		frontendLog(err)
 	}
-	scrape()
 }
 
 func main() {
