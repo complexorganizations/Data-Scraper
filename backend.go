@@ -566,7 +566,7 @@ func outputResult() {
 	}
 }
 
-func main() {
+func scrape() {
 	clearCache()
 	siteMap := readSiteMap()
 	readSettingsJSON()
