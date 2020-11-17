@@ -1,6 +1,6 @@
 {
   "Settings": {
-    "Gui": true,
+    "Gui": false,
     "Log": true,
     "JavaScript": false,
     "Workers": 10,

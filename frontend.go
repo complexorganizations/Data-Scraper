@@ -50,7 +50,7 @@ var (
 
 func frontendLog(err error) {
 	if settings.Log {
-		fmt.Println(err)
+		fmt.Println("Error: ", err)
 	}
 }
 
