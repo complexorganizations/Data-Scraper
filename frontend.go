@@ -505,6 +505,7 @@ func uiEditSelector(index int) string {
 							<option value="SelectorElementClick" `+ IfThenElse(el.Type == "SelectorElementClick", `selected`, "") +`>Element click</option>
 							<option value="SelectorGroup" `+ IfThenElse(el.Type == "SelectorGroup", `selected`, "") +`>Grouped</option>
 							<option value="SelectorSitemapXmlLink" `+ IfThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") +`>Sitemap.xml links</option>
+
 						</select>
 					</tr>
 					<tr>
