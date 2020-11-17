@@ -17,7 +17,7 @@ func frontendLog(err error) {
 	}
 }
 
-func IfThenElse(condition bool, a string, b string) string {
+func ifThenElse(condition bool, a string, b string) string {
 	if condition {
 		return a
 	}
@@ -215,18 +215,18 @@ func uiEditSettings() string {
 		</head>
 		<body>
 			<table>
-				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + IfThenElse(settings.Gui, `checked`, "") + `></td></tr>
-				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + IfThenElse(settings.Log, `checked`, "") + `></td></tr>
-				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + IfThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
+				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
+				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(settings.Log, `checked`, "") + `></td></tr>
+				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
 
 				<tr>
 					<th>Export</th>
 					<td>
 						<select id="settings_export">
-							<option value="json" ` + IfThenElse(settings.Export == "json", `selected="selected"`, "") + `>JSON</option>
-							<option value="xml" ` + IfThenElse(settings.Export == "xml", `selected="selected"`, "") + `>XML</option>
-							<option value="csv" ` + IfThenElse(settings.Export == "csv", `selected="selected"`, "") + `>CSV</option>
+							<option value="json" ` + ifThenElse(settings.Export == "json", `selected="selected"`, "") + `>JSON</option>
+							<option value="xml" ` + ifThenElse(settings.Export == "xml", `selected="selected"`, "") + `>XML</option>
+							<option value="csv" ` + ifThenElse(settings.Export == "csv", `selected="selected"`, "") + `>CSV</option>
 						</select>
 					</td>
 				<tr>
@@ -358,7 +358,7 @@ func viewMap(ui lorca.UI) {
 }
 
 func addSelector(ui lorca.UI) {
-	newSelector := Selectors{}
+	newSelector := selectors{}
 	newSelector.ParentSelectors = []string{""}
 	smap.Selectors = append(smap.Selectors, newSelector)
 	err := ui.Load("data:text/html," + url.PathEscape(uiEditSelector(len(smap.Selectors)-1)))
@@ -486,18 +486,18 @@ func uiEditSelector(index int) string {
 					<tr>
 						<th>type</th><td>
 						<select id="map_type">
-							<option value="SelectorText" `+ IfThenElse(el.Type == "SelectorText", `selected`, "") +`>Text</option>
-							<option value="SelectorLink" `+ IfThenElse(el.Type == "SelectorLink", `selected`, "") +`>Link</option>
-							<option value="SelectorPopupLink" `+ IfThenElse(el.Type == "SelectorPopupLink", `selected`, "") +`>Popup link</option>
-							<option value="SelectorImage" `+ IfThenElse(el.Type == "SelectorImage", `selected`, "") +`>Image</option>
-							<option value="SelectorTable" `+ IfThenElse(el.Type == "SelectorTable", `selected`, "") +`>Table</option>
-							<option value="SelectorElementAttribute" `+ IfThenElse(el.Type == "SelectorElementAttribute", `selected`, "") +`>Element attribute</option>
-							<option value="SelectorHTML" `+ IfThenElse(el.Type == "SelectorHTML", `selected`, "") +`>HTML</option>
-							<option value="SelectorElement" `+ IfThenElse(el.Type == "SelectorElement", `selected`, "") +`>Element</option>
-							<option value="SelectorElementScroll" `+ IfThenElse(el.Type == "SelectorElementScroll", `selected`, "") +`>Element scroll down</option>
-							<option value="SelectorElementClick" `+ IfThenElse(el.Type == "SelectorElementClick", `selected`, "") +`>Element click</option>
-							<option value="SelectorGroup" `+ IfThenElse(el.Type == "SelectorGroup", `selected`, "") +`>Grouped</option>
-							<option value="SelectorSitemapXmlLink" `+ IfThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") +`>Sitemap.xml links</option>
+							<option value="SelectorText" ` + ifThenElse(el.Type == "SelectorText", `selected`, "") + `>Text</option>
+							<option value="SelectorLink" ` + ifThenElse(el.Type == "SelectorLink", `selected`, "") + `>Link</option>
+							<option value="SelectorPopupLink" ` + ifThenElse(el.Type == "SelectorPopupLink", `selected`, "") + `>Popup link</option>
+							<option value="SelectorImage" ` + ifThenElse(el.Type == "SelectorImage", `selected`, "") + `>Image</option>
+							<option value="SelectorTable" ` + ifThenElse(el.Type == "SelectorTable", `selected`, "") + `>Table</option>
+							<option value="SelectorElementAttribute" ` + ifThenElse(el.Type == "SelectorElementAttribute", `selected`, "") + `>Element attribute</option>
+							<option value="SelectorHTML" ` + ifThenElse(el.Type == "SelectorHTML", `selected`, "") + `>HTML</option>
+							<option value="SelectorElement" ` + ifThenElse(el.Type == "SelectorElement", `selected`, "") + `>Element</option>
+							<option value="SelectorElementScroll" ` + ifThenElse(el.Type == "SelectorElementScroll", `selected`, "") + `>Element scroll down</option>
+							<option value="SelectorElementClick" ` + ifThenElse(el.Type == "SelectorElementClick", `selected`, "") + `>Element click</option>
+							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Grouped</option>
+							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Sitemap.xml links</option>
 
 						</select>
 					</tr>
@@ -505,11 +505,11 @@ func uiEditSelector(index int) string {
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
-								<option value="_root"` + IfThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") + `>_root</option>`
+								<option value="_root"` + ifThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") + `>_root</option>`
 
 	for _, e := range smap.Selectors {
 		if e.ID != el.ID {
-			page += `<option value="` + e.ID + `" ` + IfThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") + `>` + e.ID + `</option>`
+			page += `<option value="` + e.ID + `" ` + ifThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") + `>` + e.ID + `</option>`
 		}
 	}
 
@@ -517,7 +517,7 @@ func uiEditSelector(index int) string {
 						</td>
 					</tr>
 					<tr><th>selector</th><td><input type="text" id="map_selector" value="` + el.Selector + `"><button onclick=selectElement(` + strconv.Itoa(index) + `)>Select</button></td></tr>
-					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + IfThenElse(el.Multiple, `checked"`, "") + `></td></tr>
+					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(el.Multiple, `checked"`, "") + `></td></tr>
 					<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>
 					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(el.Delay) + `"></td></tr>
 				</table>
