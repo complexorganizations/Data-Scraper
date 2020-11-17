@@ -79,7 +79,7 @@ func uiViewSitemap() string {
 	page := `
 		<html>
 			<head>
-				<title>Preview</title>
+				<title>Data Scraper Sitemap Generator</title>
 				<style>
 					` + globalStyles + `
 					body {
