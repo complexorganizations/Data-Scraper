@@ -31,45 +31,45 @@ var (
 const  configFile = "sitemap.json"
 
 type selectors struct {
-	ID					string		`json:"id"`
-	Type				string		`json:"type"`
-	ParentSelectors		[]string	`json:"parentSelectors"`
-	Selector			string		`json:"selector"`
-	Multiple			bool		`json:"multiple"`
-	Regex				string		`json:"regex"`
-	Delay				int			`json:"delay"`
-	ExtractAttribute	string		`json:"exactAttribute"`
+	ID                string    `json:"id"`
+	Type              string    `json:"type"`
+	ParentSelectors   []string  `json:"parentSelectors"`
+	Selector          string    `json:"selector"`
+	Multiple          bool      `json:"multiple"`
+	Regex             string    `json:"regex"`
+	Delay             int       `json:"delay"`
+	ExtractAttribute  string    `json:"exactAttribute"`
 }
 
 type scraping struct {
-	ID			string		`json:"_id,omitempty"`
-	StartURL	[]string	`json:"startUrl"`
-	Selectors	[]selectors	`json:"selectors"`
+	ID         string       `json:"_id,omitempty"`
+	StartURL   []string     `json:"startUrl"`
+	Selectors  []selectors  `json:"selectors"`
 }
 
 type settingsT struct {
-	Gui				bool		`json:"gui"`
-	Log				bool		`json:"log"`
-	JavaScript		bool		`json:"javascript"`
-	Workers			int			`json:"workers"`
-	Export			string		`json:"export"`
-	UserAgents		[]string	`json:"userAgents"`
-	Captcha			string		`json:"captcha"`
-	Proxy			[]string	`json:"proxy"`
-	LogFile			string		`json:"log_file"`
-	OutputFile	string		`json:"output_filename"`
+	Gui         bool      `json:"gui"`
+	Log         bool      `json:"log"`
+	JavaScript  bool      `json:"javascript"`
+	Workers     int       `json:"workers"`
+	Export      string    `json:"export"`
+	UserAgents  []string  `json:"userAgents"`
+	Captcha     string    `json:"captcha"`
+	Proxy       []string  `json:"proxy"`
+	LogFile     string    `json:"log_file"`
+	OutputFile  string    `json:"output_filename"`
 }
 
 type jsonType struct {
-	Settings	settingsT	`json:"settings"`
-	Sitemap		scraping	`json:"sitemap"`
+	Settings  settingsT  `json:"settings"`
+	Sitemap   scraping   `json:"sitemap"`
 }
 
 type workerJob struct {
-	startURL	string
-	parent		string
-	siteMap		*scraping
-	linkOutput	map[string]interface{}
+	startURL    string
+	parent      string
+	siteMap     *scraping
+	linkOutput  map[string]interface{}
 }
 
 func clearCache() {
