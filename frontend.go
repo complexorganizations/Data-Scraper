@@ -553,7 +553,9 @@ func uiSelectElement(index int) string {
 
 	client := &http.Client{Transport: transport}
 	req, err := http.NewRequest("GET", sitemap.StartURL[0], nil)
-	if err != nil { frontendLog(err) }
+	if err != nil {
+		frontendLog(err)
+	}
 	if len(settings.UserAgents) > 0 {
 		req.Header.Set("User-Agent", settings.UserAgents[0])
 	}
