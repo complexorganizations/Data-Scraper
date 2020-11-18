@@ -507,7 +507,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						logErrors(err)
 						os.Exit(0)
 					}
-					var data map[string]interface{}
+					var data = map[string]interface{}{}
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
 					switch settings.Export {
