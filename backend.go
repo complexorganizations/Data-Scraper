@@ -234,7 +234,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 
 func selectorTable(doc *goquery.Document, selector *selectors) map[string]interface{} {
 	var headings, row []string
-	var rows [][]string
+	var rows = [][]string{}
 	table := make(map[string]interface{})
 	doc.Find(selector.Selector).Each(func( _ int, tableHTML *goquery.Selection) {
 		tableHTML.Find("tr").Each(func( _ int, rowHTML *goquery.Selection) {
