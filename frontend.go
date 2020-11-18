@@ -5,15 +5,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/zserge/lorca"
 )
 
+var shouldScrape = false
+
 func frontendLog(err error) {
 	if settings.Log {
-		fmt.Println("Error: ", err)
+		_, _ = fmt.Fprintln(os.Stderr, "Error: ", err)
 	}
 }
 
@@ -107,12 +110,12 @@ func uiViewSitemap() string {
 						<th>Start URL</th>
 					</tr>
 					<tr>
-						<td>` + smap.ID + `</td>
+						<td>` + sitemap.ID + `</td>
 						<td>`
 
-	for i, e := range smap.StartURL {
+	for i, e := range sitemap.StartURL {
 		page += e
-		if i < len(smap.StartURL)-1 {
+		if i < len(sitemap.StartURL)-1 {
 			page += ", "
 		}
 	}
@@ -292,12 +295,12 @@ func removeSiteURL(ui lorca.UI) {
 }
 
 func saveMap(ui lorca.UI) {
-	smap.ID = fmt.Sprint(ui.Eval(`document.getElementById("txt_sitemap_id").value;`))
+	sitemap.ID = fmt.Sprint(ui.Eval(`document.getElementById("txt_sitemap_id").value;`))
 	urlNum, _ := strconv.Atoi(fmt.Sprint(ui.Eval(`url_num.toString();`)))
-	smap.StartURL = []string{}
+	sitemap.StartURL = []string{}
 	for i := 0; i < urlNum; i++ {
 		code := fmt.Sprintf(`document.getElementById("txt_starturl%d").value;`, i+1)
-		smap.StartURL = append(smap.StartURL, fmt.Sprint(ui.Eval(code)))
+		sitemap.StartURL = append(sitemap.StartURL, fmt.Sprint(ui.Eval(code)))
 	}
 	writeJSON()
 	err := ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
@@ -320,11 +323,11 @@ func uiEditMap() string {
 			</head>
 			<body>
 				<label for="txt_sitemap_id">Sitemap name: </label>
-				<input type="text" placeholder="Enter sitemap name" id="txt_sitemap_id" value="` + smap.ID + `"></input>
+				<input type="text" placeholder="Enter sitemap name" id="txt_sitemap_id" value="` + sitemap.ID + `"></input>
 				<label for="urlInputs">Start URL: </label>
 				<div id="urlInputs">`
 
-	for i, e := range smap.StartURL {
+	for i, e := range sitemap.StartURL {
 		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
 
@@ -333,7 +336,7 @@ func uiEditMap() string {
 				<button onclick=addSiteURL()>+</button>
 				<button onclick=saveMap()>Save</button>
 				<script>
-					let url_num = ` + strconv.Itoa(len(smap.StartURL)) + `
+					let url_num = ` + strconv.Itoa(len(sitemap.StartURL)) + `
 					let url_inputs = document.getElementById("urlInputs");
 					let el;
 				</script>
@@ -360,8 +363,8 @@ func viewMap(ui lorca.UI) {
 func addSelector(ui lorca.UI) {
 	newSelector := selectors{}
 	newSelector.ParentSelectors = []string{""}
-	smap.Selectors = append(smap.Selectors, newSelector)
-	err := ui.Load("data:text/html," + url.PathEscape(uiEditSelector(len(smap.Selectors)-1)))
+	sitemap.Selectors = append(sitemap.Selectors, newSelector)
+	err := ui.Load("data:text/html," + url.PathEscape(uiEditSelector(len(sitemap.Selectors)-1)))
 	if err != nil {
 		frontendLog(err)
 	}
@@ -389,7 +392,7 @@ func uiViewSelectors() string {
 						<th>edit</th>
 					</tr>`
 
-	for i, e := range smap.Selectors {
+	for i, e := range sitemap.Selectors {
 		page += `<tr>`
 		page += `<td>` + e.ID + `</td>`
 		page += `<td>` + e.Type + `</td>`
@@ -428,7 +431,7 @@ func uiViewSelectors() string {
 }
 
 func deleteSelector(ui lorca.UI, index int) {
-	smap.Selectors = append(smap.Selectors[:index], smap.Selectors[index+1:]...)
+	sitemap.Selectors = append(sitemap.Selectors[:index], sitemap.Selectors[index+1:]...)
 	writeJSON()
 	err := ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
 	if err != nil {
@@ -438,7 +441,7 @@ func deleteSelector(ui lorca.UI, index int) {
 
 func saveSelector(ui lorca.UI, index int) {
 	var err error
-	el := smap.Selectors[index]
+	el := sitemap.Selectors[index]
 	el.ID = fmt.Sprint(ui.Eval(`document.getElementById("map_id").value;`))
 	el.Type = fmt.Sprint(ui.Eval(`document.getElementById("map_type").value;`))
 	el.ParentSelectors = []string{}
@@ -451,7 +454,7 @@ func saveSelector(ui lorca.UI, index int) {
 	el.Multiple = fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true"
 	el.Regex = fmt.Sprint(ui.Eval(`document.getElementById("map_regex").value;`))
 	el.Delay, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
-	smap.Selectors[index] = el
+	sitemap.Selectors[index] = el
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
 	if err != nil {
@@ -468,7 +471,7 @@ func selectElement(ui lorca.UI, index int) {
 }
 
 func uiEditSelector(index int) string {
-	el := smap.Selectors[index]
+	el := sitemap.Selectors[index]
 	page := `
 		<html>
 			<head>
@@ -507,7 +510,7 @@ func uiEditSelector(index int) string {
 							<select id="map_parents" multiple>
 								<option value="_root"` + ifThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") + `>_root</option>`
 
-	for _, e := range smap.Selectors {
+	for _, e := range sitemap.Selectors {
 		if e.ID != el.ID {
 			page += `<option value="` + e.ID + `" ` + ifThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") + `>` + e.ID + `</option>`
 		}
@@ -532,16 +535,20 @@ func uiEditSelector(index int) string {
 }
 
 func selectedElement(ui lorca.UI, index int, str string) {
-	smap.Selectors[index].Selector = str
+	sitemap.Selectors[index].Selector = str
 	editSelector(ui, index)
 }
 
 func uiSelectElement(index int) string {
-	resp, err := http.Get(smap.StartURL[0])
-	html, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		frontendLog(err)
+	resp, err := http.Get(sitemap.StartURL[0])
+	var html []byte
+	if err == nil {
+		html, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			frontendLog(err)
+		}
 	}
+
 	page := string(html)
 	insertIndex := strings.Index(page, "</body>")
 	if insertIndex == -1 {
@@ -620,11 +627,51 @@ func uiSelectElement(index int) string {
 }
 
 func runScraper(ui lorca.UI) {
-	scrape()
+	shouldScrape = true
 	err := ui.Close()
 	if err != nil {
 		frontendLog(err)
 	}
+}
+
+func bindFunctions(ui lorca.UI) error {
+	type binding struct {
+		name string
+		function interface{}
+	}
+
+	functions := []binding{
+		{"runScraper", 		func() { runScraper(ui) }},
+		{"runScraper", 		func() { runScraper(ui) }},
+		{"editSettings", 		func() { editSettings(ui) }},
+		{"editSitemap", 		func() { editSitemap(ui) }},
+		{"saveSettings", 		func() { saveSettings(ui) }},
+		{"addUserAgent", 		func() { addUserAgent(ui) }},
+		{"removeUserAgent",	func() { removeUserAgent(ui) }},
+		{"addProxy", 			func() { addProxy(ui) }},
+		{"removeProxy", 		func() { removeProxy(ui) }},
+		{"addSiteURL", 		func() { addSiteURL(ui) }},
+		{"removeSiteURL", 	func() { removeSiteURL(ui) }},
+		{"saveMap", 			func() { saveMap(ui) }},
+		{"viewSelectors", 	func() { viewSelectors(ui) }},
+		{"editSelector", 		func(i int) { editSelector(ui, i) }},
+		{"deleteSelector",	func(i int) { deleteSelector(ui, i) }},
+		{"saveSelector", 		func(i int) { saveSelector(ui, i) }},
+		{"addSelector", 		func() { addSelector(ui) }},
+		{"viewMap", 			func() { viewMap(ui) }},
+		{"selectElement", 	func(i int) { selectElement(ui, i) }},
+		{"selectedElement", 	func(i int, str string) { selectedElement(ui, i, str) }},
+	}
+
+	var err error = nil
+	for _, e := range functions {
+		err = ui.Bind(e.name, e.function)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func main() {
@@ -636,32 +683,21 @@ func main() {
 	}
 
 	ui, err := lorca.New("", "", 900, 600)
+	if err != nil {
+		frontendLog(err)
+		return
+	}
 
-	err = ui.Bind("runScraper", func() { runScraper(ui) })
-	err = ui.Bind("editSettings", func() { editSettings(ui) })
-	err = ui.Bind("editSitemap", func() { editSitemap(ui) })
-	err = ui.Bind("saveSettings", func() { saveSettings(ui) })
-	err = ui.Bind("addUserAgent", func() { addUserAgent(ui) })
-	err = ui.Bind("removeUserAgent", func() { removeUserAgent(ui) })
-	err = ui.Bind("addProxy", func() { addProxy(ui) })
-	err = ui.Bind("removeProxy", func() { removeProxy(ui) })
-	err = ui.Bind("addSiteURL", func() { addSiteURL(ui) })
-	err = ui.Bind("removeSiteURL", func() { removeSiteURL(ui) })
-	err = ui.Bind("saveMap", func() { saveMap(ui) })
-	err = ui.Bind("viewSelectors", func() { viewSelectors(ui) })
-	err = ui.Bind("editSelector", func(i int) { editSelector(ui, i) })
-	err = ui.Bind("deleteSelector", func(i int) { deleteSelector(ui, i) })
-	err = ui.Bind("saveSelector", func(i int) { saveSelector(ui, i) })
-	err = ui.Bind("addSelector", func() { addSelector(ui) })
-	err = ui.Bind("viewMap", func() { viewMap(ui) })
-	err = ui.Bind("selectElement", func(i int) { selectElement(ui, i) })
-	err = ui.Bind("selectedElement", func(i int, str string) { selectedElement(ui, i, str) })
+	err = bindFunctions(ui)
+	if err != nil { frontendLog(err) }
+
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
+	if err != nil { frontendLog(err) }
 
 	<-ui.Done()
 
 	err = ui.Close()
-	if err != nil {
-		frontendLog(err)
-	}
+	if err != nil { frontendLog(err) }
+
+	if shouldScrape { scrape() }
 }
