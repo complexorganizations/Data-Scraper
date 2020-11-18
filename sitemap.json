@@ -1,15 +1,17 @@
 {
-  "Settings": {
-    "Gui": false,
-    "Log": false,
-    "JavaScript": false,
-    "Workers": 10,
-    "Export": "json",
-    "UserAgents": [],
-    "Captcha": "",
-    "Proxy": []
+  "settings": {
+    "gui": false,
+    "log": false,
+    "javascript": false,
+    "workers": 10,
+    "export": "json",
+    "userAgents": [],
+    "captcha": "",
+    "proxy": [],
+    "output_filename": "output.json",
+    "log_file": "logs.log"
   },
-  "Sitemap": {
+  "sitemap": {
     "_id": "www.prajwalkoirala.com",
     "startUrl": [
       "https://www.prajwalkoirala.com"
@@ -25,7 +27,7 @@
         "multiple": false,
         "regex": "",
         "delay": 0,
-        "ExtractAttribute": ""
+        "extractAttribute": ""
       },
       {
         "id": "Picture",
@@ -37,7 +39,7 @@
         "multiple": false,
         "regex": "",
         "delay": 0,
-        "ExtractAttribute": ""
+        "extractAttribute": ""
       }
     ]
   }
