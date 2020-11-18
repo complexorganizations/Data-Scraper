@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -540,7 +541,21 @@ func selectedElement(ui lorca.UI, index int, str string) {
 }
 
 func uiSelectElement(index int) string {
-	resp, err := http.Get(sitemap.StartURL[0])
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
+	}
+
+	if len(settings.Proxy) > 0 {
+		proxyString := settings.Proxy[0]
+		proxyURL, _ := url.Parse(proxyString)
+		transport.Proxy = http.ProxyURL(proxyURL)
+	}
+
+	client := &http.Client{Transport: transport}
+	req, err := http.NewRequest("GET", sitemap.StartURL[0], nil)
+	if err != nil { frontendLog(err) }
+	req.Header.Set("User-Agent", settings.UserAgents[0])
+	resp, err := client.Do(req)
 	var html []byte
 	if err == nil {
 		html, err = ioutil.ReadAll(resp.Body)
@@ -641,7 +656,6 @@ func bindFunctions(ui lorca.UI) error {
 	}
 
 	functions := []binding{
-		{"runScraper", func() { runScraper(ui) }},
 		{"runScraper", func() { runScraper(ui) }},
 		{"editSettings", func() { editSettings(ui) }},
 		{"editSitemap", func() { editSitemap(ui) }},
