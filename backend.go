@@ -24,52 +24,52 @@ import (
 )
 
 var (
-	settings	settingsT
-	sitemap		scraping
+	settings settingsT
+	sitemap  scraping
 )
 
-const  configFile = "sitemap.json"
+const configFile = "sitemap.json"
 
 type selectors struct {
-	ID                string    `json:"id"`
-	Type              string    `json:"type"`
-	ParentSelectors   []string  `json:"parentSelectors"`
-	Selector          string    `json:"selector"`
-	Multiple          bool      `json:"multiple"`
-	Regex             string    `json:"regex"`
-	Delay             int       `json:"delay"`
-	ExtractAttribute  string    `json:"exactAttribute"`
+	ID               string   `json:"id"`
+	Type             string   `json:"type"`
+	ParentSelectors  []string `json:"parentSelectors"`
+	Selector         string   `json:"selector"`
+	Multiple         bool     `json:"multiple"`
+	Regex            string   `json:"regex"`
+	Delay            int      `json:"delay"`
+	ExtractAttribute string   `json:"exactAttribute"`
 }
 
 type scraping struct {
-	ID         string       `json:"_id,omitempty"`
-	StartURL   []string     `json:"startUrl"`
-	Selectors  []selectors  `json:"selectors"`
+	ID        string      `json:"_id,omitempty"`
+	StartURL  []string    `json:"startUrl"`
+	Selectors []selectors `json:"selectors"`
 }
 
 type settingsT struct {
-	Gui         bool      `json:"gui"`
-	Log         bool      `json:"log"`
-	JavaScript  bool      `json:"javascript"`
-	Workers     int       `json:"workers"`
-	Export      string    `json:"export"`
-	UserAgents  []string  `json:"userAgents"`
-	Captcha     string    `json:"captcha"`
-	Proxy       []string  `json:"proxy"`
-	LogFile     string    `json:"log_file"`
-	OutputFile  string    `json:"output_filename"`
+	Gui        bool     `json:"gui"`
+	Log        bool     `json:"log"`
+	JavaScript bool     `json:"javascript"`
+	Workers    int      `json:"workers"`
+	Export     string   `json:"export"`
+	UserAgents []string `json:"userAgents"`
+	Captcha    string   `json:"captcha"`
+	Proxy      []string `json:"proxy"`
+	LogFile    string   `json:"log_file"`
+	OutputFile string   `json:"output_filename"`
 }
 
 type jsonType struct {
-	Settings  settingsT  `json:"settings"`
-	Sitemap   scraping   `json:"sitemap"`
+	Settings settingsT `json:"settings"`
+	Sitemap  scraping  `json:"sitemap"`
 }
 
 type workerJob struct {
-	startURL    string
-	parent      string
-	siteMap     *scraping
-	linkOutput  map[string]interface{}
+	startURL   string
+	parent     string
+	siteMap    *scraping
+	linkOutput map[string]interface{}
 }
 
 func clearCache() {
@@ -85,8 +85,10 @@ func clearCache() {
 	default:
 		fmt.Println("Error: Temporary files can't be deleted.")
 	}
-	
-	if err != nil { frontendLog(err) }
+
+	if err != nil {
+		frontendLog(err)
+	}
 }
 
 func logErrors(error error) {
@@ -110,10 +112,14 @@ func logErrors(error error) {
 func readJSON() {
 	jsonData := jsonType{}
 	data, err := ioutil.ReadFile(configFile)
-	if err != nil { logErrors(err) }
+	if err != nil {
+		logErrors(err)
+	}
 
 	err = json.Unmarshal(data, &jsonData)
-	if err != nil { logErrors(err) }
+	if err != nil {
+		logErrors(err)
+	}
 
 	sitemap = jsonData.Sitemap
 	settings = jsonData.Settings
@@ -122,10 +128,14 @@ func readJSON() {
 func writeJSON() {
 	jsonData := jsonType{settings, sitemap}
 	dataJSON, err := json.MarshalIndent(jsonData, "", "  ")
-	if err != nil { logErrors(err) }
+	if err != nil {
+		logErrors(err)
+	}
 
 	err = ioutil.WriteFile(configFile, dataJSON, 0644)
-	if err != nil { logErrors(err) }
+	if err != nil {
+		logErrors(err)
+	}
 }
 
 func selectorText(doc *goquery.Document, selector *selectors) []string {
@@ -156,7 +166,9 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
 			href, ok := s.Attr("href")
-			if !ok { fmt.Println("Error: HREF has not been found.") }
+			if !ok {
+				fmt.Println("Error: HREF has not been found.")
+			}
 
 			links = append(links, toFixedURL(href, baseURL))
 
@@ -175,7 +187,7 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 				fmt.Println("Error: HREF has not been found.")
 			}
 			links = append(links, href)
-	
+
 			return selector.Multiple
 		},
 	)
@@ -236,12 +248,12 @@ func selectorTable(doc *goquery.Document, selector *selectors) map[string]interf
 	var headings, row []string
 	var rows = [][]string{}
 	table := make(map[string]interface{})
-	doc.Find(selector.Selector).Each(func( _ int, tableHTML *goquery.Selection) {
-		tableHTML.Find("tr").Each(func( _ int, rowHTML *goquery.Selection) {
-			rowHTML.Find("th").Each(func( _ int, tableHeading *goquery.Selection) {
+	doc.Find(selector.Selector).Each(func(_ int, tableHTML *goquery.Selection) {
+		tableHTML.Find("tr").Each(func(_ int, rowHTML *goquery.Selection) {
+			rowHTML.Find("th").Each(func(_ int, tableHeading *goquery.Selection) {
 				headings = append(headings, tableHeading.Text())
 			})
-			rowHTML.Find("td").Each(func( _ int, tableCell *goquery.Selection) {
+			rowHTML.Find("td").Each(func(_ int, tableCell *goquery.Selection) {
 				row = append(row, tableCell.Text())
 			})
 			if len(row) != 0 {
@@ -257,7 +269,7 @@ func selectorTable(doc *goquery.Document, selector *selectors) map[string]interf
 
 func crawlURL(href, userAgent string) *goquery.Document {
 	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{ InsecureSkipVerify: false },
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 	}
 
 	if len(settings.Proxy) > 0 {
@@ -266,7 +278,7 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		transport.Proxy = http.ProxyURL(proxyURL)
 	}
 
-	netClient := &http.Client{ Transport: transport }
+	netClient := &http.Client{Transport: transport}
 	req, err := http.NewRequest(http.MethodGet, href, nil)
 	if err != nil {
 		logErrors(err)
@@ -284,8 +296,10 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 
 	err = response.Body.Close()
-	
-if err != nil { frontendLog(err) }
+
+	if err != nil {
+		frontendLog(err)
+	}
 	return doc
 }
 
@@ -538,8 +552,10 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						}
 						csvWriter.Flush()
 						err = csvFile.Close()
-						
-						if err != nil { frontendLog(err) }
+
+						if err != nil {
+							frontendLog(err)
+						}
 					case "json":
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
@@ -577,7 +593,9 @@ func outputResult() {
 	}
 	if allowedFormat[userFormat] {
 		err := ioutil.WriteFile(settings.OutputFile, []byte{}, 0644)
-		if err != nil { logErrors(err) }
+		if err != nil {
+			logErrors(err)
+		}
 	} else {
 		_, _ = fmt.Fprintf(os.Stderr, "Format \"%s\" not supported", userFormat)
 		os.Exit(1)

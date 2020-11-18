@@ -636,31 +636,31 @@ func runScraper(ui lorca.UI) {
 
 func bindFunctions(ui lorca.UI) error {
 	type binding struct {
-		name string
+		name     string
 		function interface{}
 	}
 
 	functions := []binding{
-		{"runScraper", 		func() { runScraper(ui) }},
-		{"runScraper", 		func() { runScraper(ui) }},
-		{"editSettings", 		func() { editSettings(ui) }},
-		{"editSitemap", 		func() { editSitemap(ui) }},
-		{"saveSettings", 		func() { saveSettings(ui) }},
-		{"addUserAgent", 		func() { addUserAgent(ui) }},
-		{"removeUserAgent",	func() { removeUserAgent(ui) }},
-		{"addProxy", 			func() { addProxy(ui) }},
-		{"removeProxy", 		func() { removeProxy(ui) }},
-		{"addSiteURL", 		func() { addSiteURL(ui) }},
-		{"removeSiteURL", 	func() { removeSiteURL(ui) }},
-		{"saveMap", 			func() { saveMap(ui) }},
-		{"viewSelectors", 	func() { viewSelectors(ui) }},
-		{"editSelector", 		func(i int) { editSelector(ui, i) }},
-		{"deleteSelector",	func(i int) { deleteSelector(ui, i) }},
-		{"saveSelector", 		func(i int) { saveSelector(ui, i) }},
-		{"addSelector", 		func() { addSelector(ui) }},
-		{"viewMap", 			func() { viewMap(ui) }},
-		{"selectElement", 	func(i int) { selectElement(ui, i) }},
-		{"selectedElement", 	func(i int, str string) { selectedElement(ui, i, str) }},
+		{"runScraper", func() { runScraper(ui) }},
+		{"runScraper", func() { runScraper(ui) }},
+		{"editSettings", func() { editSettings(ui) }},
+		{"editSitemap", func() { editSitemap(ui) }},
+		{"saveSettings", func() { saveSettings(ui) }},
+		{"addUserAgent", func() { addUserAgent(ui) }},
+		{"removeUserAgent", func() { removeUserAgent(ui) }},
+		{"addProxy", func() { addProxy(ui) }},
+		{"removeProxy", func() { removeProxy(ui) }},
+		{"addSiteURL", func() { addSiteURL(ui) }},
+		{"removeSiteURL", func() { removeSiteURL(ui) }},
+		{"saveMap", func() { saveMap(ui) }},
+		{"viewSelectors", func() { viewSelectors(ui) }},
+		{"editSelector", func(i int) { editSelector(ui, i) }},
+		{"deleteSelector", func(i int) { deleteSelector(ui, i) }},
+		{"saveSelector", func(i int) { saveSelector(ui, i) }},
+		{"addSelector", func() { addSelector(ui) }},
+		{"viewMap", func() { viewMap(ui) }},
+		{"selectElement", func(i int) { selectElement(ui, i) }},
+		{"selectedElement", func(i int, str string) { selectedElement(ui, i, str) }},
 	}
 
 	var err error = nil
@@ -689,15 +689,23 @@ func main() {
 	}
 
 	err = bindFunctions(ui)
-	if err != nil { frontendLog(err) }
+	if err != nil {
+		frontendLog(err)
+	}
 
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
-	if err != nil { frontendLog(err) }
+	if err != nil {
+		frontendLog(err)
+	}
 
 	<-ui.Done()
 
 	err = ui.Close()
-	if err != nil { frontendLog(err) }
+	if err != nil {
+		frontendLog(err)
+	}
 
-	if shouldScrape { scrape() }
+	if shouldScrape {
+		scrape()
+	}
 }
