@@ -13,7 +13,9 @@ import (
 	"github.com/zserge/lorca"
 )
 
-var shouldScrape = false
+var (
+	shouldScrape = false
+)
 
 func frontendLog(err error) {
 	if settings.Log {
