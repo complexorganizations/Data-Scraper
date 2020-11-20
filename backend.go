@@ -28,7 +28,9 @@ var (
 	sitemap  scraping
 )
 
-const configFile = "sitemap.json"
+const (
+	configFile = "sitemap.json"
+)
 
 type selectors struct {
 	ID               string   `json:"id"`
