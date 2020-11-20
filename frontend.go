@@ -143,6 +143,7 @@ func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
 	settings.Log = fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
+	settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
 	settings.JavaScript = fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true"
 	settings.Workers, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_workers").value;`)))
 	if err != nil {
@@ -162,6 +163,7 @@ func saveSettings(ui lorca.UI) {
 		code := fmt.Sprintf(`document.getElementById("txt_proxy%d").value;`, i+1)
 		settings.Proxy = append(settings.Proxy, fmt.Sprint(ui.Eval(code)))
 	}
+	settings.OutputFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_output").value;`))
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
 	if err != nil {
@@ -185,7 +187,6 @@ func removeUserAgent(ui lorca.UI) {
 			ua.removeChild(ua.children[user_agent_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func addProxy(ui lorca.UI) {
@@ -204,7 +205,6 @@ func removeProxy(ui lorca.UI) {
 			proxies.removeChild(proxies.children[proxy_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func uiEditSettings() string {
@@ -217,12 +217,19 @@ func uiEditSettings() string {
 				input {
 					display: block;
 				}
+				.hide {
+					display: none;
+				}
 			</style>
 		</head>
 		<body>
 			<table>
 				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
 				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(settings.Log, `checked`, "") + `></td></tr>
+				<tr id="show_logfile"`+ifThenElse(!settings.Log, ` class="hide"`, "")+`>
+					<th>Log file</th>
+					<td><input id="settings_logfile" type="text" value="` + settings.LogFile + `"></td>
+				</tr>
 				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
 
@@ -260,6 +267,7 @@ func uiEditSettings() string {
 						<button onclick=addProxy()>+</button>
 					</td>
 				</tr>
+				<tr><th>Output file</th><td><input id="settings_output" type="text" value="` + settings.OutputFile + `"></td></tr>
 			</table>
 			<div class="buttons">
 				<button onclick="saveSettings()">Save</button>
@@ -270,6 +278,12 @@ func uiEditSettings() string {
 				let proxy_num = ` + strconv.Itoa(len(settings.Proxy)) + `
 				let proxies = document.getElementById("proxies");
 				let el;
+
+				let checkbox = document.getElementById("settings_log");
+				let show_logfile = document.getElementById("show_logfile");
+				checkbox.addEventListener('change', function() {
+					show_logfile.classList.toggle("hide");
+				});
 			</script>
 		</body>
 	</html>
@@ -294,7 +308,6 @@ func removeSiteURL(ui lorca.UI) {
 			url_inputs.removeChild(url_inputs.children[url_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("url_num.toString();"))
 }
 
 func saveMap(ui lorca.UI) {
