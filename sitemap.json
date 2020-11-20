@@ -1,6 +1,6 @@
 {
   "settings": {
-    "gui": true,
+    "gui": false,
     "log": false,
     "javascript": false,
     "cookies": false,
