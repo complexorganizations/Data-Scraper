@@ -3,6 +3,7 @@
     "gui": true,
     "log": false,
     "javascript": false,
+    "cookies": false,
     "workers": 10,
     "export": "json",
     "userAgents": [],
