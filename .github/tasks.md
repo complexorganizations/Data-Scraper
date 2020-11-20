@@ -1,10 +1,10 @@
-- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it
-- [ ] Fix the bugs for export to xml, csv, json
-- [ ] Support Screenshots [Elements && Page]
-- [ ] Make sure the output files is in GUI [Logs, Output]
-- [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
+- [ ] Enable cookies
 - [ ] Support choosing multiple elements.
 - [ ] Support browsing the website without choosing any elements
-- [ ] Enable cookies
+- [ ] Make sure the output files is in GUI [Logs, Output]
+- [ ] Fix the bugs for export to xml, csv, json
+- [ ] Support Screenshots [Elements && Page]
+- [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
 - [ ] Add login support
+- [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it
 - [ ] More testing and bug fixing
