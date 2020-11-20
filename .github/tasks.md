@@ -1,7 +1,6 @@
 - [ ] Enable cookies
 - [ ] Support choosing multiple elements
 - [ ] Support browsing the website without choosing any elements
-- [x] Make sure the output files is in GUI [Logs, Output]
 - [ ] Fix the bugs for export to xml, csv, json
 - [ ] Support Screenshots [Elements && Page]
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
