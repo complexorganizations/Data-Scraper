@@ -242,6 +242,7 @@ func uiEditSettings() string {
 							<option value="csv" ` + ifThenElse(settings.Export == "csv", `selected="selected"`, "") + `>CSV</option>
 						</select>
 					</td>
+				<tr><th>Output file</th><td><input id="settings_output" type="text" value="` + settings.OutputFile + `"></td></tr>
 				<tr>
 					<th>User agents</th>
 					<td>
@@ -267,7 +268,6 @@ func uiEditSettings() string {
 						<button onclick=addProxy()>+</button>
 					</td>
 				</tr>
-				<tr><th>Output file</th><td><input id="settings_output" type="text" value="` + settings.OutputFile + `"></td></tr>
 			</table>
 			<div class="buttons">
 				<button onclick="saveSettings()">Save</button>
