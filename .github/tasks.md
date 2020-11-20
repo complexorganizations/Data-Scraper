@@ -1,5 +1,5 @@
 - [ ] Enable cookies
-- [ ] Support choosing multiple elements.
+- [ ] Support choosing multiple elements
 - [ ] Support browsing the website without choosing any elements
 - [ ] Make sure the output files is in GUI [Logs, Output]
 - [ ] Fix the bugs for export to xml, csv, json
