@@ -187,7 +187,6 @@ func removeUserAgent(ui lorca.UI) {
 			ua.removeChild(ua.children[user_agent_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func addProxy(ui lorca.UI) {
@@ -206,7 +205,6 @@ func removeProxy(ui lorca.UI) {
 			proxies.removeChild(proxies.children[proxy_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("user_agent_num.toString();"))
 }
 
 func uiEditSettings() string {
@@ -310,7 +308,6 @@ func removeSiteURL(ui lorca.UI) {
 			url_inputs.removeChild(url_inputs.children[url_num]);
 		}
 	`)
-	fmt.Println(ui.Eval("url_num.toString();"))
 }
 
 func saveMap(ui lorca.UI) {
