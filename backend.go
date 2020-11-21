@@ -59,7 +59,7 @@ type settingsT struct {
 	UserAgents []string `json:"userAgents"`
 	Captcha    string   `json:"captcha"`
 	Proxy      []string `json:"proxy"`
-	OutputFile string   `json:"output_filename"`
+	OutputFile string   `json:"output_file"`
 	LogFile    string   `json:"log_file"`
 }
 
