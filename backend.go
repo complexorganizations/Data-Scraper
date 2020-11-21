@@ -54,7 +54,6 @@ type settingsT struct {
 	Log        bool     `json:"log"`
 	LogFile    string   `json:"logFile"`
 	JavaScript bool     `json:"javascript"`
-	Cookies    bool     `json:"cookies"`
 	Workers    int      `json:"workers"`
 	Export     string   `json:"export"`
 	OutputFile string   `json:"outputFile"`
