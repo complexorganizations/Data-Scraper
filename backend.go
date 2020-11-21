@@ -52,15 +52,15 @@ type scraping struct {
 type settingsT struct {
 	Gui        bool     `json:"gui"`
 	Log        bool     `json:"log"`
+	LogFile    string   `json:"logFile"`
 	JavaScript bool     `json:"javascript"`
 	Cookies    bool     `json:"cookies"`
 	Workers    int      `json:"workers"`
 	Export     string   `json:"export"`
+	OutputFile string   `json:"outputFile"`
 	UserAgents []string `json:"userAgents"`
 	Captcha    string   `json:"captcha"`
 	Proxy      []string `json:"proxy"`
-	OutputFile string   `json:"output_file"`
-	LogFile    string   `json:"log_file"`
 }
 
 type jsonType struct {
