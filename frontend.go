@@ -226,7 +226,7 @@ func uiEditSettings() string {
 			<table>
 				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
 				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(settings.Log, `checked`, "") + `></td></tr>
-				<tr id="show_logfile"`+ifThenElse(!settings.Log, ` class="hide"`, "")+`>
+				<tr id="show_logfile"` + ifThenElse(!settings.Log, ` class="hide"`, "") + `>
 					<th>Log file</th>
 					<td><input id="settings_logfile" type="text" value="` + settings.LogFile + `"></td>
 				</tr>
@@ -596,24 +596,32 @@ func uiSelectElement(index int, selectUrl string) string {
 	pUrl, _ := url.Parse(selectUrl)
 	selectUrl = pUrl.Scheme + "://" + pUrl.Host
 	foundReplace := 0
-	for true{
+	for true {
 		var attrs = map[string]int{
 			"href": -1,
-			"src": -1,
+			"src":  -1,
 		}
 		searchIndex := -1
 		for attr := range attrs {
-			attrs[attr] = strings.Index(page[foundReplace:], attr + "=\"")
-			if attrs[attr] > -1 {attrs[attr] += len(page[:foundReplace])}
+			attrs[attr] = strings.Index(page[foundReplace:], attr+"=\"")
+			if attrs[attr] > -1 {
+				attrs[attr] += len(page[:foundReplace])
+			}
 
-			if attrs[attr] == -1 { continue }
-			if searchIndex == -1 { searchIndex = attrs[attr] + len(attr + "=\"") }
+			if attrs[attr] == -1 {
+				continue
+			}
+			if searchIndex == -1 {
+				searchIndex = attrs[attr] + len(attr+"=\"")
+			}
 			if attrs[attr] < searchIndex {
-				searchIndex = attrs[attr] + len(attr + "=\"")
+				searchIndex = attrs[attr] + len(attr+"=\"")
 			}
 		}
 
-		if searchIndex == -1 { break }
+		if searchIndex == -1 {
+			break
+		}
 		if strings.HasPrefix(page[searchIndex:], "http") {
 			foundReplace = searchIndex + 1
 			continue
