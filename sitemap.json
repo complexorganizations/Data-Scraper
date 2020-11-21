@@ -9,7 +9,7 @@
     "userAgents": [],
     "captcha": "",
     "proxy": [],
-    "output_filename": "output.json",
+    "output_file": "output.json",
     "log_file": "logs.log"
   },
   "sitemap": {
