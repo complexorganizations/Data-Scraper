@@ -478,9 +478,11 @@ func saveSelector(ui lorca.UI, index int) {
 	}
 }
 
-func selectElement(ui lorca.UI, index int) {
-	saveSelector(ui, index)
-	err := ui.Load("data:text/html," + url.PathEscape(uiSelectElement(index)))
+func selectElement(ui lorca.UI, index int, selectUrl string) {
+	if selectUrl == sitemap.StartURL[0] {
+		saveSelector(ui, index)
+	}
+	err := ui.Load("data:text/html," + url.PathEscape(uiSelectElement(index, selectUrl)))
 	if err != nil {
 		frontendLog(err)
 	}
@@ -535,7 +537,13 @@ func uiEditSelector(index int) string {
 	page += `</select>
 						</td>
 					</tr>
-					<tr><th>selector</th><td><input type="text" id="map_selector" value="` + el.Selector + `"><button onclick=selectElement(` + strconv.Itoa(index) + `)>Select</button></td></tr>
+					<tr>
+						<th>selector</th>
+						<td>
+							<input type="text" id="map_selector" value="` + el.Selector + `">
+							<button onclick="selectElement(`+ strconv.Itoa(index) +`, '`+sitemap.StartURL[0]+`')">Select</button>
+						</td>
+					</tr>
 					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(el.Multiple, `checked"`, "") + `></td></tr>
 					<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>
 					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(el.Delay) + `"></td></tr>
@@ -555,7 +563,7 @@ func selectedElement(ui lorca.UI, index int, str string) {
 	editSelector(ui, index)
 }
 
-func uiSelectElement(index int) string {
+func uiSelectElement(index int, selectUrl string) string {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 	}
@@ -567,7 +575,7 @@ func uiSelectElement(index int) string {
 	}
 
 	client := &http.Client{Transport: transport}
-	req, err := http.NewRequest("GET", sitemap.StartURL[0], nil)
+	req, err := http.NewRequest("GET", selectUrl, nil)
 	if err != nil {
 		frontendLog(err)
 	}
@@ -585,6 +593,8 @@ func uiSelectElement(index int) string {
 
 	page := string(html)
 
+	pUrl, _ := url.Parse(selectUrl)
+	selectUrl = pUrl.Scheme + "://" + pUrl.Host
 	foundReplace := 0
 	for true{
 		var attrs = map[string]int{
@@ -609,7 +619,7 @@ func uiSelectElement(index int) string {
 			continue
 		}
 
-		page = page[:searchIndex] + sitemap.StartURL[0] + ifThenElse(page[searchIndex] == '/', "" , "/") + page[searchIndex:]
+		page = page[:searchIndex] + selectUrl + ifThenElse(page[searchIndex] == '/', "" , "/") + page[searchIndex:]
 		foundReplace = searchIndex + 1
 	}
 
@@ -625,17 +635,38 @@ func uiSelectElement(index int) string {
 				let identifier;
 				let ui;
 				let choice_label;
+				let browse = true; 
 			
 				(function () {
+					document.querySelectorAll("a[href]").forEach((as)=>{
+					 as.onclick = (ev) => {
+						selectElement(`+ strconv.Itoa(index) +`, as.href);
+						ev.preventDefault();
+					 }
+					})
 					ui = document.createElement("div");
+
 					choice_label = document.createElement("p");
 					choice_label.style.fontFamily = "sans-serif";
+					choice_label.style.flexGrow = "1";
 					ui.appendChild(choice_label);
+					
+					let browse_button = document.createElement("button");
+					browse_button.style.fontFamily = "sans-serif";
+					browse_button.style.marginRight = "16px";
+					browse_button.onclick = () => {
+						document.onmouseover = browse? mouseover : null;
+						browse = !browse;
+					}
+					browse_button.innerHTML = "Select element";
+					ui.appendChild(browse_button);
+
 					let accept_button = document.createElement("button");
 					accept_button.style.fontFamily = "sans-serif";
 					accept_button.onclick = () => selectedElement(` + strconv.Itoa(index) + `, identifier);
 					accept_button.innerHTML = "Accept choice";
 					ui.appendChild(accept_button);
+
 					ui.style.position = "fixed";
 					ui.style.left = "0";
 					ui.style.bottom = "0";
@@ -644,10 +675,13 @@ func uiSelectElement(index int) string {
 					ui.style.backgroundColor = "white";
 					ui.style.display = "flex";
 					ui.style.fontFamily = "sans-serif"
+					ui.style.padding= "8px 16px";
+					ui.style.borderTop= "solid black 1px";
 					document.body.appendChild(ui);
 				}())
+				
 
-				document.onmouseover = (e) => {
+				const mouseover = (e) => {
 					if (!!new_element) new_element.remove();
 					let x = e.clientX, y = e.clientY;
 					let hover_element = document.elementFromPoint(x, y);
@@ -722,7 +756,7 @@ func bindFunctions(ui lorca.UI) error {
 		{"saveSelector", func(i int) { saveSelector(ui, i) }},
 		{"addSelector", func() { addSelector(ui) }},
 		{"viewMap", func() { viewMap(ui) }},
-		{"selectElement", func(i int) { selectElement(ui, i) }},
+		{"selectElement", func(i int, url string) { selectElement(ui, i, url) }},
 		{"selectedElement", func(i int, str string) { selectedElement(ui, i, str) }},
 	}
 
