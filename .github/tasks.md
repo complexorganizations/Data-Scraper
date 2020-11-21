@@ -1,6 +1,5 @@
 - [ ] Don't save anything into memory
 - [ ] Support choosing multiple elements
-- [ ] Support browsing the website without choosing any elements
 - [ ] Fix the bugs for export to xml, csv, json
 - [ ] Support Screenshots [Elements && Page]
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
