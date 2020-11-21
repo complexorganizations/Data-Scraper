@@ -2,12 +2,12 @@
   "settings": {
     "gui": true,
     "log": false,
-    "log_file": "logs.log",
+    "logFile": "logs.log",
     "javascript": false,
     "cookies": false,
     "workers": 10,
     "export": "json",
-    "output_file": "output.json",
+    "outputFile": "output.json",
     "userAgents": [],
     "captcha": "",
     "proxy": []
