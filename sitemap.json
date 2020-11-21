@@ -2,15 +2,15 @@
   "settings": {
     "gui": true,
     "log": false,
+    "log_file": "logs.log",
     "javascript": false,
     "cookies": false,
     "workers": 10,
     "export": "json",
+    "output_file": "output.json",
     "userAgents": [],
     "captcha": "",
-    "proxy": [],
-    "output_file": "output.json",
-    "log_file": "logs.log"
+    "proxy": []
   },
   "sitemap": {
     "_id": "www.prajwalkoirala.com",
