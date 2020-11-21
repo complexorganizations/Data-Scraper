@@ -584,10 +584,40 @@ func uiSelectElement(index int) string {
 	}
 
 	page := string(html)
+
+	foundReplace := 0
+	for true{
+		var attrs = map[string]int{
+			"href": -1,
+			"src": -1,
+		}
+		searchIndex := -1
+		for attr := range attrs {
+			attrs[attr] = strings.Index(page[foundReplace:], attr + "=\"")
+			if attrs[attr] > -1 {attrs[attr] += len(page[:foundReplace])}
+
+			if attrs[attr] == -1 { continue }
+			if searchIndex == -1 { searchIndex = attrs[attr] + len(attr + "=\"") }
+			if attrs[attr] < searchIndex {
+				searchIndex = attrs[attr] + len(attr + "=\"")
+			}
+		}
+
+		if searchIndex == -1 { break }
+		if strings.HasPrefix(page[searchIndex:], "http") {
+			foundReplace = searchIndex + 1
+			continue
+		}
+
+		page = page[:searchIndex] + sitemap.StartURL[0] + ifThenElse(page[searchIndex] == '/', "" , "/") + page[searchIndex:]
+		foundReplace = searchIndex + 1
+	}
+
 	insertIndex := strings.Index(page, "</body>")
 	if insertIndex == -1 {
 		insertIndex = len(page) - 1
 	}
+
 	page =
 		page[:insertIndex] +
 			`<script defer>
