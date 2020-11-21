@@ -1,4 +1,3 @@
-- [ ] Don't save anything into memory
 - [ ] Support choosing multiple elements
 - [ ] Fix the bugs for export to xml, csv, json
 - [ ] Support Screenshots [Elements && Page]
