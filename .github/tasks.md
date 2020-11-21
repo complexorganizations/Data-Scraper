@@ -1,4 +1,3 @@
-- [ ] Enable cookies
 - [ ] Don't save anything into memory
 - [ ] Support choosing multiple elements
 - [ ] Support browsing the website without choosing any elements
