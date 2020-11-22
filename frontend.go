@@ -652,7 +652,7 @@ func uiSelectElement(index int, selectUrl string) string {
 			            as.onclick = (ev) => {
 			                ev.preventDefault();
 							if(as.href.includes("tel:") || as.href.includes("mailto:")) return;
-			                selectElement(`+ strconv.Itoa(index) +`, as.href);
+			                selectElement(` + strconv.Itoa(index) + `, as.href);
 			            }
 			        })
 			
