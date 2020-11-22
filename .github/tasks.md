@@ -1,6 +1,6 @@
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
 - [ ] Add login support
-- [ ] Remove `ctrl` to select multiple elements.
+- [ ] Remove `ctrl` to select multiple elements. [If multiple elements are selected then their multiple elements, if their single element is selected than its single element]
 - [ ] Beautify the `sitemap.json` and change the name of all the `key:value` names
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it
 - [ ] Code Optimizations && Code Cleanup && Bug Fixing
