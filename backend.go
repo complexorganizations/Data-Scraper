@@ -54,7 +54,6 @@ type settingsT struct {
 	Log        bool     `json:"log"`
 	LogFile    string   `json:"logFile"`
 	JavaScript bool     `json:"javascript"`
-	Cookies    bool     `json:"cookies"`
 	Workers    int      `json:"workers"`
 	Export     string   `json:"export"`
 	OutputFile string   `json:"outputFile"`
@@ -432,7 +431,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 			fmt.Println("URL:", job.startURL)
 			linkOutput := make(map[string]interface{})
 			for _, selector := range job.siteMap.Selectors {
-				if job.parent == selector.ParentSelectors[0] {
+				if len(selector.ParentSelectors) > 0 && job.parent == selector.ParentSelectors[0] {
 					if selector.Type == "SelectorText" {
 						resultText := selectorText(doc, &selector)
 						if len(resultText) != 0 {

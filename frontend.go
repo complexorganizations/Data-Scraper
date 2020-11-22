@@ -541,7 +541,7 @@ func uiEditSelector(index int) string {
 						<th>selector</th>
 						<td>
 							<input type="text" id="map_selector" value="` + el.Selector + `">
-							<button onclick="selectElement(`+ strconv.Itoa(index) +`, '`+sitemap.StartURL[0]+`')">Select</button>
+							<button onclick="selectElement(` + strconv.Itoa(index) + `, '` + sitemap.StartURL[0] + `')">Select</button>
 						</td>
 					</tr>
 					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(el.Multiple, `checked"`, "") + `></td></tr>
@@ -627,7 +627,7 @@ func uiSelectElement(index int, selectUrl string) string {
 			continue
 		}
 
-		page = page[:searchIndex] + selectUrl + ifThenElse(page[searchIndex] == '/', "" , "/") + page[searchIndex:]
+		page = page[:searchIndex] + selectUrl + ifThenElse(page[searchIndex] == '/', "", "/") + page[searchIndex:]
 		foundReplace = searchIndex + 1
 	}
 
