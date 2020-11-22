@@ -74,6 +74,32 @@ type workerJob struct {
 	linkOutput map[string]interface{}
 }
 
+// Datatype to store xml data
+type WebsiteData map[string]interface{}
+
+type xmlMapEntry struct {
+    XMLName xml.Name
+    Value   interface{} `xml:",chardata"`
+}
+
+func (m WebsiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+
+	if len(m) == 0 {
+        return nil
+    }
+
+    err := e.EncodeToken(start)
+    if err != nil {
+        return err
+	}
+	
+    for k, v := range m {
+        e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
+    }
+
+    return e.EncodeToken(start.End())
+}
+
 func clearCache() {
 	operatingSystem := runtime.GOOS
 	var err error
@@ -528,7 +554,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 					data[job.startURL] = job.linkOutput
 					switch settings.Export {
 					case "xml":
-						output, err := xml.MarshalIndent(data, "", " ")
+						output, err := xml.MarshalIndent(WebsiteData(job.linkOutput), "", "  ")
 						if err != nil {
 							logErrors(err)
 							os.Exit(0)
@@ -542,7 +568,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						}
 						csvWriter := csv.NewWriter(csvFile)
 						var rows [][]string
-						for i, v := range data {
+						for i, v := range data[job.startURL].(map[string]interface{}) {
 							rows = append(rows, []string{i, fmt.Sprint(v)})
 						}
 						for _, row := range rows {
