@@ -1,4 +1,3 @@
-- [ ] Fix the bugs for export [xml, csv, json]
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
 - [ ] Add login support
 - [ ] If there is Captcha on the page, than use (Google Cloud Vision API, Google Cloud Speech API) to solve it
