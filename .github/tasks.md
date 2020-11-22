@@ -1,5 +1,5 @@
 - [ ] Support choosing multiple elements
-- [ ] Fix the bugs for export to xml, csv, json
+- [ ] Fix the bugs for export [xml, csv, json]
 - [ ] Support Screenshots [Elements && Page]
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
 - [ ] Add login support
