@@ -639,93 +639,129 @@ func uiSelectElement(index int, selectUrl string) string {
 	page =
 		page[:insertIndex] +
 			`<script defer>
-				let new_element;
-				let identifier;
-				let ui;
-				let choice_label;
-				let browse = true; 
+			    let new_element;
+			    let selected_elements_hover = [];
+			    let selected_elements_new = [];
+			    let identifiers;
+			    let ui;
+			    let choice_label;
+			    let browse = true;
 			
-				(function () {
-					document.querySelectorAll("a[href]").forEach((as)=>{
-					 as.onclick = (ev) => {
-						selectElement(` + strconv.Itoa(index) + `, as.href);
-						ev.preventDefault();
-					 }
-					})
-					ui = document.createElement("div");
-
-					choice_label = document.createElement("p");
-					choice_label.style.fontFamily = "sans-serif";
-					choice_label.style.flexGrow = "1";
-					ui.appendChild(choice_label);
-					
-					let browse_button = document.createElement("button");
-					browse_button.style.fontFamily = "sans-serif";
-					browse_button.style.marginRight = "16px";
-					browse_button.onclick = () => {
-						document.onmouseover = browse? mouseover : null;
-						browse = !browse;
-					}
-					browse_button.innerHTML = "Select element";
-					ui.appendChild(browse_button);
-
-					let accept_button = document.createElement("button");
-					accept_button.style.fontFamily = "sans-serif";
-					accept_button.onclick = () => selectedElement(` + strconv.Itoa(index) + `, identifier);
-					accept_button.innerHTML = "Accept choice";
-					ui.appendChild(accept_button);
-
-					ui.style.position = "fixed";
-					ui.style.left = "0";
-					ui.style.bottom = "0";
-					ui.style.width = "100%";
-					ui.style.zIndex = "10000";
-					ui.style.backgroundColor = "white";
-					ui.style.display = "flex";
-					ui.style.fontFamily = "sans-serif"
-					ui.style.padding= "8px 16px";
-					ui.style.borderTop= "solid black 1px";
-					document.body.appendChild(ui);
-				}())
-				
-
-				const mouseover = (e) => {
-					if (!!new_element) new_element.remove();
-					let x = e.clientX, y = e.clientY;
-					let hover_element = document.elementFromPoint(x, y);
-					if (ui.contains(hover_element)) hover_element = null;
+			    (function () {
+			        document.querySelectorAll("a[href]").forEach((as) => {
+			            as.onclick = (ev) => {
+			                ev.preventDefault();
+							if(as.href.includes("tel:") || as.href.includes("mailto:")) return;
+			                selectElement(`+ strconv.Itoa(index) +`, as.href);
+			            }
+			        })
 			
-					if (!!hover_element) {
-						new_element = document.createElement("div");
-						var rect = hover_element.getBoundingClientRect();
-						new_element.style.position = "fixed";
-						new_element.style.zIndex = "10000";
-    			        new_element.style.backgroundColor = "rgba(255, 0, 0, .2)";
-    			        new_element.style.top = rect.top + "px";
-    			        new_element.style.height = rect.bottom - rect.top + "px";
-    			        new_element.style.left = rect.left + "px";
-    			        new_element.style.width = rect.right - rect.left + "px";
-                		// new_element.style.display = "none";
-
-						new_element.onmousedown = (e) => {
-							if (!!hover_element) {
-								identifier = hover_element.tagName.toLocaleLowerCase();
-					
-								if (hover_element.id.length > 0)
-									identifier += "#" + hover_element.id;
-					
-								hover_element.classList.forEach((e) => {
-									identifier += "." + e;
-								})
-					
-								choice_label.innerHTML = identifier;
-								e.preventDefault();
-							}
-						}
-
-    			        document.body.appendChild(new_element)
-    			    }
-    			}
+			        ui = document.createElement("div");
+			
+			        choice_label = document.createElement("p");
+			        choice_label.style.fontFamily = "sans-serif";
+			        choice_label.style.flexGrow = "1";
+			        ui.appendChild(choice_label);
+			
+			        let browse_button = document.createElement("button");
+			        browse_button.style.fontFamily = "sans-serif";
+			        browse_button.style.marginRight = "16px";
+			        browse_button.onclick = () => {
+			            document.onmouseover = browse ? mouseover : null;
+			            browse = !browse;
+			        }
+			        browse_button.innerHTML = "Select element";
+			        ui.appendChild(browse_button);
+			
+			        let accept_button = document.createElement("button");
+			        accept_button.style.fontFamily = "sans-serif";
+			        accept_button.onclick = () => selectedElement(` + strconv.Itoa(index) + `, identifiers);
+			        accept_button.innerHTML = "Accept choice";
+			        ui.appendChild(accept_button);
+			
+			        ui.style.position = "fixed";
+			        ui.style.left = "0";
+			        ui.style.right = "0";
+			        ui.style.bottom = "0";
+			        ui.style.zIndex = "10000";
+			        ui.style.backgroundColor = "white";
+			        ui.style.display = "flex";
+			        ui.style.fontFamily = "sans-serif"
+			        ui.style.padding = "8px 16px";
+			        ui.style.borderTop = "solid black 1px";
+			        document.body.appendChild(ui);
+			    }())
+			
+			
+			    const mouseover = (e) => {
+			        const hoverIndex = el => selected_elements_hover.indexOf(el)
+			        const newIndex = el => selected_elements_new.indexOf(el)
+			        const removeSelected = i => {
+			            selected_elements_new[i].remove()
+			            selected_elements_hover.splice(i, 1);
+			            selected_elements_new.splice(i, 1);
+			        }
+			
+			        if (!!new_element && newIndex(new_element) == -1) new_element.remove();
+			        let x = e.clientX, y = e.clientY;
+			        let hover_element = document.elementFromPoint(x, y);
+			        if (ui.contains(hover_element)) { hover_element = null; }
+			
+			        if (!!hover_element) {
+			            new_element = document.createElement("div");
+			            new_element.classList.add("test");
+			            var rect = hover_element.getBoundingClientRect();
+            			new_element.style.position = "absolute";
+            			new_element.style.zIndex = "10000";
+            			new_element.style.backgroundColor = "rgba(255, 0, 0, .2)";
+            			new_element.style.top = rect.top + window.pageYOffset + "px";
+			            new_element.style.height = rect.bottom - rect.top + "px";
+			            new_element.style.left = rect.left + "px";
+			            new_element.style.width = rect.right - rect.left + "px";
+			
+			            new_element.onmousedown = (e) => {
+			                if (!hover_element) return;
+			
+			                if (e.ctrlKey) {
+			                    if (newIndex(hover_element) > -1) {
+			                        removeSelected(newIndex(hover_element));
+			                    } else if (hoverIndex(hover_element) > -1) {
+			                        removeSelected(hoverIndex(hover_element));
+			                    }
+			                    else {
+			                        selected_elements_new.push(new_element)
+			                        selected_elements_hover.push(hover_element)
+			                    }
+			                }
+			                else {
+			                    selected_elements_new.forEach((e) => { if (!!e) e.remove() })
+			                    selected_elements_new = [new_element];
+			                    selected_elements_hover = [hover_element];
+			                }
+			
+			                identifiers = "";
+			                selected_elements_hover.forEach((hover) => {
+			                    if (identifiers.length > 0) {
+			                        identifiers += ", ";
+			                    }
+			
+			                    identifiers += hover.tagName.toLocaleLowerCase();
+			
+			                    if (hover.id.length > 0)
+			                        identifiers += "#" + hover.id;
+			
+			                    hover.classList.forEach((e) => {
+			                        identifiers += "." + e;
+			                    })
+			                })
+			
+			                choice_label.innerHTML = identifiers;
+			                e.preventDefault();
+			            }
+			
+			            document.body.appendChild(new_element);
+			        }
+			    }
 			</script>` +
 			page[insertIndex:]
 
