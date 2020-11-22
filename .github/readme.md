@@ -56,14 +56,14 @@ Why not use a browser extension to scrape a website?
 Why is this app so minimalist?
 - Minimalist but extremely strong, this app is designed to run in the background.
 
-Can this solve reCAPTCHA?
-- Yeah, recaptcha can be solved using Google cloud voice, vision API's.
+Can this solve captcha?
+- Yeah, captcha can be solved using Google cloud voice, vision API's.
 
 Should i manually try and change the `sitemap.json` file?
 - No, You should not.
 
 How can i open the GUI again?
-- `"Gui": true` ***Google Chrome (Required)***
+- Open the file `sitemap.json` and change it from `"Gui": false` to `"Gui": true` ***Google Chrome (Required)***
 
 ---
 ### Concurrency
