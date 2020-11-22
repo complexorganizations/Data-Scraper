@@ -78,26 +78,26 @@ type workerJob struct {
 type WebsiteData map[string]interface{}
 
 type xmlMapEntry struct {
-    XMLName xml.Name
-    Value   interface{} `xml:",chardata"`
+	XMLName xml.Name
+	Value   interface{} `xml:",chardata"`
 }
 
 func (m WebsiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	if len(m) == 0 {
-        return nil
-    }
-
-    err := e.EncodeToken(start)
-    if err != nil {
-        return err
+		return nil
 	}
-	
-    for k, v := range m {
-        e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
-    }
 
-    return e.EncodeToken(start.End())
+	err := e.EncodeToken(start)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
+	}
+
+	return e.EncodeToken(start.End())
 }
 
 func clearCache() {
