@@ -6,7 +6,7 @@
     "javascript": false,
     "workers": 10,
     "export": "json",
-    "outputFile": "output.json",
+    "outputFile": "output",
     "userAgents": [],
     "captcha": "",
     "proxy": []
