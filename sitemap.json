@@ -12,8 +12,8 @@
     "proxy": []
   },
   "sitemap": {
-    "_id": "www.prajwalkoirala.com",
-    "startUrl": [
+    "projectID": "www.prajwalkoirala.com",
+    "startURL": [
       "https://www.prajwalkoirala.com"
     ],
     "selectors": [
