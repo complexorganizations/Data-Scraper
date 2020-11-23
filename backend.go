@@ -74,7 +74,6 @@ type workerJob struct {
 	linkOutput map[string]interface{}
 }
 
-// Datatype to store xml data
 type WebsiteData map[string]interface{}
 
 type xmlMapEntry struct {
@@ -335,12 +334,12 @@ func toFixedURL(href, baseURL string) string {
 	uri, err := url.Parse(href)
 	if err != nil {
 		logErrors(err)
-		os.Exit(0)
+		os.Exit(1)
 	}
 	base, err := url.Parse(baseURL)
 	if err != nil {
 		logErrors(err)
-		os.Exit(0)
+		os.Exit(1)
 	}
 	toFixedURI := base.ResolveReference(uri)
 	return toFixedURI.String()
@@ -403,7 +402,7 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		logErrors(err)
-		os.Exit(0)
+		os.Exit(1)
 	}
 	return doc
 }
@@ -547,7 +546,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 					out, err := ioutil.ReadFile(settings.OutputFile)
 					if err != nil {
 						logErrors(err)
-						os.Exit(0)
+						os.Exit(1)
 					}
 					var data = map[string]interface{}{}
 					err = json.Unmarshal(out, &data)
@@ -557,14 +556,14 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						output, err := xml.MarshalIndent(WebsiteData(job.linkOutput), "", "  ")
 						if err != nil {
 							logErrors(err)
-							os.Exit(0)
+							os.Exit(1)
 						}
 						_ = ioutil.WriteFile(settings.OutputFile, output, 0644)
 					case "csv":
 						csvFile, err := os.OpenFile(settings.OutputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
 							logErrors(err)
-							os.Exit(0)
+							os.Exit(1)
 						}
 						csvWriter := csv.NewWriter(csvFile)
 						var rows [][]string
@@ -588,7 +587,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						output, err := json.MarshalIndent(data, "", " ")
 						if err != nil {
 							logErrors(err)
-							os.Exit(0)
+							os.Exit(1)
 						}
 						_ = ioutil.WriteFile(settings.OutputFile, output, 0644)
 					default:
