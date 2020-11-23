@@ -44,8 +44,8 @@ type selectors struct {
 }
 
 type scraping struct {
-	ID        string      `json:"_id,omitempty"`
-	StartURL  []string    `json:"startUrl"`
+	ID        string      `json:"projectID,omitempty"`
+	StartURL  []string    `json:"startURL"`
 	Selectors []selectors `json:"selectors"`
 }
 
