@@ -71,14 +71,14 @@ Most modern apps and system have rate limits.
 
 | Workers         | Requests           | JavaScript         |
 | --------------  | ------------------ | ------------------ |
-| 1               | 250/min            | 75/min             |
-| 5               | 1250/min           | 375/min            |
-| 10              | 2500/min           | 750/min            |
-| 25              | 6250/min           | 1875/min           |
-| 50              | 12500/min          | 3750/min           |
-| 100             | 25000/min          | 7500/min           |
-| 500             | 125000/min         | 37500/min          |
-| 1000            | 250000/min         | 75000/min          |
+| 1               | 250/min            | 50/min             |
+| 5               | 1,250/min          | 250/min            |
+| 10              | 2,500/min          | 500/min            |
+| 25              | 6,250/min          | 1,250/min          |
+| 50              | 12,500/min         | 2,500/min          |
+| 100             | 25,000/min         | 5,000/min          |
+| 500             | 125,000/min        | 25,000/min         |
+| 1000            | 250,000/min        | 50,000/min         |
 
 ---
 ### Author
