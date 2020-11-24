@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
 )
@@ -79,6 +83,41 @@ type WebsiteData map[string]interface{}
 type xmlMapEntry struct {
 	XMLName xml.Name
 	Value   interface{} `xml:",chardata"`
+}
+
+type audioPostBody struct {
+	Audio  audioPostAudio    `json:"audio"`
+	Config recognitionConfig `json:"config"`
+}
+
+type audioPostAudio struct {
+	Content string `json:"content"`
+}
+
+type speechRecognitionResponse struct {
+	Result []speechRecognitionAlternativeResult `json:"results"`
+}
+
+type speechRecognitionAlternativeResult struct {
+	Alternatives []speechRecognitionAlternative `json:"alternatives"`
+	ChannelTag   int                            `json:"channelTag"`
+}
+
+type speechRecognitionAlternative struct {
+	Transcript string     `json:"transcript"`
+	Confidence float64    `json:"confidence"`
+	Words      []wordInfo `json:"words"`
+}
+
+type wordInfo struct {
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+	Word      string `json:"word"`
+}
+
+type recognitionConfig struct {
+	LanguageCode string `json:"languageCode"`
+	Model        string `json:"model"`
 }
 
 func (m WebsiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -294,6 +333,54 @@ func selectorTable(doc *goquery.Document, selector *selectors) map[string]interf
 	return table
 }
 
+func parseCatchAudio(url string) (string, error) {
+	var speechBody speechRecognitionResponse
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	buf := new(bytes.Buffer)
+
+	// Write the audio body to the buffer
+	_, err = io.Copy(buf, resp.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	audioBody := &audioPostBody{
+		Audio: audioPostAudio{
+			Content: base64.RawURLEncoding.EncodeToString(buf.Bytes()),
+		},
+		Config: recognitionConfig{
+			LanguageCode: "en-US",
+			Model:        "video",
+		},
+	}
+
+	reqBody, err := json.Marshal(audioBody)
+
+	// pass audio into google speech api
+	speechResp, err := http.Post("https://speech.googleapis.com/v1p1beta1/speech:recognize?key="+settings.Captcha, "application/json", bytes.NewBuffer(reqBody))
+
+	if err != nil {
+		return "", err
+	}
+
+	defer speechResp.Body.Close()
+
+	err = json.NewDecoder(speechResp.Body).Decode(&speechBody)
+
+	if err != nil {
+		return "", err
+	}
+
+	return speechBody.Result[0].Alternatives[0].Transcript, nil
+}
+
 func crawlURL(href, userAgent string) *goquery.Document {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
@@ -407,6 +494,121 @@ func emulateURL(url, userAgent string) *goquery.Document {
 	return doc
 }
 
+func navigateURL(url, userAgent string) *goquery.Document {
+	var opts []func(*chromedp.ExecAllocator)
+	if len(settings.Proxy) > 0 {
+		proxyString := settings.Proxy[0]
+		proxyServer := chromedp.ProxyServer(proxyString)
+		opts = append(chromedp.DefaultExecAllocatorOptions[:], proxyServer)
+	} else {
+		opts = append(chromedp.DefaultExecAllocatorOptions[:])
+	}
+	if len(userAgent) > 0 {
+		opts = append(opts, chromedp.UserAgent(userAgent))
+	}
+
+	bCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	ctx, cancel := chromedp.NewContext(bCtx)
+
+	defer cancel()
+
+	var checkboxNode *target.Info
+	var challengeNode *target.Info
+
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.WaitReady("iframe", chromedp.ByQuery),
+	)
+
+	if err != nil {
+		logErrors(err)
+		os.Exit(0)
+	}
+
+	// need to get captcha iframe targets out
+	targets, _ := chromedp.Targets(ctx)
+
+	for _, t := range targets {
+		if t.Type == "iframe" && strings.Contains(t.URL, "anchor") {
+			checkboxNode = t
+		}
+		if t.Type == "iframe" && strings.Contains(t.URL, "bframe") {
+			challengeNode = t
+		}
+	}
+	// set context to captcha checkbox iframe
+	ictx, _ := chromedp.NewContext(ctx, chromedp.WithTargetID(checkboxNode.TargetID))
+
+	var ok bool
+	var checked string
+
+	err = chromedp.Run(
+		ctx,
+		chromedp.WaitVisible(`#recaptcha-anchor`, chromedp.NodeVisible),
+		chromedp.Click(`#recaptcha-anchor`, chromedp.ByID),
+	)
+
+	err = chromedp.Run(
+		ictx,
+		chromedp.AttributeValue(`#recaptcha-anchor`, "aria-checked", &checked, &ok),
+	)
+
+	if err != nil {
+		logErrors(err)
+		os.Exit(0)
+	}
+
+	isCheched, _ := strconv.ParseBool(checked)
+
+	if !isCheched {
+		var audioSource *string
+		ictx2, _ := chromedp.NewContext(ctx, chromedp.WithTargetID(challengeNode.TargetID))
+
+		err = chromedp.Run(
+			ictx2,
+			chromedp.WaitVisible(`#recaptcha-audio-button`, chromedp.ByID),
+			chromedp.Click(`#recaptcha-audio-button`, chromedp.NodeVisible),
+			chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
+			chromedp.AttributeValue(`#audio-source`, "src", audioSource, &ok),
+		)
+
+		if err != nil {
+			logErrors(err)
+			os.Exit(0)
+		}
+
+		if audioSource != nil {
+			text, err := parseCatchAudio(*audioSource)
+
+			if err != nil {
+				logErrors(err)
+				os.Exit(0)
+			}
+
+			err = chromedp.Run(
+				ictx2,
+				chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
+				chromedp.SetValue(`#audio-response`, text, chromedp.ByID),
+				chromedp.Click(`#recaptcha-verify-button`, chromedp.NodeVisible),
+			)
+		}
+	}
+
+	var body string
+	err = chromedp.Run(ctx,
+		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
+	)
+
+	r := strings.NewReader(body)
+	doc, err := goquery.NewDocumentFromReader(r)
+	if err != nil {
+		logErrors(err)
+		os.Exit(0)
+	}
+
+	return doc
+}
+
 func getURL(urls []string) <-chan string {
 	c := make(chan string)
 	go func() {
@@ -446,7 +648,11 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		for job := range jobs {
 			var doc *goquery.Document
 			if settings.JavaScript {
-				doc = emulateURL(job.startURL, userAgent)
+				if settings.Captcha != "" {
+					doc = navigateURL(job.startURL, userAgent)
+				} else {
+					doc = emulateURL(job.startURL, userAgent)
+				}
 			} else {
 				doc = crawlURL(job.startURL, userAgent)
 			}
