@@ -232,7 +232,7 @@ func uiEditSettings() string {
 				</tr>
 				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
-
+				<tr><th>RateLimits</th><td><input id="settings_ratelimiting" type="number" value="` + strconv.Itoa(settings.RateLimiting) + `"></td></tr>
 				<tr>
 					<th>Export</th>
 					<td>
