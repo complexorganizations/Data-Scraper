@@ -3,7 +3,7 @@
     "gui": true,
     "log": false,
     "logFile": "logs.log",
-    "javascript": false,
+    "javaScript": false,
     "workers": 10,
     "rateLimiting": 0,
     "export": "json",
