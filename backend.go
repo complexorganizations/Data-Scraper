@@ -79,7 +79,7 @@ type workerJob struct {
 	linkOutput map[string]interface{}
 }
 
-type WebsiteData map[string]interface{}
+type websiteData map[string]interface{}
 
 type xmlMapEntry struct {
 	XMLName xml.Name
@@ -121,7 +121,7 @@ type recognitionConfig struct {
 	Model        string `json:"model"`
 }
 
-func (m WebsiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	if len(m) == 0 {
 		return nil
@@ -760,7 +760,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 					data[job.startURL] = job.linkOutput
 					switch settings.Export {
 					case "xml":
-						output, err := xml.MarshalIndent(WebsiteData(job.linkOutput), "", "  ")
+						output, err := xml.MarshalIndent(websiteData(job.linkOutput), "", "  ")
 						if err != nil {
 							logErrors(err)
 							os.Exit(1)

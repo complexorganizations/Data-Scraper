@@ -232,7 +232,7 @@ func uiEditSettings() string {
 				</tr>
 				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
-				<tr><th>Rate limiting</th><td><input id="settings_ratelimiting" type="number" value="` + strconv.Itoa(settings.RateLimiting) + `"></td></tr>
+				<tr><th>Rate limit</th><td><input id="settings_ratelimiting" type="number" value="` + strconv.Itoa(settings.RateLimiting) + `"></td></tr>
 				<tr>
 					<th>Export</th>
 					<td>
@@ -478,11 +478,11 @@ func saveSelector(ui lorca.UI, index int) {
 	}
 }
 
-func selectElement(ui lorca.UI, index int, selectUrl string) {
-	if selectUrl == sitemap.StartURL[0] {
+func selectElement(ui lorca.UI, index int, selectURL string) {
+	if selectURL == sitemap.StartURL[0] {
 		saveSelector(ui, index)
 	}
-	err := ui.Load("data:text/html," + url.PathEscape(uiSelectElement(index, selectUrl)))
+	err := ui.Load("data:text/html," + url.PathEscape(uiSelectElement(index, selectURL)))
 	if err != nil {
 		frontendLog(err)
 	}
@@ -563,7 +563,7 @@ func selectedElement(ui lorca.UI, index int, str string) {
 	editSelector(ui, index)
 }
 
-func uiSelectElement(index int, selectUrl string) string {
+func uiSelectElement(index int, selectURL string) string {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 	}
@@ -575,7 +575,7 @@ func uiSelectElement(index int, selectUrl string) string {
 	}
 
 	client := &http.Client{Transport: transport}
-	req, err := http.NewRequest("GET", selectUrl, nil)
+	req, err := http.NewRequest("GET", selectURL, nil)
 	if err != nil {
 		frontendLog(err)
 	}
@@ -593,8 +593,8 @@ func uiSelectElement(index int, selectUrl string) string {
 
 	page := string(html)
 
-	pUrl, _ := url.Parse(selectUrl)
-	selectUrl = pUrl.Scheme + "://" + pUrl.Host
+	pURL, _ := url.Parse(selectURL)
+	selectURL = pURL.Scheme + "://" + pURL.Host
 	foundReplace := 0
 	for true {
 		var attrs = map[string]int{
@@ -627,7 +627,7 @@ func uiSelectElement(index int, selectUrl string) string {
 			continue
 		}
 
-		page = page[:searchIndex] + selectUrl + ifThenElse(page[searchIndex] == '/', "", "/") + page[searchIndex:]
+		page = page[:searchIndex] + selectURL + ifThenElse(page[searchIndex] == '/', "", "/") + page[searchIndex:]
 		foundReplace = searchIndex + 1
 	}
 
