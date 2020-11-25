@@ -57,7 +57,7 @@ type settingsT struct {
 	Gui          bool     `json:"gui"`
 	Log          bool     `json:"log"`
 	LogFile      string   `json:"logFile"`
-	JavaScript   bool     `json:"javascript"`
+	JavaScript   bool     `json:"javaScript"`
 	Workers      int      `json:"workers"`
 	RateLimiting int      `json:"rateLimiting"`
 	Export       string   `json:"export"`
