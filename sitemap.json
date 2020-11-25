@@ -5,6 +5,7 @@
     "logFile": "logs.log",
     "javascript": false,
     "workers": 10,
+    "rateLimiting": 0,
     "export": "json",
     "outputFile": "output",
     "userAgents": [],
