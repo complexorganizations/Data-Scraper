@@ -1,4 +1,5 @@
 - [ ] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
 - [ ] Add login support
+- [ ] Rate Limits
 - [ ] Remove `ctrl` to select multiple elements. [If multiple elements are selected then their multiple elements, if their single element is selected than its single element]
 - [ ] Code Optimizations && Code Cleanup && Bug Fixing
