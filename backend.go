@@ -54,16 +54,17 @@ type scraping struct {
 }
 
 type settingsT struct {
-	Gui        bool     `json:"gui"`
-	Log        bool     `json:"log"`
-	LogFile    string   `json:"logFile"`
-	JavaScript bool     `json:"javascript"`
-	Workers    int      `json:"workers"`
-	Export     string   `json:"export"`
-	OutputFile string   `json:"outputFile"`
-	UserAgents []string `json:"userAgents"`
-	Captcha    string   `json:"captcha"`
-	Proxy      []string `json:"proxy"`
+	Gui          bool     `json:"gui"`
+	Log          bool     `json:"log"`
+	LogFile      string   `json:"logFile"`
+	JavaScript   bool     `json:"javascript"`
+	Workers      int      `json:"workers"`
+	RateLimiting int      `json:"rateLimiting"`
+	Export       string   `json:"export"`
+	OutputFile   string   `json:"outputFile"`
+	UserAgents   []string `json:"userAgents"`
+	Captcha      string   `json:"captcha"`
+	Proxy        []string `json:"proxy"`
 }
 
 type jsonType struct {
