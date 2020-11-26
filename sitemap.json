@@ -17,31 +17,35 @@
     "startURL": [
       "https://www.prajwalkoirala.com"
     ],
-    "selectors": [
-      {
-        "id": "Name",
-        "type": "SelectorText",
-        "parentSelectors": [
-          "_root"
-        ],
-        "selector": "h1",
-        "multiple": false,
-        "regex": "",
-        "delay": 0,
-        "extractAttribute": ""
+    "login": {
+      "https://example.com/login": {
+        "username": "password"
       },
-      {
-        "id": "Picture",
-        "type": "SelectorImage",
-        "parentSelectors": [
-          "_root"
-        ],
-        "selector": "img",
-        "multiple": false,
-        "regex": "",
-        "delay": 0,
-        "extractAttribute": ""
-      }
-    ]
+      "selectors": [
+        {
+          "id": "Name",
+          "type": "SelectorText",
+          "parentSelectors": [
+            "_root"
+          ],
+          "selector": "h1",
+          "multiple": false,
+          "regex": "",
+          "delay": 0,
+          "extractAttribute": ""
+        },
+        {
+          "id": "Picture",
+          "type": "SelectorImage",
+          "parentSelectors": [
+            "_root"
+          ],
+          "selector": "img",
+          "multiple": false,
+          "regex": "",
+          "delay": 0,
+          "extractAttribute": ""
+        }
+      ]
+    }
   }
-}
