@@ -41,11 +41,11 @@ const (
 )
 
 type selectors struct {
-	ID               string   `json:"id"`
-	Type             string   `json:"type"`
+	ID               string   `json:"id,omitempty"`
+	Type             string   `json:"type,omitempty"`
 	Download         *bool    `json:"download,omitempty"`
 	ParentSelectors  []string `json:"parentSelectors,omitempty"`
-	Selector         string   `json:"selector"`
+	Selector         string   `json:"selector,omitempty"`
 	Multiple         *bool    `json:"multiple,omitempty"`
 	Regex            string   `json:"regex,omitempty"`
 	Delay            *int     `json:"delay,omitempty"`
@@ -53,27 +53,27 @@ type selectors struct {
 }
 
 type login struct {
-	Url      string `json:"url"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Url      string `json:"url,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type scraping struct {
 	ID        string      `json:"projectID,omitempty"`
-	StartURL  []string    `json:"startURL"`
+	StartURL  []string    `json:"startURL,omitempty"`
 	Login     *login      `json:"login,omitempty"`
-	Selectors []selectors `json:"selectors"`
+	Selectors []selectors `json:"selectors,omitempty"`
 }
 
 type settingsT struct {
-	Gui        bool     `json:"gui"`
+	Gui        bool     `json:"gui,omitempty"`
 	Log        *bool    `json:"log,omitempty"`
 	LogFile    string   `json:"logFile,omitempty"`
 	JavaScript *bool    `json:"javaScript,omitempty"`
-	Workers    int      `json:"workers"`
+	Workers    int      `json:"workers,omitempty"`
 	RateLimit  *int     `json:"rateLimit,omitempty"`
-	Export     string   `json:"export"`
-	OutputFile string   `json:"outputFile"`
+	Export     string   `json:"export,omitempty"`
+	OutputFile string   `json:"outputFile,omitempty"`
 	UserAgents []string `json:"userAgents,omitempty"`
 	Captcha    string   `json:"captcha,omitempty"`
 	Proxy      []string `json:"proxy,omitempty"`
@@ -203,7 +203,6 @@ func readJSON() {
 	if err != nil {
 		logErrors(err)
 	}
-
 	for i, e := range sitemap.Selectors {
 		if e.Download == nil {
 			e.Download = newbool(false)
@@ -380,7 +379,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
 		if ok {
-			err := downloadFile(src, "images/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
+			err := downloadFile(src, "assets/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
 			logErrors(err)
 		} else {
 			fmt.Println("Error: SRC has not been found.")
