@@ -8,6 +8,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/cdproto/target"
@@ -30,6 +32,9 @@ import (
 var (
 	settings settingsT
 	sitemap  scraping
+	startTime time.Time
+	img int
+	rate int
 )
 
 const (
@@ -39,32 +44,40 @@ const (
 type selectors struct {
 	ID               string   `json:"id"`
 	Type             string   `json:"type"`
-	ParentSelectors  []string `json:"parentSelectors"`
+	Download         bool     `json:"download"`
+	ParentSelectors  []string `json:"parentSelectors,omitempty"`
 	Selector         string   `json:"selector"`
 	Multiple         bool     `json:"multiple"`
-	Regex            string   `json:"regex"`
+	Regex            string   `json:"regex,omitempty"`
 	Delay            int      `json:"delay"`
 	ExtractAttribute string   `json:"extractAttribute"`
+}
+
+type login struct {
+	Url      string `json:"url,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type scraping struct {
 	ID        string      `json:"projectID,omitempty"`
 	StartURL  []string    `json:"startURL"`
+	Login     login       `json:"login,omitempty"`
 	Selectors []selectors `json:"selectors"`
 }
 
 type settingsT struct {
 	Gui          bool     `json:"gui"`
 	Log          bool     `json:"log"`
-	LogFile      string   `json:"logFile"`
+	LogFile      string   `json:"logFile,omitempty"`
 	JavaScript   bool     `json:"javaScript"`
 	Workers      int      `json:"workers"`
-	RateLimiting int      `json:"rateLimiting"`
+	RateLimit    int      `json:"rateLimit"`
 	Export       string   `json:"export"`
 	OutputFile   string   `json:"outputFile"`
-	UserAgents   []string `json:"userAgents"`
+	UserAgents   []string `json:"userAgents,omitempty"`
 	Captcha      string   `json:"captcha"`
-	Proxy        []string `json:"proxy"`
+	Proxy        []string `json:"proxy,omitempty"`
 }
 
 type jsonType struct {
@@ -83,7 +96,7 @@ type websiteData map[string]interface{}
 
 type xmlMapEntry struct {
 	XMLName xml.Name
-	Value   interface{} `xml:",chardata"`
+	Value   interface{} `xml:",char_data"`
 }
 
 type audioPostBody struct {
@@ -133,7 +146,10 @@ func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	for k, v := range m {
-		e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
+		err = e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
+		if err != nil {
+			return err
+		}
 	}
 
 	return e.EncodeToken(start.End())
@@ -297,12 +313,43 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 	return elementOutputList
 }
 
+func downloadFile(URL, fileName string) error {
+	response, err := http.Get(URL)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != 200 {
+		return errors.New("code not 200")
+	}
+
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		return err
+	}
+	err = file.Close()
+	if err != nil {
+		_ = response.Body.Close()
+		return err
+	}
+	err = response.Body.Close()
+	return err
+}
+
 func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	var sources []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
-		if !ok {
-			fmt.Println("Error: HREF has not been found.")
+		if ok {
+			err := downloadFile(src, "images/" + strconv.Itoa(img) + src[strings.LastIndex(src, "."):])
+			logErrors(err)
+		} else {
+			fmt.Println("Error: SRC has not been found.")
 		}
 		sources = append(sources, src)
 
@@ -313,7 +360,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 
 func selectorTable(doc *goquery.Document, selector *selectors) map[string]interface{} {
 	var headings, row []string
-	var rows = [][]string{}
+	var rows [][]string
 	table := make(map[string]interface{})
 	doc.Find(selector.Selector).Each(func(_ int, tableHTML *goquery.Selection) {
 		tableHTML.Find("tr").Each(func(_ int, rowHTML *goquery.Selection) {
@@ -341,7 +388,6 @@ func parseCatchAudio(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
 
 	buf := new(bytes.Buffer)
 
@@ -371,7 +417,6 @@ func parseCatchAudio(url string) (string, error) {
 		return "", err
 	}
 
-	defer speechResp.Body.Close()
 
 	err = json.NewDecoder(speechResp.Body).Decode(&speechBody)
 
@@ -379,7 +424,14 @@ func parseCatchAudio(url string) (string, error) {
 		return "", err
 	}
 
-	return speechBody.Result[0].Alternatives[0].Transcript, nil
+	err = speechResp.Body.Close()
+	if err != nil {
+		_ = resp.Body.Close()
+		return speechBody.Result[0].Alternatives[0].Transcript, err
+	}
+
+	err = resp.Body.Close()
+	return speechBody.Result[0].Alternatives[0].Transcript, err
 }
 
 func crawlURL(href, userAgent string) *goquery.Document {
@@ -537,8 +589,13 @@ func navigateURL(url, userAgent string) *goquery.Document {
 			challengeNode = t
 		}
 	}
-	// set context to captcha checkbox iframe
-	ictx, _ := chromedp.NewContext(ctx, chromedp.WithTargetID(checkboxNode.TargetID))
+	var iCtx context.Context
+	if checkboxNode == nil {
+		logErrors(fmt.Errorf("checkboxNode is nil"))
+	} else {
+		// set context to captcha checkbox iframe
+		iCtx, _ = chromedp.NewContext(ctx, chromedp.WithTargetID(checkboxNode.TargetID))
+	}
 
 	var ok bool
 	var checked string
@@ -550,7 +607,7 @@ func navigateURL(url, userAgent string) *goquery.Document {
 	)
 
 	err = chromedp.Run(
-		ictx,
+		iCtx,
 		chromedp.AttributeValue(`#recaptcha-anchor`, "aria-checked", &checked, &ok),
 	)
 
@@ -559,18 +616,23 @@ func navigateURL(url, userAgent string) *goquery.Document {
 		os.Exit(0)
 	}
 
-	isCheched, _ := strconv.ParseBool(checked)
+	isChecked, _ := strconv.ParseBool(checked)
 
-	if !isCheched {
-		var audioSource *string
-		ictx2, _ := chromedp.NewContext(ctx, chromedp.WithTargetID(challengeNode.TargetID))
+	if !isChecked {
+		var audioSource string
+		var iCtx2 context.Context
+		if challengeNode == nil {
+			logErrors(fmt.Errorf("challengeNode is nil"))
+		} else {
+			iCtx2, _ = chromedp.NewContext(ctx, chromedp.WithTargetID(challengeNode.TargetID))
+		}
 
 		err = chromedp.Run(
-			ictx2,
+			iCtx2,
 			chromedp.WaitVisible(`#recaptcha-audio-button`, chromedp.ByID),
 			chromedp.Click(`#recaptcha-audio-button`, chromedp.NodeVisible),
 			chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
-			chromedp.AttributeValue(`#audio-source`, "src", audioSource, &ok),
+			chromedp.AttributeValue(`#audio-source`, "src", &audioSource, &ok),
 		)
 
 		if err != nil {
@@ -578,8 +640,8 @@ func navigateURL(url, userAgent string) *goquery.Document {
 			os.Exit(0)
 		}
 
-		if audioSource != nil {
-			text, err := parseCatchAudio(*audioSource)
+		if audioSource != "" {
+			text, err := parseCatchAudio(audioSource)
 
 			if err != nil {
 				logErrors(err)
@@ -587,7 +649,7 @@ func navigateURL(url, userAgent string) *goquery.Document {
 			}
 
 			err = chromedp.Run(
-				ictx2,
+				iCtx2,
 				chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
 				chromedp.SetValue(`#audio-response`, text, chromedp.ByID),
 				chromedp.Click(`#recaptcha-verify-button`, chromedp.NodeVisible),
@@ -648,6 +710,16 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		userAgent := userAgents[count]
 		for job := range jobs {
 			var doc *goquery.Document
+			if settings.RateLimit != 0 {
+				if time.Now().Sub(startTime).Seconds() < 60 && rate >= settings.RateLimit{
+					time.Sleep(time.Now().Sub(startTime))
+				}
+				if time.Now().Sub(startTime).Seconds() >= 60 {
+					startTime = time.Now()
+					rate = 0
+				}
+			}
+			rate++
 			if settings.JavaScript {
 				if settings.Captcha != "" {
 					doc = navigateURL(job.startURL, userAgent)
@@ -841,5 +913,7 @@ func scrape() {
 	clearCache()
 	siteMap := sitemap
 	outputResult()
+	startTime = time.Now()
+	rate = 0
 	_ = scraper(&siteMap, "_root")
 }
