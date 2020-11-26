@@ -17,7 +17,7 @@ var (
 )
 
 func frontendLog(err error) {
-	if settings.Log {
+	if *settings.Log {
 		_, _ = fmt.Fprintln(os.Stderr, "Error: ", err)
 	}
 }
@@ -138,15 +138,15 @@ func uiViewSitemap() string {
 func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
-	settings.Log = fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
-	if settings.Log {
+	*settings.Log = fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
+	if *settings.Log {
 		settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
 	} else {
 		settings.LogFile = ""
 	}
-	settings.JavaScript = fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true"
+	*settings.JavaScript = fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true"
 	settings.Workers, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_workers").value;`)))
-	settings.RateLimit, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
+	*settings.RateLimit, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
 	if err != nil {
 		frontendLog(err)
 	}
@@ -226,14 +226,14 @@ func uiEditSettings() string {
 		<body>
 			<table>
 				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
-				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(settings.Log, `checked`, "") + `></td></tr>
-				<tr id="show_logfile"` + ifThenElse(!settings.Log, ` class="hide"`, "") + `>
+				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(*settings.Log, `checked`, "") + `></td></tr>
+				<tr id="show_logfile"` + ifThenElse(!*settings.Log, ` class="hide"`, "") + `>
 					<th>Log file</th>
 					<td><input id="settings_logfile" type="text" value="` + settings.LogFile + `"></td>
 				</tr>
-				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(settings.JavaScript, `checked`, "") + `></td></tr>
+				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(*settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
-				<tr><th>Rate limit</th><td><input id="settings_rate_limit" type="number" value="` + strconv.Itoa(settings.RateLimit) + `"></td></tr>
+				<tr><th>Rate limit</th><td><input id="settings_rate_limit" type="number" value="` + strconv.Itoa(*settings.RateLimit) + `"></td></tr>
 				<tr>
 					<th>Export</th>
 					<td>
@@ -318,14 +318,15 @@ func saveMap(ui lorca.UI) {
 		code := fmt.Sprintf(`document.getElementById("txt_starturl%d").value;`, i+1)
 		sitemap.StartURL = append(sitemap.StartURL, fmt.Sprint(ui.Eval(code)))
 	}
-	if fmt.Sprint(ui.Eval(`document.getElementById("login").checked;`)) == "true" {
-		sitemap.Login = login{
+
+	if fmt.Sprint(ui.Eval(`document.getElementById("login").checked.toString();`)) == "true" {
+		sitemap.Login = &login{
 			Url:      fmt.Sprint(ui.Eval(`document.getElementById("txt_login_url").value;`)),
 			Username: fmt.Sprint(ui.Eval(`document.getElementById("txt_login_username").value;`)),
 			Password: fmt.Sprint(ui.Eval(`document.getElementById("txt_login_password").value;`)),
 		}
 	} else {
-		sitemap.Login = login{}
+		sitemap.Login = nil
 	}
 	writeJSON()
 	err := ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
@@ -358,19 +359,26 @@ func uiEditMap() string {
 	for i, e := range sitemap.StartURL {
 		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
+
+	sitemap.Login = &login{
+		Url:      "",
+		Username: "",
+		Password: "",
+	}
+
 	page += `</div>
 				<button onclick=removeSiteURL()>-</button>
 				<button onclick=addSiteURL()>+</button>
 				<br /><br />
 				<label for="login">Require login</label>
-				<input type="checkbox" id="login" ` + ifThenElse(sitemap.Login == login{}, ``, `checked`) + `></input>
-				<div id="show_login"  ` + ifThenElse(sitemap.Login == login{}, ` class="hide"`, "") + `>
+				<input type="checkbox" id="login" `+ifThenElse(sitemap.Login.Url == "", ``, `checked`)+`></input>
+				<div id="show_login"  `+ ifThenElse(sitemap.Login.Url == "", ` class="hide"`, "") + `>
 					<label for="txt_login_url">Login URL: </label>
 					<input type="text" placeholder="Enter login url" id="txt_login_url" value="` + sitemap.Login.Url + `"></input>
 					<label for="txt_login_username">Username: </label>
-					<input type="text" placeholder="Enter username" id="txt_login_username" value="` + sitemap.Login.Username + `"></input>
+					<input type="text" placeholder="Enter username" id="txt_login_username" value="` + sitemap.Login.Username+ `"></input>
 					<label for="txt_login_password">Password: </label>
-					<input type="text" placeholder="Enter password" id="txt_login_password" value="` + sitemap.Login.Password + `"></input>
+					<input type="text" placeholder="Enter password" id="txt_login_password" value="` + sitemap.Login.Password+ `"></input>
 				</div>
 				<button onclick=saveMap()>Save</button>
 				<script>
@@ -449,13 +457,13 @@ func uiViewSelectors() string {
 		}
 		page += `</td>`
 		page += `<td>` + e.Selector + `</td>`
-		if e.Multiple {
+		if *e.Multiple {
 			page += `<td> yes </td>`
 		} else {
 			page += `<td> no </td>`
 		}
 		page += `<td>` + e.Regex + `</td>`
-		page += `<td>` + strconv.Itoa(e.Delay) + `</td>`
+		page += `<td>` + strconv.Itoa(*e.Delay) + `</td>`
 		page += `<td><button onclick="editSelector(` + strconv.Itoa(i) + `)">Edit</button></td>`
 		page += `</tr>`
 	}
@@ -484,7 +492,7 @@ func saveSelector(ui lorca.UI, index int) {
 	el := sitemap.Selectors[index]
 	el.ID = fmt.Sprint(ui.Eval(`document.getElementById("map_id").value;`))
 	el.Type = fmt.Sprint(ui.Eval(`document.getElementById("map_type").value;`))
-	el.Download = fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true"
+	*el.Download = fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true"
 	el.ParentSelectors = []string{}
 	parentNum, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_parents").selectedOptions.length.toString();`)))
 	for i := 0; i < parentNum; i++ {
@@ -492,9 +500,9 @@ func saveSelector(ui lorca.UI, index int) {
 		el.ParentSelectors = append(el.ParentSelectors, fmt.Sprint(ui.Eval(code)))
 	}
 	el.Selector = fmt.Sprint(ui.Eval(`document.getElementById("map_selector").value;`))
-	el.Multiple = fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true"
+	*el.Multiple = fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true"
 	el.Regex = fmt.Sprint(ui.Eval(`document.getElementById("map_regex").value;`))
-	el.Delay, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
+	*el.Delay, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
 	sitemap.Selectors[index] = el
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
@@ -550,7 +558,7 @@ func uiEditSelector(index int) string {
 
 						</select>
 					</tr>
-					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(el.Download, "checked", "") + `></input></td></tr>
+					<tr id="download" `+ifThenElse(el.Type == "SelectorImage", "", `class="hide"`)+`><th>Download</th><td><input type="checkbox" id="download"`+ifThenElse(*el.Download, "checked", "")+`></input></td></tr>
 					<tr>
 						<th>parent selectors</th>
 						<td>
@@ -571,9 +579,9 @@ func uiEditSelector(index int) string {
 							<button onclick="selectElement(` + strconv.Itoa(index) + `, '` + sitemap.StartURL[0] + `')">Select</button>
 						</td>
 					</tr>
-					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(el.Multiple, `checked"`, "") + `></td></tr>
+					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>
 					<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>
-					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(el.Delay) + `"></td></tr>
+					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(*el.Delay) + `"></td></tr>
 				</table>
 				<div class="buttons">
 					<button onclick=deleteSelector(` + strconv.Itoa(index) + `)>Delete</button>
