@@ -370,8 +370,8 @@ func uiEditMap() string {
 				<button onclick=addSiteURL()>+</button>
 				<br /><br />
 				<label for="login">Require login</label>
-				<input type="checkbox" id="login" `+ifThenElse(sitemap.Login == login{}, ``, `checked`)+`></input>
-				<div id="show_login"  `+ ifThenElse(sitemap.Login == login{}, ` class="hide"`, "") + `>
+				<input type="checkbox" id="login" ` + ifThenElse(sitemap.Login == login{}, ``, `checked`) + `></input>
+				<div id="show_login"  ` + ifThenElse(sitemap.Login == login{}, ` class="hide"`, "") + `>
 					<label for="txt_login_url">Login URL: </label>
 					<input type="text" placeholder="Enter login url" id="txt_login_url" value="` + sitemap.Login.Url + `"></input>
 					<label for="txt_login_username">Username: </label>
@@ -561,7 +561,7 @@ func uiEditSelector(index int) string {
 
 						</select>
 					</tr>
-					<tr id="download" `+ifThenElse(el.Type == "SelectorImage", "", `class="hide"`)+`><th>Download</th><td><input type="checkbox" id="download"`+ifThenElse(el.Download, "checked", "")+`></input></td></tr>
+					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(el.Download, "checked", "") + `></input></td></tr>
 					<tr>
 						<th>parent selectors</th>
 						<td>

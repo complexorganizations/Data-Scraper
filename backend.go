@@ -30,11 +30,11 @@ import (
 )
 
 var (
-	settings settingsT
-	sitemap  scraping
+	settings  settingsT
+	sitemap   scraping
 	startTime time.Time
-	img int
-	rate int
+	img       int
+	rate      int
 )
 
 const (
@@ -67,17 +67,17 @@ type scraping struct {
 }
 
 type settingsT struct {
-	Gui          bool     `json:"gui"`
-	Log          bool     `json:"log"`
-	LogFile      string   `json:"logFile,omitempty"`
-	JavaScript   bool     `json:"javaScript"`
-	Workers      int      `json:"workers"`
-	RateLimit    int      `json:"rateLimit"`
-	Export       string   `json:"export"`
-	OutputFile   string   `json:"outputFile"`
-	UserAgents   []string `json:"userAgents,omitempty"`
-	Captcha      string   `json:"captcha"`
-	Proxy        []string `json:"proxy,omitempty"`
+	Gui        bool     `json:"gui"`
+	Log        bool     `json:"log"`
+	LogFile    string   `json:"logFile,omitempty"`
+	JavaScript bool     `json:"javaScript"`
+	Workers    int      `json:"workers"`
+	RateLimit  int      `json:"rateLimit"`
+	Export     string   `json:"export"`
+	OutputFile string   `json:"outputFile"`
+	UserAgents []string `json:"userAgents,omitempty"`
+	Captcha    string   `json:"captcha"`
+	Proxy      []string `json:"proxy,omitempty"`
 }
 
 type jsonType struct {
@@ -346,7 +346,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
 		if ok {
-			err := downloadFile(src, "images/" + strconv.Itoa(img) + src[strings.LastIndex(src, "."):])
+			err := downloadFile(src, "images/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
 			logErrors(err)
 		} else {
 			fmt.Println("Error: SRC has not been found.")
@@ -416,7 +416,6 @@ func parseCatchAudio(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 
 	err = json.NewDecoder(speechResp.Body).Decode(&speechBody)
 
@@ -711,7 +710,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		for job := range jobs {
 			var doc *goquery.Document
 			if settings.RateLimit != 0 {
-				if time.Now().Sub(startTime).Seconds() < 60 && rate >= settings.RateLimit{
+				if time.Now().Sub(startTime).Seconds() < 60 && rate >= settings.RateLimit {
 					time.Sleep(time.Now().Sub(startTime))
 				}
 				if time.Now().Sub(startTime).Seconds() >= 60 {
