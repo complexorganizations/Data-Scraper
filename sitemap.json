@@ -37,6 +37,7 @@
       {
         "id": "Picture",
         "type": "SelectorImage",
+        "download": false,
         "parentSelectors": [
           "_root"
         ],
