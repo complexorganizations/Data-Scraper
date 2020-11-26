@@ -17,10 +17,6 @@
     "startURL": [
       "https://www.prajwalkoirala.com"
     ],
-    "login": {
-      "url": "https://example.com/login",
-      "username": "password"
-    },
     "selectors": [
       {
         "id": "Name",
