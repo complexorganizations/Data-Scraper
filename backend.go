@@ -234,7 +234,7 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 		func(i int, s *goquery.Selection) bool {
 			href, errors := s.Attr("href")
 			if !errors {
-				fmt.Println("Error: HREF has not been found.")
+				log.Println("Error: HREF not found")
 			}
 
 			links = append(links, toFixedURL(href, baseURL))
@@ -251,7 +251,7 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 		func(i int, s *goquery.Selection) bool {
 			href, errors := s.Attr(selector.ExtractAttribute)
 			if !errors {
-				fmt.Println("Error: HREF has not been found.")
+				log.Println("Error: HREF not found")
 			}
 			links = append(links, href)
 
@@ -275,13 +275,13 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 					} else if elementSelector.Type == "SelectorImage" {
 						resultText, errors := s.Find(elementSelector.Selector).Attr("src")
 						if !errors {
-							fmt.Println("Error: HREF has not been found.")
+							log.Println("Error: HREF not found")
 						}
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorLink" {
 						resultText, errors := s.Find(elementSelector.Selector).Attr("href")
 						if !errors {
-							fmt.Println("Error: HREF has not been found.")
+							log.Println("Error: HREF not found")
 						}
 						elementOutput[elementSelector.ID] = resultText
 					}
@@ -302,7 +302,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, errors := s.Attr("src")
 		if !errors {
-			fmt.Println("Error: HREF has not been found.")
+			log.Println("Error: HREF not found")
 		}
 		sources = append(sources, src)
 
