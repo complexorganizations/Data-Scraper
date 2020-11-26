@@ -1,4 +1,1 @@
-- [x] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
-- [x] Add login support
-- [x] Rate Limits (req / per minute)
-- [x] Remove `ctrl` to select multiple elements. [If multiple elements are selected then their multiple elements, if their single element is selected than its single element]
+- [ ] Make the JSON even simpler. [Remove Unused Values]
