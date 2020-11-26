@@ -10,6 +10,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,19 +26,14 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 )
 
 var (
-	settings settingsT
-	sitemap  scraping
+	settings  settingsT
+	sitemap   scraping
 	startTime time.Time
-	img int
-	rate int
+	img       int
+	rate      int
 )
 
 const (
@@ -135,23 +134,19 @@ type recognitionConfig struct {
 }
 
 func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-
 	if len(m) == 0 {
 		return nil
 	}
-
 	err := e.EncodeToken(start)
 	if err != nil {
 		return err
 	}
-
 	for k, v := range m {
 		err = e.Encode(xmlMapEntry{XMLName: xml.Name{Local: k}, Value: v})
 		if err != nil {
 			return err
 		}
 	}
-
 	return e.EncodeToken(start.End())
 }
 
@@ -168,7 +163,6 @@ func clearCache() {
 	default:
 		fmt.Println("Error: Temporary files can't be deleted.")
 	}
-
 	if err != nil {
 		frontendLog(err)
 	}
@@ -182,9 +176,7 @@ func logErrors(error error) {
 			log.SetOutput(os.Stderr)
 			_, _ = fmt.Fprintf(os.Stderr, "Can't open log file: %s, printing to stderr...\n", settings.LogFile)
 		}
-
 		log.Println(error)
-
 		if err == nil {
 			err = file.Close()
 			_, _ = fmt.Fprintf(os.Stderr, "Error closing log file: %s!\n", settings.LogFile)
@@ -207,7 +199,6 @@ func readJSON() {
 	if err != nil {
 		logErrors(err)
 	}
-
 	err = json.Unmarshal(data, &jsonData)
 	if err != nil {
 		logErrors(err)
@@ -267,7 +258,6 @@ func writeJSON() {
 	if err != nil {
 		logErrors(err)
 	}
-
 	err = ioutil.WriteFile(configFile, dataJSON, 0644)
 	if err != nil {
 		logErrors(err)
@@ -305,9 +295,7 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 			if !errors {
 				log.Println("Error: HREF not found")
 			}
-
 			links = append(links, toFixedURL(href, baseURL))
-
 			return *selector.Multiple
 		},
 	)
@@ -323,7 +311,6 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 				log.Println("Error: HREF not found")
 			}
 			links = append(links, href)
-
 			return *selector.Multiple
 		},
 	)
@@ -359,7 +346,6 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 			if len(elementOutput) != 0 {
 				elementOutputList = append(elementOutputList, elementOutput)
 			}
-
 			return *selector.Multiple
 		},
 	)
@@ -371,16 +357,13 @@ func downloadFile(URL, fileName string) error {
 	if err != nil {
 		return err
 	}
-
 	if response.StatusCode != 200 {
 		return errors.New("code not 200")
 	}
-
 	file, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
 		return err
@@ -399,13 +382,12 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
 		if ok {
-			err := downloadFile(src, "images/" + strconv.Itoa(img) + src[strings.LastIndex(src, "."):])
+			err := downloadFile(src, "images/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
 			logErrors(err)
 		} else {
 			fmt.Println("Error: SRC has not been found.")
 		}
 		sources = append(sources, src)
-
 		return *selector.Multiple
 	})
 	return sources
@@ -436,21 +418,15 @@ func selectorTable(doc *goquery.Document, selector *selectors) map[string]interf
 
 func parseCatchAudio(url string) (string, error) {
 	var speechBody speechRecognitionResponse
-	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
 	}
-
 	buf := new(bytes.Buffer)
-
-	// Write the audio body to the buffer
 	_, err = io.Copy(buf, resp.Body)
-
 	if err != nil {
 		return "", err
 	}
-
 	audioBody := &audioPostBody{
 		Audio: audioPostAudio{
 			Content: base64.RawURLEncoding.EncodeToString(buf.Bytes()),
@@ -460,29 +436,20 @@ func parseCatchAudio(url string) (string, error) {
 			Model:        "video",
 		},
 	}
-
 	reqBody, err := json.Marshal(audioBody)
-
-	// pass audio into google speech api
 	speechResp, err := http.Post("https://speech.googleapis.com/v1p1beta1/speech:recognize?key="+settings.Captcha, "application/json", bytes.NewBuffer(reqBody))
-
 	if err != nil {
 		return "", err
 	}
-
-
 	err = json.NewDecoder(speechResp.Body).Decode(&speechBody)
-
 	if err != nil {
 		return "", err
 	}
-
 	err = speechResp.Body.Close()
 	if err != nil {
 		_ = resp.Body.Close()
 		return speechBody.Result[0].Alternatives[0].Transcript, err
 	}
-
 	err = resp.Body.Close()
 	return speechBody.Result[0].Alternatives[0].Transcript, err
 }
@@ -491,13 +458,11 @@ func crawlURL(href, userAgent string) *goquery.Document {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 	}
-
 	if len(settings.Proxy) > 0 {
 		proxyString := settings.Proxy[0]
 		proxyURL, _ := url.Parse(proxyString)
 		transport.Proxy = http.ProxyURL(proxyURL)
 	}
-
 	netClient := &http.Client{Transport: transport}
 	req, err := http.NewRequest(http.MethodGet, href, nil)
 	if err != nil {
@@ -512,11 +477,8 @@ func crawlURL(href, userAgent string) *goquery.Document {
 		logErrors(err)
 		os.Exit(1)
 	}
-
 	doc, err := goquery.NewDocumentFromReader(response.Body)
-
 	err = response.Body.Close()
-
 	if err != nil {
 		frontendLog(err)
 	}
@@ -554,7 +516,6 @@ func getChildSelector(selector *selectors) bool {
 			count++
 		}
 	}
-
 	return count == 0
 }
 
@@ -612,28 +573,20 @@ func navigateURL(url, userAgent string) *goquery.Document {
 	if len(userAgent) > 0 {
 		opts = append(opts, chromedp.UserAgent(userAgent))
 	}
-
 	bCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	ctx, cancel := chromedp.NewContext(bCtx)
-
 	defer cancel()
-
 	var checkboxNode *target.Info
 	var challengeNode *target.Info
-
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.WaitReady("iframe", chromedp.ByQuery),
 	)
-
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
-
-	// need to get captcha iframe targets out
 	targets, _ := chromedp.Targets(ctx)
-
 	for _, t := range targets {
 		if t.Type == "iframe" && strings.Contains(t.URL, "anchor") {
 			checkboxNode = t
@@ -646,31 +599,24 @@ func navigateURL(url, userAgent string) *goquery.Document {
 	if checkboxNode == nil {
 		logErrors(fmt.Errorf("checkboxNode is nil"))
 	} else {
-		// set context to captcha checkbox iframe
 		iCtx, _ = chromedp.NewContext(ctx, chromedp.WithTargetID(checkboxNode.TargetID))
 	}
-
 	var ok bool
 	var checked string
-
 	err = chromedp.Run(
 		ctx,
 		chromedp.WaitVisible(`#recaptcha-anchor`, chromedp.NodeVisible),
 		chromedp.Click(`#recaptcha-anchor`, chromedp.ByID),
 	)
-
 	err = chromedp.Run(
 		iCtx,
 		chromedp.AttributeValue(`#recaptcha-anchor`, "aria-checked", &checked, &ok),
 	)
-
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
-
 	isChecked, _ := strconv.ParseBool(checked)
-
 	if !isChecked {
 		var audioSource string
 		var iCtx2 context.Context
@@ -679,7 +625,6 @@ func navigateURL(url, userAgent string) *goquery.Document {
 		} else {
 			iCtx2, _ = chromedp.NewContext(ctx, chromedp.WithTargetID(challengeNode.TargetID))
 		}
-
 		err = chromedp.Run(
 			iCtx2,
 			chromedp.WaitVisible(`#recaptcha-audio-button`, chromedp.ByID),
@@ -687,20 +632,16 @@ func navigateURL(url, userAgent string) *goquery.Document {
 			chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
 			chromedp.AttributeValue(`#audio-source`, "src", &audioSource, &ok),
 		)
-
 		if err != nil {
 			logErrors(err)
 			os.Exit(0)
 		}
-
 		if audioSource != "" {
 			text, err := parseCatchAudio(audioSource)
-
 			if err != nil {
 				logErrors(err)
 				os.Exit(0)
 			}
-
 			err = chromedp.Run(
 				iCtx2,
 				chromedp.WaitVisible(`#audio-response`, chromedp.ByID),
@@ -709,19 +650,16 @@ func navigateURL(url, userAgent string) *goquery.Document {
 			)
 		}
 	}
-
 	var body string
 	err = chromedp.Run(ctx,
 		chromedp.InnerHTML(`body`, &body, chromedp.NodeVisible, chromedp.ByQuery),
 	)
-
 	r := strings.NewReader(body)
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		logErrors(err)
 		os.Exit(0)
 	}
-
 	return doc
 }
 
@@ -733,11 +671,9 @@ func getURL(urls []string) <-chan string {
 			stringMatch, _ := re.FindStringMatch(urlLink)
 			if stringMatch != nil {
 				val2 := strings.Replace(urlLink, fmt.Sprintf("%s", stringMatch), "", -2)
-
 				urlRange := fmt.Sprintf("%s", stringMatch)
 				urlRange = strings.Replace(urlRange, "[", "", -2)
 				urlRange = strings.Replace(urlRange, "]", "", -2)
-
 				rang := strings.Split(urlRange, "-")
 				int1, _ := strconv.ParseInt(rang[0], 10, 64)
 				int2, _ := strconv.ParseInt(rang[1], 10, 64)
@@ -911,7 +847,6 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 						}
 						csvWriter.Flush()
 						err = csvFile.Close()
-
 						if err != nil {
 							frontendLog(err)
 						}

@@ -1,4 +1,5 @@
-- [x] Support download images, [Add a checkbox after image selector, and if its checked download all the images]
-- [x] Add login support
-- [x] Rate Limits (req / per minute)
-- [x] Remove `ctrl` to select multiple elements. [If multiple elements are selected then their multiple elements, if their single element is selected than its single element]
+- [ ] Make the JSON even simpler. [Remove Unused Values] {If they are empty or 0 than lets not put them in the json}
+- [ ] Remove the `Log` setting and instead if there is a value for the logs files `logs.log` than its true, but if its empty than its false.
+- [ ] On the useragnet and proxy, people can add nothing and it will be true, lets make sure people are putting in some value in there before they can add new things.
+- [ ] The login values wont save.
+- [ ] Can we make it so instead of declaring `JSON|CSV|XML` from the list we just read the file extension from the output filename and do those formats.
