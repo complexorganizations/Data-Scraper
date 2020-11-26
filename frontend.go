@@ -3,14 +3,13 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/zserge/lorca"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/zserge/lorca"
 )
 
 var (

@@ -10,6 +10,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,11 +26,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 )
 
 var (
