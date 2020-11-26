@@ -279,7 +279,6 @@ func uiEditSettings() string {
 				let proxy_num = ` + strconv.Itoa(len(settings.Proxy)) + `
 				let proxies = document.getElementById("proxies");
 				let el;
-
 				let checkbox = document.getElementById("settings_log");
 				let show_logfile = document.getElementById("show_logfile");
 				checkbox.addEventListener('change', function() {
@@ -355,17 +354,14 @@ func uiEditMap() string {
 				<input type="text" placeholder="Enter sitemap name" id="txt_sitemap_id" value="` + sitemap.ID + `"></input>
 				<label for="urlInputs">Start URL: </label>
 				<div id="urlInputs">`
-
 	for i, e := range sitemap.StartURL {
 		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
-
 	sitemap.Login = &login{
 		Url:      "",
 		Username: "",
 		Password: "",
 	}
-
 	page += `</div>
 				<button onclick=removeSiteURL()>-</button>
 				<button onclick=addSiteURL()>+</button>
@@ -665,7 +661,6 @@ func uiSelectElement(index int, selectURL string) string {
 			foundReplace = searchIndex + 1
 			continue
 		}
-
 		page = page[:searchIndex] + selectURL + ifThenElse(page[searchIndex] == '/', "", "/") + page[searchIndex:]
 		foundReplace = searchIndex + 1
 	}
@@ -683,7 +678,6 @@ func uiSelectElement(index int, selectURL string) string {
 			    let ui;
 			    let choice_label;
 			    let browse = true;
-			
 			    (function () {
 			        document.querySelectorAll("a[href]").forEach((as) => {
 			            as.onclick = (ev) => {
@@ -692,14 +686,11 @@ func uiSelectElement(index int, selectURL string) string {
 			                selectElement(` + strconv.Itoa(index) + `, as.href);
 			            }
 			        })
-			
 			        ui = document.createElement("div");
-			
 			        choice_label = document.createElement("p");
 			        choice_label.style.fontFamily = "sans-serif";
 			        choice_label.style.flexGrow = "1";
 			        ui.appendChild(choice_label);
-			
 			        let browse_button = document.createElement("button");
 			        browse_button.style.fontFamily = "sans-serif";
 			        browse_button.style.marginRight = "16px";
@@ -709,13 +700,11 @@ func uiSelectElement(index int, selectURL string) string {
 			        }
 			        browse_button.innerHTML = "Select element";
 			        ui.appendChild(browse_button);
-			
 			        let accept_button = document.createElement("button");
 			        accept_button.style.fontFamily = "sans-serif";
 			        accept_button.onclick = () => selectedElement(` + strconv.Itoa(index) + `, identifiers);
 			        accept_button.innerHTML = "Accept choice";
 			        ui.appendChild(accept_button);
-			
 			        ui.style.position = "fixed";
 			        ui.style.left = "0";
 			        ui.style.right = "0";
@@ -728,8 +717,6 @@ func uiSelectElement(index int, selectURL string) string {
 			        ui.style.borderTop = "solid black 1px";
 			        document.body.appendChild(ui);
 			    }())
-			
-			
 			    const mouseover = (e) => {
 			        const hoverIndex = el => selected_elements_hover.indexOf(el)
 			        const newIndex = el => selected_elements_new.indexOf(el)
@@ -738,12 +725,10 @@ func uiSelectElement(index int, selectURL string) string {
 			            selected_elements_hover.splice(i, 1);
 			            selected_elements_new.splice(i, 1);
 			        }
-			
 			        if (!!new_element && newIndex(new_element) == -1) new_element.remove();
 			        let x = e.clientX, y = e.clientY;
 			        let hover_element = document.elementFromPoint(x, y);
 			        if (ui.contains(hover_element)) { hover_element = null; }
-			
 			        if (!!hover_element) {
 			            new_element = document.createElement("div");
 			            new_element.classList.add("test");
@@ -755,10 +740,8 @@ func uiSelectElement(index int, selectURL string) string {
 			            new_element.style.height = rect.bottom - rect.top + "px";
 			            new_element.style.left = rect.left + "px";
 			            new_element.style.width = rect.right - rect.left + "px";
-			
 			            new_element.onmousedown = (e) => {
 			                if (!hover_element) return;
-			
 							if (newIndex(hover_element) > -1) {
 								removeSelected(newIndex(hover_element));
 							} else if (hoverIndex(hover_element) > -1) {
@@ -768,15 +751,12 @@ func uiSelectElement(index int, selectURL string) string {
 								selected_elements_new.push(new_element)
 								selected_elements_hover.push(hover_element)
 							}
-
 			                identifiers = "";
 			                selected_elements_hover.forEach((hover) => {
 			                    if (identifiers.length > 0) {
 			                        identifiers += ", ";
 			                    }
-			
 			                    identifiers += hover.tagName.toLocaleLowerCase();
-			
 			                    if (hover.id.length > 0)
 			                        identifiers += "#" + hover.id;
 			
@@ -784,11 +764,9 @@ func uiSelectElement(index int, selectURL string) string {
 			                        identifiers += "." + e;
 			                    })
 			                })
-			
 			                choice_label.innerHTML = identifiers;
 			                e.preventDefault();
 			            }
-			
 			            document.body.appendChild(new_element);
 			        }
 			    }
@@ -810,7 +788,6 @@ func bindFunctions(ui lorca.UI) error {
 		name     string
 		function interface{}
 	}
-
 	functions := []binding{
 		{"runScraper", func() { runScraper(ui) }},
 		{"editSettings", func() { editSettings(ui) }},
@@ -832,7 +809,6 @@ func bindFunctions(ui lorca.UI) error {
 		{"selectElement", func(i int, url string) { selectElement(ui, i, url) }},
 		{"selectedElement", func(i int, str string) { selectedElement(ui, i, str) }},
 	}
-
 	var err error = nil
 	for _, e := range functions {
 		err = ui.Bind(e.name, e.function)
@@ -840,7 +816,6 @@ func bindFunctions(ui lorca.UI) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
