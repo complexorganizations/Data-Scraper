@@ -722,23 +722,16 @@ func uiSelectElement(index int, selectURL string) string {
 			            new_element.onmousedown = (e) => {
 			                if (!hover_element) return;
 			
-			                if (e.ctrlKey) {
-			                    if (newIndex(hover_element) > -1) {
-			                        removeSelected(newIndex(hover_element));
-			                    } else if (hoverIndex(hover_element) > -1) {
-			                        removeSelected(hoverIndex(hover_element));
-			                    }
-			                    else {
-			                        selected_elements_new.push(new_element)
-			                        selected_elements_hover.push(hover_element)
-			                    }
-			                }
-			                else {
-			                    selected_elements_new.forEach((e) => { if (!!e) e.remove() })
-			                    selected_elements_new = [new_element];
-			                    selected_elements_hover = [hover_element];
-			                }
-			
+							if (newIndex(hover_element) > -1) {
+								removeSelected(newIndex(hover_element));
+							} else if (hoverIndex(hover_element) > -1) {
+								removeSelected(hoverIndex(hover_element));
+							}
+							else {
+								selected_elements_new.push(new_element)
+								selected_elements_hover.push(hover_element)
+							}
+
 			                identifiers = "";
 			                selected_elements_hover.forEach((hover) => {
 			                    if (identifiers.length > 0) {
