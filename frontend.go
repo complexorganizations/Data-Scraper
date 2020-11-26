@@ -115,14 +115,12 @@ func uiViewSitemap() string {
 					<tr>
 						<td>` + sitemap.ID + `</td>
 						<td>`
-
 	for i, e := range sitemap.StartURL {
 		page += e
 		if i < len(sitemap.StartURL)-1 {
 			page += ", "
 		}
 	}
-
 	page += `</td>
 					</tr>
 				</table>
@@ -135,7 +133,6 @@ func uiViewSitemap() string {
 			</body>
 		</html>
 	`
-
 	return page
 }
 
@@ -293,7 +290,6 @@ func uiEditSettings() string {
 		</body>
 	</html>
 	`
-
 	return page
 }
 
@@ -332,7 +328,6 @@ func saveMap(ui lorca.UI) {
 	} else {
 		sitemap.Login = login{}
 	}
-
 	writeJSON()
 	err := ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
 	if err != nil {
@@ -364,7 +359,6 @@ func uiEditMap() string {
 	for i, e := range sitemap.StartURL {
 		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
-
 	page += `</div>
 				<button onclick=removeSiteURL()>-</button>
 				<button onclick=addSiteURL()>+</button>
@@ -447,7 +441,6 @@ func uiViewSelectors() string {
 		page += `<tr>`
 		page += `<td>` + e.ID + `</td>`
 		page += `<td>` + e.Type + `</td>`
-
 		page += `<td>`
 		for i, el := range e.ParentSelectors {
 			page += el
@@ -456,7 +449,6 @@ func uiViewSelectors() string {
 			}
 		}
 		page += `</td>`
-
 		page += `<td>` + e.Selector + `</td>`
 		if e.Multiple {
 			page += `<td> yes </td>`
@@ -468,7 +460,6 @@ func uiViewSelectors() string {
 		page += `<td><button onclick="editSelector(` + strconv.Itoa(i) + `)">Edit</button></td>`
 		page += `</tr>`
 	}
-
 	page += `</table>
 				<div class="buttons">
 					<button onclick=viewMap()>View sitemap</button>
@@ -477,7 +468,6 @@ func uiViewSelectors() string {
 			</body>
 		</html>
 	`
-
 	return page
 }
 
@@ -567,13 +557,11 @@ func uiEditSelector(index int) string {
 						<td>
 							<select id="map_parents" multiple>
 								<option value="_root"` + ifThenElse(contains(el.ParentSelectors, "_root"), `selected="selected"`, "") + `>_root</option>`
-
 	for _, e := range sitemap.Selectors {
 		if e.ID != el.ID {
 			page += `<option value="` + e.ID + `" ` + ifThenElse(contains(el.ParentSelectors, e.ID), `selected="selected"`, "") + `>` + e.ID + `</option>`
 		}
 	}
-
 	page += `</select>
 						</td>
 					</tr>
@@ -617,13 +605,11 @@ func uiSelectElement(index int, selectURL string) string {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 	}
-
 	if len(settings.Proxy) > 0 {
 		proxyString := settings.Proxy[0]
 		proxyURL, _ := url.Parse(proxyString)
 		transport.Proxy = http.ProxyURL(proxyURL)
 	}
-
 	client := &http.Client{Transport: transport}
 	req, err := http.NewRequest("GET", selectURL, nil)
 	if err != nil {
@@ -640,9 +626,7 @@ func uiSelectElement(index int, selectURL string) string {
 			frontendLog(err)
 		}
 	}
-
 	page := string(html)
-
 	pURL, _ := url.Parse(selectURL)
 	selectURL = pURL.Scheme + "://" + pURL.Host
 	foundReplace := 0
@@ -657,7 +641,6 @@ func uiSelectElement(index int, selectURL string) string {
 			if attrs[attr] > -1 {
 				attrs[attr] += len(page[:foundReplace])
 			}
-
 			if attrs[attr] == -1 {
 				continue
 			}
@@ -668,7 +651,6 @@ func uiSelectElement(index int, selectURL string) string {
 				searchIndex = attrs[attr] + len(attr+"=\"")
 			}
 		}
-
 		if searchIndex == -1 {
 			break
 		}
@@ -680,12 +662,10 @@ func uiSelectElement(index int, selectURL string) string {
 		page = page[:searchIndex] + selectURL + ifThenElse(page[searchIndex] == '/', "", "/") + page[searchIndex:]
 		foundReplace = searchIndex + 1
 	}
-
 	insertIndex := strings.Index(page, "</body>")
 	if insertIndex == -1 {
 		insertIndex = len(page) - 1
 	}
-
 	page =
 		page[:insertIndex] +
 			`<script defer>
@@ -807,7 +787,6 @@ func uiSelectElement(index int, selectURL string) string {
 			    }
 			</script>` +
 			page[insertIndex:]
-
 	return page
 }
 
@@ -860,35 +839,28 @@ func bindFunctions(ui lorca.UI) error {
 
 func main() {
 	readJSON()
-
 	if !settings.Gui {
 		scrape()
 		return
 	}
-
 	ui, err := lorca.New("", "", 900, 600)
 	if err != nil {
 		frontendLog(err)
 		return
 	}
-
 	err = bindFunctions(ui)
 	if err != nil {
 		frontendLog(err)
 	}
-
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
 	if err != nil {
 		frontendLog(err)
 	}
-
 	<-ui.Done()
-
 	err = ui.Close()
 	if err != nil {
 		frontendLog(err)
 	}
-
 	if shouldScrape {
 		scrape()
 	}
