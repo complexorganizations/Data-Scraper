@@ -10,7 +10,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Here is a sample config, either build your own or use this one as an example. `sitemap.json`
 ```
-{"settings":{"gui":true,"workers":1,"export":"json","outputFile":"output.json"},"sitemap":{"projectID":"www.prajwalkoirala.com","startURL":["https://www.prajwalkoirala.com"],"selectors":[{"id":"Name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1"},{"id":"Picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img"}]}}
+{"settings":{"gui":true,"workers":1,"outputFile":"output.json"},"sitemap":{"projectID":"www.prajwalkoirala.com","startURL":["https://www.prajwalkoirala.com"],"selectors":[{"id":"Name","type":"SelectorText","parentSelectors":["_root"],"selector":"h1"},{"id":"Picture","type":"SelectorImage","parentSelectors":["_root"],"selector":"img"}]}}
 ```
 You can finally run the scraper.
 ```
