@@ -18,35 +18,34 @@
       "https://www.prajwalkoirala.com"
     ],
     "login": {
-      "https://example.com/login": {
-        "username": "password"
+      "url": "https://example.com/login",
+      "username": "password"
+    },
+    "selectors": [
+      {
+        "id": "Name",
+        "type": "SelectorText",
+        "parentSelectors": [
+          "_root"
+        ],
+        "selector": "h1",
+        "multiple": false,
+        "regex": "",
+        "delay": 0,
+        "extractAttribute": ""
       },
-      "selectors": [
-        {
-          "id": "Name",
-          "type": "SelectorText",
-          "parentSelectors": [
-            "_root"
-          ],
-          "selector": "h1",
-          "multiple": false,
-          "regex": "",
-          "delay": 0,
-          "extractAttribute": ""
-        },
-        {
-          "id": "Picture",
-          "type": "SelectorImage",
-          "parentSelectors": [
-            "_root"
-          ],
-          "selector": "img",
-          "multiple": false,
-          "regex": "",
-          "delay": 0,
-          "extractAttribute": ""
-        }
-      ]
-    }
+      {
+        "id": "Picture",
+        "type": "SelectorImage",
+        "parentSelectors": [
+          "_root"
+        ],
+        "selector": "img",
+        "multiple": false,
+        "regex": "",
+        "delay": 0,
+        "extractAttribute": ""
+      }
+    ]
   }
 }
