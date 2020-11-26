@@ -232,9 +232,9 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, ok := s.Attr("href")
-			if !ok {
-				fmt.Println("Error: HREF has not been found.")
+			href, err := s.Attr("href")
+			if err != nil {
+				logErrors(err)
 			}
 
 			links = append(links, toFixedURL(href, baseURL))
@@ -249,9 +249,9 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, ok := s.Attr(selector.ExtractAttribute)
-			if !ok {
-				fmt.Println("Error: HREF has not been found.")
+			href, err := s.Attr(selector.ExtractAttribute)
+			if err != nil {
+				logErrors(err)
 			}
 			links = append(links, href)
 
@@ -273,15 +273,15 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 						resultText := s.Find(elementSelector.Selector).Text()
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorImage" {
-						resultText, ok := s.Find(elementSelector.Selector).Attr("src")
-						if !ok {
-							fmt.Println("Error: HREF has not been found.")
+						resultText, err := s.Find(elementSelector.Selector).Attr("src")
+						if err != nil {
+							logErrors(err)
 						}
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorLink" {
-						resultText, ok := s.Find(elementSelector.Selector).Attr("href")
-						if !ok {
-							fmt.Println("Error: HREF has not been found.")
+						resultText, err := s.Find(elementSelector.Selector).Attr("href")
+						if err != nil {
+							logErrors(err)
 						}
 						elementOutput[elementSelector.ID] = resultText
 					}
@@ -300,9 +300,9 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	var sources []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
-		src, ok := s.Attr("src")
-		if !ok {
-			fmt.Println("Error: HREF has not been found.")
+		src, err := s.Attr("src")
+		if err != nil {
+			logErrors(err)
 		}
 		sources = append(sources, src)
 
