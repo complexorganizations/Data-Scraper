@@ -13,7 +13,7 @@ git clone https://github.com/complexorganizations/data-scraper.git
 ```
 Here is a sample config, either build your own or use this one as an example. `sitemap.json`
 ```
-data scraper
+Sitemap here
 ```
 You can finally run the scraper.
 ```
