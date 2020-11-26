@@ -1,5 +1,4 @@
 ### Data Scraper
-
 Data Scraper is a super fast crawler, scraper used to scrape and extract data, Its used to scrape data from wide ranges of applications.
 
 ---
