@@ -7,7 +7,7 @@
     "workers": 10,
     "rateLimiting": 0,
     "export": "json",
-    "outputFile": "output",
+    "outputFile": "output.json",
     "userAgents": [],
     "captcha": "",
     "proxy": []
