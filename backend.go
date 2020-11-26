@@ -232,8 +232,8 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, ok := s.Attr("href")
-			if !ok {
+			href, errors := s.Attr("href")
+			if !errors {
 				fmt.Println("Error: HREF has not been found.")
 			}
 
@@ -249,8 +249,8 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, ok := s.Attr(selector.ExtractAttribute)
-			if !ok {
+			href, errors := s.Attr(selector.ExtractAttribute)
+			if !errors {
 				fmt.Println("Error: HREF has not been found.")
 			}
 			links = append(links, href)
@@ -273,14 +273,14 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 						resultText := s.Find(elementSelector.Selector).Text()
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorImage" {
-						resultText, ok := s.Find(elementSelector.Selector).Attr("src")
-						if !ok {
+						resultText, errors := s.Find(elementSelector.Selector).Attr("src")
+						if !errors {
 							fmt.Println("Error: HREF has not been found.")
 						}
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorLink" {
-						resultText, ok := s.Find(elementSelector.Selector).Attr("href")
-						if !ok {
+						resultText, errors := s.Find(elementSelector.Selector).Attr("href")
+						if !errors {
 							fmt.Println("Error: HREF has not been found.")
 						}
 						elementOutput[elementSelector.ID] = resultText
@@ -300,8 +300,8 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	var sources []string
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
-		src, ok := s.Attr("src")
-		if !ok {
+		src, errors := s.Attr("src")
+		if !errors {
 			fmt.Println("Error: HREF has not been found.")
 		}
 		sources = append(sources, src)
