@@ -371,14 +371,14 @@ func uiEditMap() string {
 				<button onclick=addSiteURL()>+</button>
 				<br /><br />
 				<label for="login">Require login</label>
-				<input type="checkbox" id="login" `+ifThenElse(sitemap.Login.Url == "", ``, `checked`)+`></input>
-				<div id="show_login"  `+ ifThenElse(sitemap.Login.Url == "", ` class="hide"`, "") + `>
+				<input type="checkbox" id="login" ` + ifThenElse(sitemap.Login.Url == "", ``, `checked`) + `></input>
+				<div id="show_login"  ` + ifThenElse(sitemap.Login.Url == "", ` class="hide"`, "") + `>
 					<label for="txt_login_url">Login URL: </label>
 					<input type="text" placeholder="Enter login url" id="txt_login_url" value="` + sitemap.Login.Url + `"></input>
 					<label for="txt_login_username">Username: </label>
-					<input type="text" placeholder="Enter username" id="txt_login_username" value="` + sitemap.Login.Username+ `"></input>
+					<input type="text" placeholder="Enter username" id="txt_login_username" value="` + sitemap.Login.Username + `"></input>
 					<label for="txt_login_password">Password: </label>
-					<input type="text" placeholder="Enter password" id="txt_login_password" value="` + sitemap.Login.Password+ `"></input>
+					<input type="text" placeholder="Enter password" id="txt_login_password" value="` + sitemap.Login.Password + `"></input>
 				</div>
 				<button onclick=saveMap()>Save</button>
 				<script>
@@ -558,7 +558,7 @@ func uiEditSelector(index int) string {
 
 						</select>
 					</tr>
-					<tr id="download" `+ifThenElse(el.Type == "SelectorImage", "", `class="hide"`)+`><th>Download</th><td><input type="checkbox" id="download"`+ifThenElse(*el.Download, "checked", "")+`></input></td></tr>
+					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>
 					<tr>
 						<th>parent selectors</th>
 						<td>

@@ -66,17 +66,17 @@ type scraping struct {
 }
 
 type settingsT struct {
-	Gui          bool     `json:"gui"`
-	Log          *bool    `json:"log,omitempty"`
-	LogFile      string   `json:"logFile,omitempty"`
-	JavaScript   *bool    `json:"javaScript,omitempty"`
-	Workers      int      `json:"workers"`
-	RateLimit    *int     `json:"rateLimit,omitempty"`
-	Export       string   `json:"export"`
-	OutputFile   string   `json:"outputFile"`
-	UserAgents   []string `json:"userAgents,omitempty"`
-	Captcha      string   `json:"captcha,omitempty"`
-	Proxy        []string `json:"proxy,omitempty"`
+	Gui        bool     `json:"gui"`
+	Log        *bool    `json:"log,omitempty"`
+	LogFile    string   `json:"logFile,omitempty"`
+	JavaScript *bool    `json:"javaScript,omitempty"`
+	Workers    int      `json:"workers"`
+	RateLimit  *int     `json:"rateLimit,omitempty"`
+	Export     string   `json:"export"`
+	OutputFile string   `json:"outputFile"`
+	UserAgents []string `json:"userAgents,omitempty"`
+	Captcha    string   `json:"captcha,omitempty"`
+	Proxy      []string `json:"proxy,omitempty"`
 }
 
 type jsonType struct {
@@ -225,10 +225,8 @@ func readJSON() {
 	if jsonData.Settings.RateLimit == nil {
 		jsonData.Settings.RateLimit = newint(0)
 	}
-
 	sitemap = jsonData.Sitemap
 	settings = jsonData.Settings
-
 }
 
 func writeJSON() {
@@ -700,7 +698,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		for job := range jobs {
 			var doc *goquery.Document
 			if *settings.RateLimit != 0 {
-				if time.Now().Sub(startTime).Seconds() < 60 && rate >= *settings.RateLimit{
+				if time.Now().Sub(startTime).Seconds() < 60 && rate >= *settings.RateLimit {
 					time.Sleep(time.Now().Sub(startTime))
 				}
 				if time.Now().Sub(startTime).Seconds() >= 60 {

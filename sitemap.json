@@ -1,7 +1,7 @@
 {
   "settings": {
-    "gui": false,
-    "workers": 10,
+    "gui": true,
+    "workers": 1,
     "export": "json",
     "outputFile": "output.json"
   },
@@ -13,7 +13,7 @@
     "selectors": [
       {
         "id": "Name",
-        "type": "SelectorImage",
+        "type": "SelectorText",
         "parentSelectors": [
           "_root"
         ],
