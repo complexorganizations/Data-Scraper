@@ -249,9 +249,9 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, ok := s.Attr(selector.ExtractAttribute)
-			if !ok {
-				fmt.Println("Error: HREF has not been found.")
+			href, err := s.Attr(selector.ExtractAttribute)
+			if !err {
+				logErrors(err)
 			}
 			links = append(links, href)
 
