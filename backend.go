@@ -44,39 +44,39 @@ const (
 type selectors struct {
 	ID               string   `json:"id"`
 	Type             string   `json:"type"`
-	Download         bool     `json:"download"`
+	Download         *bool    `json:"download,omitempty"`
 	ParentSelectors  []string `json:"parentSelectors,omitempty"`
 	Selector         string   `json:"selector"`
-	Multiple         bool     `json:"multiple"`
+	Multiple         *bool    `json:"multiple,omitempty"`
 	Regex            string   `json:"regex,omitempty"`
-	Delay            int      `json:"delay"`
-	ExtractAttribute string   `json:"extractAttribute"`
+	Delay            *int     `json:"delay,omitempty"`
+	ExtractAttribute string   `json:"extractAttribute,omitempty"`
 }
 
 type login struct {
-	Url      string `json:"url,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	Url      string `json:"url"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type scraping struct {
 	ID        string      `json:"projectID,omitempty"`
 	StartURL  []string    `json:"startURL"`
-	Login     login       `json:"login,omitempty"`
+	Login     *login      `json:"login,omitempty"`
 	Selectors []selectors `json:"selectors"`
 }
 
 type settingsT struct {
 	Gui          bool     `json:"gui"`
-	Log          bool     `json:"log"`
+	Log          *bool    `json:"log,omitempty"`
 	LogFile      string   `json:"logFile,omitempty"`
-	JavaScript   bool     `json:"javaScript"`
+	JavaScript   *bool    `json:"javaScript,omitempty"`
 	Workers      int      `json:"workers"`
-	RateLimit    int      `json:"rateLimit"`
+	RateLimit    *int     `json:"rateLimit,omitempty"`
 	Export       string   `json:"export"`
 	OutputFile   string   `json:"outputFile"`
 	UserAgents   []string `json:"userAgents,omitempty"`
-	Captcha      string   `json:"captcha"`
+	Captcha      string   `json:"captcha,omitempty"`
 	Proxy        []string `json:"proxy,omitempty"`
 }
 
@@ -175,7 +175,7 @@ func clearCache() {
 }
 
 func logErrors(error error) {
-	if settings.Log {
+	if *settings.Log {
 		file, err := os.OpenFile(settings.LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		log.SetOutput(file)
 		if err != nil {
@@ -191,6 +191,15 @@ func logErrors(error error) {
 		}
 	}
 }
+func newbool(b bool) *bool {
+	ret := b
+	return &ret
+}
+
+func newint(b int) *int {
+	ret := b
+	return &ret
+}
 
 func readJSON() {
 	jsonData := jsonType{}
@@ -204,12 +213,56 @@ func readJSON() {
 		logErrors(err)
 	}
 
+	for i, e := range sitemap.Selectors {
+		if e.Download == nil {
+			e.Download = newbool(false)
+		}
+		if e.Multiple == nil {
+			e.Multiple = newbool(false)
+		}
+		if e.Delay == nil {
+			e.Delay = newint(0)
+		}
+		jsonData.Sitemap.Selectors[i] = e
+	}
+	if jsonData.Settings.Log == nil {
+		jsonData.Settings.Log = newbool(false)
+	}
+	if jsonData.Settings.JavaScript == nil {
+		jsonData.Settings.JavaScript = newbool(false)
+	}
+	if jsonData.Settings.RateLimit == nil {
+		jsonData.Settings.RateLimit = newint(0)
+	}
+
 	sitemap = jsonData.Sitemap
 	settings = jsonData.Settings
+
 }
 
 func writeJSON() {
 	jsonData := jsonType{settings, sitemap}
+	for i, e := range jsonData.Sitemap.Selectors {
+		if e.Download != nil && !*e.Download {
+			e.Download = nil
+		}
+		if e.Multiple != nil && !*e.Multiple {
+			e.Multiple = nil
+		}
+		if e.Delay != nil && *e.Delay == 0 {
+			e.Delay = nil
+		}
+		jsonData.Sitemap.Selectors[i] = e
+	}
+	if jsonData.Settings.Log != nil && !*jsonData.Settings.Log {
+		jsonData.Settings.Log = nil
+	}
+	if jsonData.Settings.JavaScript != nil && !*jsonData.Settings.JavaScript {
+		jsonData.Settings.JavaScript = nil
+	}
+	if jsonData.Settings.RateLimit != nil && *jsonData.Settings.RateLimit == 0 {
+		jsonData.Settings.RateLimit = nil
+	}
 	dataJSON, err := json.MarshalIndent(jsonData, "", "  ")
 	if err != nil {
 		logErrors(err)
@@ -238,7 +291,7 @@ func selectorText(doc *goquery.Document, selector *selectors) []string {
 				text = append(text, strings.TrimSpace(s.Text()))
 			}
 
-			return selector.Multiple
+			return *selector.Multiple
 		},
 	)
 	return text
@@ -255,7 +308,7 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 
 			links = append(links, toFixedURL(href, baseURL))
 
-			return selector.Multiple
+			return *selector.Multiple
 		},
 	)
 	return links
@@ -271,7 +324,7 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 			}
 			links = append(links, href)
 
-			return selector.Multiple
+			return *selector.Multiple
 		},
 	)
 	return links
@@ -307,7 +360,7 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 				elementOutputList = append(elementOutputList, elementOutput)
 			}
 
-			return selector.Multiple
+			return *selector.Multiple
 		},
 	)
 	return elementOutputList
@@ -353,7 +406,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 		}
 		sources = append(sources, src)
 
-		return selector.Multiple
+		return *selector.Multiple
 	})
 	return sources
 }
@@ -710,8 +763,8 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		userAgent := userAgents[count]
 		for job := range jobs {
 			var doc *goquery.Document
-			if settings.RateLimit != 0 {
-				if time.Now().Sub(startTime).Seconds() < 60 && rate >= settings.RateLimit{
+			if *settings.RateLimit != 0 {
+				if time.Now().Sub(startTime).Seconds() < 60 && rate >= *settings.RateLimit{
 					time.Sleep(time.Now().Sub(startTime))
 				}
 				if time.Now().Sub(startTime).Seconds() >= 60 {
@@ -720,7 +773,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 				}
 			}
 			rate++
-			if settings.JavaScript {
+			if *settings.JavaScript {
 				if settings.Captcha != "" {
 					doc = navigateURL(job.startURL, userAgent)
 				} else {
