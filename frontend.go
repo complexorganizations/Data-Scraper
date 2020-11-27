@@ -139,7 +139,7 @@ func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
 	settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
-	settings.JavaScript =newbool(fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true")
+	settings.JavaScript = newbool(fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true")
 	settings.Workers, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_workers").value;`)))
 	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
 	settings.RateLimit = newint(intA)
@@ -550,7 +550,7 @@ func uiEditSelector(index int) string {
 	} else {
 		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"></input></td></tr>`
 	}
-	page += 		`<tr>
+	page += `<tr>
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
@@ -571,18 +571,18 @@ func uiEditSelector(index int) string {
 						</td>
 					</tr>`
 	if el.Multiple != nil {
-		page+=`<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>`
+		page += `<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>`
 	} else {
-		page+=`<tr><th>multiple</th><td><input type="checkbox" id="map_multiple"></td></tr>`
+		page += `<tr><th>multiple</th><td><input type="checkbox" id="map_multiple"></td></tr>`
 	}
 
-	page += 		`<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>`
+	page += `<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>`
 	if el.Delay != nil {
 		page += `<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(*el.Delay) + `"></td></tr>`
 	} else {
 		page += `<tr><th>delay</th><td><input type="number" id="map_delay" value="0"></td></tr>`
 	}
-	page += 	`</table>
+	page += `</table>
 				<div class="buttons">
 					<button onclick=deleteSelector(` + strconv.Itoa(index) + `)>Delete</button>
 					<button onclick=saveSelector(` + strconv.Itoa(index) + `)>Save</button>
