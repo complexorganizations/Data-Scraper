@@ -17,7 +17,7 @@ var (
 )
 
 func frontendLog(err error) {
-	if *settings.Log {
+	if len(settings.LogFile) > 0 {
 		_, _ = fmt.Fprintln(os.Stderr, "Error: ", err)
 	}
 }
@@ -138,8 +138,8 @@ func uiViewSitemap() string {
 func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
-	*settings.Log = fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
-	if *settings.Log {
+	log := fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
+	if log {
 		settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
 	} else {
 		settings.LogFile = ""
@@ -150,7 +150,6 @@ func saveSettings(ui lorca.UI) {
 	if err != nil {
 		frontendLog(err)
 	}
-	settings.Export = fmt.Sprint(ui.Eval(`document.getElementById("settings_export").value;`))
 	uaNum, _ := strconv.Atoi(fmt.Sprint(ui.Eval(`user_agent_num.toString();`)))
 	settings.UserAgents = []string{}
 	for i := 0; i < uaNum; i++ {
@@ -174,10 +173,15 @@ func saveSettings(ui lorca.UI) {
 
 func addUserAgent(ui lorca.UI) {
 	ui.Eval(`
-		user_agent_num++;
-		el = document.createElement("input");
-		el.id = "txt_useragent" + user_agent_num.toString();
-		ua.appendChild(el);
+		(function() {
+			if(user_agent_num > 0 && document.getElementById("txt_useragent" + user_agent_num).value.length == 0) {
+				return;
+			}
+			user_agent_num++;
+			el = document.createElement("input");
+			el.id = "txt_useragent" + user_agent_num.toString();
+			ua.appendChild(el);
+		})()
 	`)
 }
 
@@ -192,10 +196,15 @@ func removeUserAgent(ui lorca.UI) {
 
 func addProxy(ui lorca.UI) {
 	ui.Eval(`
-		proxy_num++;
-		el = document.createElement("input");
-		el.id = "txt_proxy" + proxy_num.toString();
-		proxies.appendChild(el);
+		(function() {
+			if(proxy_num > 0 && document.getElementById("txt_proxy" + proxy_num).value.length == 0) {
+				return;
+			}
+			proxy_num++;
+			el = document.createElement("input");
+			el.id = "txt_proxy" + proxy_num.toString();
+			proxies.appendChild(el);
+		})()
 	`)
 }
 
@@ -226,23 +235,14 @@ func uiEditSettings() string {
 		<body>
 			<table>
 				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
-				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(*settings.Log, `checked`, "") + `></td></tr>
-				<tr id="show_logfile"` + ifThenElse(!*settings.Log, ` class="hide"`, "") + `>
+				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(len(settings.LogFile) > 0, `checked`, "") + `></td></tr>
+				<tr id="show_logfile" ` + ifThenElse(len(settings.LogFile) > 0, ``, `class="hide"`) + `>
 					<th>Log file</th>
 					<td><input id="settings_logfile" type="text" value="` + settings.LogFile + `"></td>
 				</tr>
 				<tr><th>JavaScript</th><td><input id="settings_js" type="checkbox" ` + ifThenElse(*settings.JavaScript, `checked`, "") + `></td></tr>
 				<tr><th>Workers</th><td><input id="settings_workers" type="number" value="` + strconv.Itoa(settings.Workers) + `"></td></tr>
 				<tr><th>Rate limit</th><td><input id="settings_rate_limit" type="number" value="` + strconv.Itoa(*settings.RateLimit) + `"></td></tr>
-				<tr>
-					<th>Export</th>
-					<td>
-						<select id="settings_export">
-							<option value="json" ` + ifThenElse(settings.Export == "json", `selected="selected"`, "") + `>JSON</option>
-							<option value="xml" ` + ifThenElse(settings.Export == "xml", `selected="selected"`, "") + `>XML</option>
-							<option value="csv" ` + ifThenElse(settings.Export == "csv", `selected="selected"`, "") + `>CSV</option>
-						</select>
-					</td>
 				<tr><th>Output file</th><td><input id="settings_output" type="text" value="` + settings.OutputFile + `"></td></tr>
 				<tr>
 					<th>User agents</th>

@@ -2,7 +2,6 @@
   "settings": {
     "gui": false,
     "workers": 10,
-    "export": "json",
     "outputFile": "output.json"
   },
   "sitemap": {
@@ -13,7 +12,7 @@
     "selectors": [
       {
         "id": "Name",
-        "type": "SelectorImage",
+        "type": "SelectorText",
         "parentSelectors": [
           "_root"
         ],
