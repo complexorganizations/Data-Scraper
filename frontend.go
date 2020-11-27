@@ -138,15 +138,11 @@ func uiViewSitemap() string {
 func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
-	log := fmt.Sprint(ui.Eval(`document.getElementById("settings_log").checked.toString();`)) == "true"
-	if log {
-		settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
-	} else {
-		settings.LogFile = ""
-	}
-	*settings.JavaScript = fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true"
+	settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
+	settings.JavaScript =newbool(fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true")
 	settings.Workers, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_workers").value;`)))
-	*settings.RateLimit, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
+	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
+	settings.RateLimit = newint(intA)
 	if err != nil {
 		frontendLog(err)
 	}
@@ -227,16 +223,12 @@ func uiEditSettings() string {
 				input {
 					display: block;
 				}
-				.hide {
-					display: none;
-				}
 			</style>
 		</head>
 		<body>
 			<table>
 				<tr><th>Gui</th><td><input id="settings_gui" type="checkbox" ` + ifThenElse(settings.Gui, `checked`, "") + `></td></tr>
-				<tr><th>Log</th><td><input id="settings_log" type="checkbox" ` + ifThenElse(len(settings.LogFile) > 0, `checked`, "") + `></td></tr>
-				<tr id="show_logfile" ` + ifThenElse(len(settings.LogFile) > 0, ``, `class="hide"`) + `>
+				<tr>
 					<th>Log file</th>
 					<td><input id="settings_logfile" type="text" value="` + settings.LogFile + `"></td>
 				</tr>
@@ -279,11 +271,6 @@ func uiEditSettings() string {
 				let proxy_num = ` + strconv.Itoa(len(settings.Proxy)) + `
 				let proxies = document.getElementById("proxies");
 				let el;
-				let checkbox = document.getElementById("settings_log");
-				let show_logfile = document.getElementById("show_logfile");
-				checkbox.addEventListener('change', function() {
-					show_logfile.classList.toggle("hide");
-				});
 			</script>
 		</body>
 	</html>
@@ -452,13 +439,18 @@ func uiViewSelectors() string {
 		}
 		page += `</td>`
 		page += `<td>` + e.Selector + `</td>`
-		if *e.Multiple {
+		if e.Multiple != nil && *e.Multiple {
 			page += `<td> yes </td>`
 		} else {
 			page += `<td> no </td>`
 		}
 		page += `<td>` + e.Regex + `</td>`
-		page += `<td>` + strconv.Itoa(*e.Delay) + `</td>`
+		if e.Delay != nil {
+			page += `<td>` + strconv.Itoa(*e.Delay) + `</td>`
+		} else {
+			page += `<td>0</td>`
+		}
+
 		page += `<td><button onclick="editSelector(` + strconv.Itoa(i) + `)">Edit</button></td>`
 		page += `</tr>`
 	}
@@ -487,7 +479,7 @@ func saveSelector(ui lorca.UI, index int) {
 	el := sitemap.Selectors[index]
 	el.ID = fmt.Sprint(ui.Eval(`document.getElementById("map_id").value;`))
 	el.Type = fmt.Sprint(ui.Eval(`document.getElementById("map_type").value;`))
-	*el.Download = fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true"
+	el.Download = newbool(fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true")
 	el.ParentSelectors = []string{}
 	parentNum, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_parents").selectedOptions.length.toString();`)))
 	for i := 0; i < parentNum; i++ {
@@ -495,9 +487,10 @@ func saveSelector(ui lorca.UI, index int) {
 		el.ParentSelectors = append(el.ParentSelectors, fmt.Sprint(ui.Eval(code)))
 	}
 	el.Selector = fmt.Sprint(ui.Eval(`document.getElementById("map_selector").value;`))
-	*el.Multiple = fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true"
+	el.Multiple = newbool(fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true")
 	el.Regex = fmt.Sprint(ui.Eval(`document.getElementById("map_regex").value;`))
-	*el.Delay, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
+	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
+	el.Delay = newint(intA)
 	sitemap.Selectors[index] = el
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
@@ -551,9 +544,13 @@ func uiEditSelector(index int) string {
 							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Selector Group</option>
 							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Selector Sitemap Xml Link</option>
 						</select>
-					</tr>
-					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>
-					<tr>
+					</tr>`
+	if el.Download != nil {
+		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>`
+	} else {
+		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"></input></td></tr>`
+	}
+	page += 		`<tr>
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
@@ -572,11 +569,20 @@ func uiEditSelector(index int) string {
 							<input type="text" id="map_selector" value="` + el.Selector + `">
 							<button onclick="selectElement(` + strconv.Itoa(index) + `, '` + sitemap.StartURL[0] + `')">Select</button>
 						</td>
-					</tr>
-					<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>
-					<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>
-					<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(*el.Delay) + `"></td></tr>
-				</table>
+					</tr>`
+	if el.Multiple != nil {
+		page+=`<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>`
+	} else {
+		page+=`<tr><th>multiple</th><td><input type="checkbox" id="map_multiple"></td></tr>`
+	}
+
+	page += 		`<tr><th>regex</th><td><input type="text" id="map_regex" value="` + el.Regex + `"></td></tr>`
+	if el.Delay != nil {
+		page += `<tr><th>delay</th><td><input type="number" id="map_delay" value="` + strconv.Itoa(*el.Delay) + `"></td></tr>`
+	} else {
+		page += `<tr><th>delay</th><td><input type="number" id="map_delay" value="0"></td></tr>`
+	}
+	page += 	`</table>
 				<div class="buttons">
 					<button onclick=deleteSelector(` + strconv.Itoa(index) + `)>Delete</button>
 					<button onclick=saveSelector(` + strconv.Itoa(index) + `)>Save</button>
