@@ -48,7 +48,7 @@ const globalStyles = `
 	}
 	table {
 		width: 100%;
-		background-color: white;
+		background-color: #fff;
 		border: 2px solid #dadce0;
 		border-radius: 2px;
 		padding: 1000px;
@@ -439,7 +439,6 @@ func uiViewSelectors() string {
 						<th>delay</th>
 						<th>edit</th>
 					</tr>`
-
 	for i, e := range sitemap.Selectors {
 		page += `<tr>`
 		page += `<td>` + e.ID + `</td>`
@@ -551,7 +550,6 @@ func uiEditSelector(index int) string {
 							<option value="SelectorElementClick" ` + ifThenElse(el.Type == "SelectorElementClick", `selected`, "") + `>Element click</option>
 							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Grouped</option>
 							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Sitemap.xml links</option>
-
 						</select>
 					</tr>
 					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>
