@@ -320,7 +320,7 @@ func saveMap(ui lorca.UI) {
 
 	if fmt.Sprint(ui.Eval(`document.getElementById("login").checked.toString();`)) == "true" {
 		sitemap.Login = &login{
-			Url:      fmt.Sprint(ui.Eval(`document.getElementById("txt_login_url").value;`)),
+			URL:      fmt.Sprint(ui.Eval(`document.getElementById("txt_login_url").value;`)),
 			Username: fmt.Sprint(ui.Eval(`document.getElementById("txt_login_username").value;`)),
 			Password: fmt.Sprint(ui.Eval(`document.getElementById("txt_login_password").value;`)),
 		}
@@ -358,7 +358,7 @@ func uiEditMap() string {
 		page += `<input type="text" placeholder="Enter start URL" id="txt_starturl` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
 	sitemap.Login = &login{
-		Url:      "",
+		URL:      "",
 		Username: "",
 		Password: "",
 	}
@@ -367,10 +367,10 @@ func uiEditMap() string {
 				<button onclick=addSiteURL()>+</button>
 				<br /><br />
 				<label for="login">Require login</label>
-				<input type="checkbox" id="login" ` + ifThenElse(sitemap.Login.Url == "", ``, `checked`) + `></input>
-				<div id="show_login"  ` + ifThenElse(sitemap.Login.Url == "", ` class="hide"`, "") + `>
+				<input type="checkbox" id="login" ` + ifThenElse(sitemap.Login.URL == "", ``, `checked`) + `></input>
+				<div id="show_login"  ` + ifThenElse(sitemap.Login.URL == "", ` class="hide"`, "") + `>
 					<label for="txt_login_url">Login URL: </label>
-					<input type="text" placeholder="Enter login url" id="txt_login_url" value="` + sitemap.Login.Url + `"></input>
+					<input type="text" placeholder="Enter login url" id="txt_login_url" value="` + sitemap.Login.URL + `"></input>
 					<label for="txt_login_username">Username: </label>
 					<input type="text" placeholder="Enter username" id="txt_login_username" value="` + sitemap.Login.Username + `"></input>
 					<label for="txt_login_password">Password: </label>
