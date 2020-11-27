@@ -60,7 +60,7 @@ Should i manually try and change the `sitemap.json` file?
 - No, You should not.
 
 How can i open the GUI again?
-- Open the file `sitemap.json` and change it from `"Gui": false` to `"Gui": true` ***Google Chrome (Required)***
+- Open the file `sitemap.json` and alter `"Gui": false` to `"Gui": true` ***Google Chrome (Required)***
 
 ---
 ### Concurrency

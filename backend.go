@@ -41,11 +41,11 @@ const (
 )
 
 type selectors struct {
-	ID               string   `json:"id"`
-	Type             string   `json:"type"`
+	ID               string   `json:"id,omitempty"`
+	Type             string   `json:"type,omitempty"`
 	Download         *bool    `json:"download,omitempty"`
 	ParentSelectors  []string `json:"parentSelectors,omitempty"`
-	Selector         string   `json:"selector"`
+	Selector         string   `json:"selector,omitempty"`
 	Multiple         *bool    `json:"multiple,omitempty"`
 	Regex            string   `json:"regex,omitempty"`
 	Delay            *int     `json:"delay,omitempty"`
@@ -53,28 +53,28 @@ type selectors struct {
 }
 
 type login struct {
-	Url      string `json:"url"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	URL      string `json:"url,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type scraping struct {
 	ID        string      `json:"projectID,omitempty"`
-	StartURL  []string    `json:"startURL"`
+	StartURL  []string    `json:"startURL,omitempty"`
 	Login     *login      `json:"login,omitempty"`
-	Selectors []selectors `json:"selectors"`
+	Selectors []selectors `json:"selectors,omitempty"`
 }
 
 type settingsT struct {
-	Gui          bool     `json:"gui"`
-	LogFile      string   `json:"logFile,omitempty"`
-	JavaScript   *bool    `json:"javaScript,omitempty"`
-	Workers      int      `json:"workers"`
-	RateLimit    *int     `json:"rateLimit,omitempty"`
-	OutputFile   string   `json:"outputFile"`
-	UserAgents   []string `json:"userAgents,omitempty"`
-	Captcha      string   `json:"captcha,omitempty"`
-	Proxy        []string `json:"proxy,omitempty"`
+	Gui        bool     `json:"gui,omitempty"`
+	LogFile    string   `json:"logFile,omitempty"`
+	JavaScript *bool    `json:"javaScript,omitempty"`
+	Workers    int      `json:"workers,omitempty"`
+	RateLimit  *int     `json:"rateLimit,omitempty"`
+	OutputFile string   `json:"outputFile,omitempty"`
+	UserAgents []string `json:"userAgents,omitempty"`
+	Captcha    string   `json:"captcha,omitempty"`
+	Proxy      []string `json:"proxy,omitempty"`
 }
 
 type jsonType struct {
@@ -201,7 +201,6 @@ func readJSON() {
 	if err != nil {
 		logErrors(err)
 	}
-
 	for i, e := range sitemap.Selectors {
 		if e.Download == nil {
 			e.Download = newbool(false)
@@ -220,10 +219,8 @@ func readJSON() {
 	if jsonData.Settings.RateLimit == nil {
 		jsonData.Settings.RateLimit = newint(0)
 	}
-
 	sitemap = jsonData.Sitemap
 	settings = jsonData.Settings
-
 }
 
 func writeJSON() {
@@ -374,7 +371,7 @@ func selectorImage(doc *goquery.Document, selector *selectors) []string {
 	doc.Find(selector.Selector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		src, ok := s.Attr("src")
 		if ok {
-			err := downloadFile(src, "images/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
+			err := downloadFile(src, "assets/"+strconv.Itoa(img)+src[strings.LastIndex(src, "."):])
 			logErrors(err)
 		} else {
 			fmt.Println("Error: SRC has not been found.")
@@ -692,7 +689,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 		for job := range jobs {
 			var doc *goquery.Document
 			if *settings.RateLimit != 0 {
-				if time.Now().Sub(startTime).Seconds() < 60 && rate >= *settings.RateLimit{
+				if time.Now().Sub(startTime).Seconds() < 60 && rate >= *settings.RateLimit {
 					time.Sleep(time.Now().Sub(startTime))
 				}
 				if time.Now().Sub(startTime).Seconds() >= 60 {
