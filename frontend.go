@@ -538,18 +538,18 @@ func uiEditSelector(index int) string {
 					<tr>
 						<th>type</th><td>
 						<select id="map_type">
-							<option value="SelectorText" ` + ifThenElse(el.Type == "SelectorText", `selected`, "") + `>Text</option>
-							<option value="SelectorLink" ` + ifThenElse(el.Type == "SelectorLink", `selected`, "") + `>Link</option>
-							<option value="SelectorPopupLink" ` + ifThenElse(el.Type == "SelectorPopupLink", `selected`, "") + `>Popup link</option>
-							<option value="SelectorImage" ` + ifThenElse(el.Type == "SelectorImage", `selected`, "") + `>Image</option>
-							<option value="SelectorTable" ` + ifThenElse(el.Type == "SelectorTable", `selected`, "") + `>Table</option>
-							<option value="SelectorElementAttribute" ` + ifThenElse(el.Type == "SelectorElementAttribute", `selected`, "") + `>Element attribute</option>
-							<option value="SelectorHTML" ` + ifThenElse(el.Type == "SelectorHTML", `selected`, "") + `>HTML</option>
-							<option value="SelectorElement" ` + ifThenElse(el.Type == "SelectorElement", `selected`, "") + `>Element</option>
-							<option value="SelectorElementScroll" ` + ifThenElse(el.Type == "SelectorElementScroll", `selected`, "") + `>Element scroll down</option>
-							<option value="SelectorElementClick" ` + ifThenElse(el.Type == "SelectorElementClick", `selected`, "") + `>Element click</option>
-							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Grouped</option>
-							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Sitemap.xml links</option>
+							<option value="SelectorText" ` + ifThenElse(el.Type == "SelectorText", `selected`, "") + `>Selector Text</option>
+							<option value="SelectorLink" ` + ifThenElse(el.Type == "SelectorLink", `selected`, "") + `>Selector Link</option>
+							<option value="SelectorPopupLink" ` + ifThenElse(el.Type == "SelectorPopupLink", `selected`, "") + `>Selector Popup Link</option>
+							<option value="SelectorImage" ` + ifThenElse(el.Type == "SelectorImage", `selected`, "") + `>Selector Image</option>
+							<option value="SelectorTable" ` + ifThenElse(el.Type == "SelectorTable", `selected`, "") + `>Selector Table</option>
+							<option value="SelectorElementAttribute" ` + ifThenElse(el.Type == "SelectorElementAttribute", `selected`, "") + `>Selector Element Attribute</option>
+							<option value="SelectorHTML" ` + ifThenElse(el.Type == "SelectorHTML", `selected`, "") + `>Selector HTML</option>
+							<option value="SelectorElement" ` + ifThenElse(el.Type == "SelectorElement", `selected`, "") + `>Selector Element</option>
+							<option value="SelectorElementScroll" ` + ifThenElse(el.Type == "SelectorElementScroll", `selected`, "") + `>Selector Element Scroll</option>
+							<option value="SelectorElementClick" ` + ifThenElse(el.Type == "SelectorElementClick", `selected`, "") + `>Selector Element Click</option>
+							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Selector Group</option>
+							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Selector Sitemap Xml Link</option>
 						</select>
 					</tr>
 					<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>
