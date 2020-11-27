@@ -808,7 +808,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 					var data = map[string]interface{}{}
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
-					switch settings.OutputFile[strings.LastIndex(settings.OutputFile, ".") + 1:] {
+					switch settings.OutputFile[strings.LastIndex(settings.OutputFile, ".")+1:] {
 					case "xml":
 						output, err := xml.MarshalIndent(websiteData(job.linkOutput), "", "  ")
 						if err != nil {
@@ -868,7 +868,7 @@ func validURL(uri string) bool {
 }
 
 func outputResult() {
-	userFormat := strings.ToLower(settings.OutputFile[strings.LastIndex(settings.OutputFile, ".") + 1:])
+	userFormat := strings.ToLower(settings.OutputFile[strings.LastIndex(settings.OutputFile, ".")+1:])
 	allowedFormat := map[string]bool{
 		"csv":  true,
 		"xml":  true,
