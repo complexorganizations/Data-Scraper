@@ -1,8 +1,7 @@
 {
   "settings": {
-    "gui": true,
-    "workers": 1,
-    "export": "json",
+    "gui": false,
+    "workers": 10,
     "outputFile": "output.json"
   },
   "sitemap": {

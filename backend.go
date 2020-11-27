@@ -67,12 +67,10 @@ type scraping struct {
 
 type settingsT struct {
 	Gui        bool     `json:"gui,omitempty"`
-	Log        *bool    `json:"log,omitempty"`
 	LogFile    string   `json:"logFile,omitempty"`
 	JavaScript *bool    `json:"javaScript,omitempty"`
 	Workers    int      `json:"workers,omitempty"`
 	RateLimit  *int     `json:"rateLimit,omitempty"`
-	Export     string   `json:"export,omitempty"`
 	OutputFile string   `json:"outputFile,omitempty"`
 	UserAgents []string `json:"userAgents,omitempty"`
 	Captcha    string   `json:"captcha,omitempty"`
@@ -169,7 +167,7 @@ func clearCache() {
 }
 
 func logErrors(error error) {
-	if *settings.Log {
+	if len(settings.LogFile) > 0 {
 		file, err := os.OpenFile(settings.LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		log.SetOutput(file)
 		if err != nil {
@@ -215,9 +213,6 @@ func readJSON() {
 		}
 		jsonData.Sitemap.Selectors[i] = e
 	}
-	if jsonData.Settings.Log == nil {
-		jsonData.Settings.Log = newbool(false)
-	}
 	if jsonData.Settings.JavaScript == nil {
 		jsonData.Settings.JavaScript = newbool(false)
 	}
@@ -241,9 +236,6 @@ func writeJSON() {
 			e.Delay = nil
 		}
 		jsonData.Sitemap.Selectors[i] = e
-	}
-	if jsonData.Settings.Log != nil && !*jsonData.Settings.Log {
-		jsonData.Settings.Log = nil
 	}
 	if jsonData.Settings.JavaScript != nil && !*jsonData.Settings.JavaScript {
 		jsonData.Settings.JavaScript = nil
@@ -816,7 +808,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 					var data = map[string]interface{}{}
 					err = json.Unmarshal(out, &data)
 					data[job.startURL] = job.linkOutput
-					switch settings.Export {
+					switch settings.OutputFile[strings.LastIndex(settings.OutputFile, ".") + 1:] {
 					case "xml":
 						output, err := xml.MarshalIndent(websiteData(job.linkOutput), "", "  ")
 						if err != nil {
@@ -876,7 +868,7 @@ func validURL(uri string) bool {
 }
 
 func outputResult() {
-	userFormat := strings.ToLower(settings.Export)
+	userFormat := strings.ToLower(settings.OutputFile[strings.LastIndex(settings.OutputFile, ".") + 1:])
 	allowedFormat := map[string]bool{
 		"csv":  true,
 		"xml":  true,
