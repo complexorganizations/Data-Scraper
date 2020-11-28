@@ -1,2 +1,3 @@
+- [ ] Instead of downloading the page and trying to use the selector, lets just do it like a browser.
 - [ ] Code Optimizations
 - [ ] Bug Fixing
