@@ -1,3 +1,5 @@
 - [ ] Instead of downloading the page and trying to use the selector, lets just do it like a browser.
+- [ ] The selectors wont work properly
+- [ ] Build a proper GUI for all the selectors
 - [ ] Code Optimizations
 - [ ] Bug Fixing
