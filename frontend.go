@@ -139,10 +139,10 @@ func saveSettings(ui lorca.UI) {
 	var err error
 	settings.Gui = fmt.Sprint(ui.Eval(`document.getElementById("settings_gui").checked.toString();`)) == "true"
 	settings.LogFile = fmt.Sprint(ui.Eval(`document.getElementById("settings_logfile").value;`))
-	settings.JavaScript = newbool(fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true")
+	settings.JavaScript = newBool(fmt.Sprint(ui.Eval(`document.getElementById("settings_js").checked.toString();`)) == "true")
 	settings.Workers, err = strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_workers").value;`)))
 	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("settings_rate_limit").value;`)))
-	settings.RateLimit = newint(intA)
+	settings.RateLimit = newInt(intA)
 	if err != nil {
 		frontendLog(err)
 	}
@@ -479,7 +479,6 @@ func saveSelector(ui lorca.UI, index int) {
 	el := sitemap.Selectors[index]
 	el.ID = fmt.Sprint(ui.Eval(`document.getElementById("map_id").value;`))
 	el.Type = fmt.Sprint(ui.Eval(`document.getElementById("map_type").value;`))
-	el.Download = newbool(fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true")
 	el.ParentSelectors = []string{}
 	parentNum, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_parents").selectedOptions.length.toString();`)))
 	for i := 0; i < parentNum; i++ {
@@ -487,10 +486,30 @@ func saveSelector(ui lorca.UI, index int) {
 		el.ParentSelectors = append(el.ParentSelectors, fmt.Sprint(ui.Eval(code)))
 	}
 	el.Selector = fmt.Sprint(ui.Eval(`document.getElementById("map_selector").value;`))
-	el.Multiple = newbool(fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true")
+	el.Multiple = newBool(fmt.Sprint(ui.Eval(`document.getElementById("map_multiple").checked.toString();`)) == "true")
 	el.Regex = fmt.Sprint(ui.Eval(`document.getElementById("map_regex").value;`))
 	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
-	el.Delay = newint(intA)
+	el.Delay = newInt(intA)
+
+	el.Download = newBool(fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true")
+	el.AttributeName = fmt.Sprint(ui.Eval(`document.getElementById("map_attr").value;`))
+	el.HeaderRowSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_hrs").value;`))
+	el.DataRowsSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_drs").value;`))
+	el.FoundUrlRegex = fmt.Sprint(ui.Eval(`document.getElementById("map_fur").value;`))
+	*el.MinimumPriority, err = strconv.ParseFloat(fmt.Sprint(ui.Eval(`document.getElementById("map_mip").value;`)), 64)
+	if err != nil {
+		frontendLog(err)
+	}
+	sNum, _ := strconv.Atoi(fmt.Sprint(ui.Eval(`sitemap_num.toString();`)))
+	el.SitemapURLs = []string{}
+	for i := 0; i < sNum; i++ {
+		code := fmt.Sprintf(`document.getElementById("txt_sitemap_url%d").value;`, i+1)
+		el.SitemapURLs = append(el.SitemapURLs, fmt.Sprint(ui.Eval(code)))
+	}
+	el.ClickSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_csl").value;`))
+	el.ClickType = fmt.Sprint(ui.Eval(`document.getElementById("map_cty").value;`))
+	el.ClickElementUnique = fmt.Sprint(ui.Eval(`document.getElementById("map_ceu").value;`))
+
 	sitemap.Selectors[index] = el
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
@@ -508,6 +527,30 @@ func selectElement(ui lorca.UI, index int, selectURL string) {
 		frontendLog(err)
 	}
 }
+
+func addSitemap(ui lorca.UI) {
+	ui.Eval(`
+		(function() {
+			if(sitemap_num > 0 && document.getElementById("txt_sitemap_url" + sitemap_num).value.length == 0) {
+				return;
+			}
+			sitemap_num++;
+			el = document.createElement("input");
+			el.id = "txt_sitemap_url" + sitemap_num.toString();
+			ua.appendChild(el);
+		})()
+	`)
+}
+
+func removeSitemap(ui lorca.UI) {
+	ui.Eval(`
+		if(sitemap_num > 0) {
+			sitemap_num--;
+			ua.removeChild(ua.children[sitemap_num]);
+		}
+	`)
+}
+
 
 func uiEditSelector(index int) string {
 	el := sitemap.Selectors[index]
@@ -544,13 +587,68 @@ func uiEditSelector(index int) string {
 							<option value="SelectorGroup" ` + ifThenElse(el.Type == "SelectorGroup", `selected`, "") + `>Selector Group</option>
 							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Selector Sitemap Xml Link</option>
 						</select>
-					</tr>`
+					</tr>
+					<tr id="attr_tr"`+ ifThenElse(el.Type == "SelectorElementAttribute", "", `class="hide"`)+`>
+						<th>Attribute name</th>
+						<td><input type ="text" id="map_attr" value="` + el.AttributeName + `"></td>
+					</tr>
+					<tr id="xml_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+						<th>Sitemap.xml Urls</th>
+						<td>
+							<div id="sitemaps">`
+	for i, e := range el.SitemapURLs {
+		page += `<input type="text" id="txt_sitemap_url` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
+	}
+	page +=					`</div>
+							<button onclick=removeSitemap()>-</button>
+							<button onclick=addSitemap()>+</button>
+						</td>
+					</tr>
+					<tr id="fur_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+						<th>found url regex</th>
+						<td><input type ="text" id="map_fur" value="` + el.FoundUrlRegex + `"></td>
+					</tr>
+					<tr id="mip_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+						<th>minimum priority</th>
+						<td>`
+	if el.MinimumPriority != nil {
+		page += `<input type ="text" id="map_mip" value="` + fmt.Sprintf("%.2f", *el.MinimumPriority) + `">`
+	} else {
+		page += `<input type ="text" id="map_mip" value="">`
+	}
+	page +=					`</td>
+					</tr>
+					<tr id="csl_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+						<th>Click selector</th>
+						<td><input type ="text" id="map_csl" value="` + el.ClickSelector + `"></td>
+					</tr>
+					<tr id="cty_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+						<th>Click type</th>
+						<td>
+							<select id="map_cty">
+								<option value="once" ` + ifThenElse(el.ClickType == "once", `selected`, "") + `>Click once</option>
+								<option value="more" ` + ifThenElse(el.ClickType == "more", `selected`, "") + `>Click more</option>
+							</select>
+						</td>
+					</tr>
+					<tr id="ceu_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+						<th>Click element uniqueness</th>
+						<td>
+							<select id="map_ceu">
+								<option value="text" ` + ifThenElse(el.Type == "text", `selected`, "") + `>text</option>
+								<option value="htmlText" ` + ifThenElse(el.Type == "htmlText", `selected`, "") + `>html + text</option>
+								<option value="html" ` + ifThenElse(el.Type == "html", `selected`, "") + `>html</option>
+								<option value="css" ` + ifThenElse(el.Type == "css", `selected`, "") + `>css</option>
+							</select>
+						</td>
+					</tr>
+	`
 	if el.Download != nil {
 		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"` + ifThenElse(*el.Download, "checked", "") + `></input></td></tr>`
 	} else {
 		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"></input></td></tr>`
 	}
-	page += `<tr>
+	page += 		`<tr>
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
@@ -569,6 +667,14 @@ func uiEditSelector(index int) string {
 							<input type="text" id="map_selector" value="` + el.Selector + `">
 							<button onclick="selectElement(` + strconv.Itoa(index) + `, '` + sitemap.StartURL[0] + `')">Select</button>
 						</td>
+					</tr>
+					<tr id="hrs_tr"`+ ifThenElse(el.Type == "SelectorTable", "", `class="hide"`)+`>
+						<th>header row selectors</th>
+						<td><input type ="text" id="map_hrs" value="` + el.HeaderRowSelector + `"></td>
+					</tr>
+					<tr id="drs_tr"`+ ifThenElse(el.Type == "SelectorTable", "", `class="hide"`)+`>
+						<th>data row selector</th>
+						<td><input type ="text" id="map_drs" value="` + el.DataRowsSelector + `"></td>
 					</tr>`
 	if el.Multiple != nil {
 		page += `<tr><th>multiple</th><td><input type="checkbox" id="map_multiple" ` + ifThenElse(*el.Multiple, `checked"`, "") + `></td></tr>`
@@ -588,13 +694,51 @@ func uiEditSelector(index int) string {
 					<button onclick=saveSelector(` + strconv.Itoa(index) + `)>Save</button>
 				</div>
 				<script>
+					let sitemap_num = ` + strconv.Itoa(len(el.SitemapURLs)) + `
+					let ua = document.getElementById("sitemaps");
+
 					let select = document.getElementById("map_type");
 					let download = document.getElementById("download");
+					let attr_tr = document.getElementById("attr_tr");
+					let hrs_tr = document.getElementById("hrs_tr");
+					let drs_tr = document.getElementById("drs_tr");
+					let xml_tr = document.getElementById("xml_tr");
+					let fur_tr = document.getElementById("fur_tr");
+					let mip_tr = document.getElementById("mip_tr");
+					let csl_tr = document.getElementById("csl_tr");
+					let cty_tr = document.getElementById("cty_tr");
+					let ceu_tr = document.getElementById("ceu_tr");
 					select.addEventListener('change', function() {
-						if(select.value == "SelectorImage")
-							download.classList.remove("hide");
-						else
-							download.classList.add("hide");
+						download.classList.add("hide");
+						attr_tr.classList.add("hide");
+						hrs_tr.classList.add("hide");
+						drs_tr.classList.add("hide");
+						xml_tr.classList.add("hide");
+						csl_tr.classList.add("hide");
+						cty_tr.classList.add("hide");
+						ceu_tr.classList.add("hide");
+						switch(select.value) {
+							case "SelectorImage":
+								download.classList.remove("hide");		
+								break;
+							case "SelectorElementAttribute":
+								attr_tr.classList.remove("hide");		
+								break;
+							case "SelectorTable":
+								hrs_tr.classList.remove("hide");
+								drs_tr.classList.remove("hide");		
+								break;
+							case "SelectorSitemapXmlLink":
+								xml_tr.classList.remove("hide");
+								fur_tr.classList.remove("hide");
+								mip_tr.classList.remove("hide");		
+								break;
+							case "SelectorElementClick":
+								csl_tr.classList.remove("hide");
+								cty_tr.classList.remove("hide");
+								ceu_tr.classList.remove("hide");		
+								break;
+						}
 					});
 				</script>
 			</body>
@@ -807,6 +951,8 @@ func bindFunctions(ui lorca.UI) error {
 		{"viewSelectors", func() { viewSelectors(ui) }},
 		{"editSelector", func(i int) { editSelector(ui, i) }},
 		{"deleteSelector", func(i int) { deleteSelector(ui, i) }},
+		{"removeSitemap", func() { removeSitemap(ui) }},
+		{"addSitemap", func() { addSitemap(ui) }},
 		{"saveSelector", func(i int) { saveSelector(ui, i) }},
 		{"addSelector", func() { addSelector(ui) }},
 		{"viewMap", func() { viewMap(ui) }},

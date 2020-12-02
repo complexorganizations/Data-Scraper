@@ -41,15 +41,25 @@ const (
 )
 
 type selectors struct {
-	ID               string   `json:"id,omitempty"`
-	Type             string   `json:"type,omitempty"`
-	Download         *bool    `json:"download,omitempty"`
-	ParentSelectors  []string `json:"parentSelectors,omitempty"`
-	Selector         string   `json:"selector,omitempty"`
-	Multiple         *bool    `json:"multiple,omitempty"`
-	Regex            string   `json:"regex,omitempty"`
-	Delay            *int     `json:"delay,omitempty"`
-	ExtractAttribute string   `json:"extractAttribute,omitempty"`
+	ID                 string   `json:"id,omitempty"`
+	Type               string   `json:"type,omitempty"`
+	ParentSelectors    []string `json:"parentSelectors,omitempty"`
+	Selector           string   `json:"selector,omitempty"`
+	Multiple           *bool    `json:"multiple,omitempty"`
+	Regex              string   `json:"regex,omitempty"`
+	Delay              *int     `json:"delay,omitempty"`
+	ExtractAttribute   string   `json:"extractAttribute,omitempty"`
+	//Special Attribute data
+	Download           *bool    `json:"download,omitempty"`
+	AttributeName      string   `json:"attributeName,omitempty"`
+	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`
+	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`
+	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
+	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
+	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
+	ClickSelector      string   `json:"clickSelector,omitempty"` //csl_tr
+	ClickType          string   `json:"clickType"` //cty_tr
+	ClickElementUnique string   `json:"clickElementUnique"` //ceu_tr
 }
 
 type login struct {
@@ -181,12 +191,18 @@ func logErrors(error error) {
 		}
 	}
 }
-func newbool(b bool) *bool {
+
+func newBool(b bool) *bool {
 	ret := b
 	return &ret
 }
 
-func newint(b int) *int {
+func newInt(b int) *int {
+	ret := b
+	return &ret
+}
+
+func newFloat64(b float64) *float64 {
 	ret := b
 	return &ret
 }
@@ -203,21 +219,24 @@ func readJSON() {
 	}
 	for i, e := range sitemap.Selectors {
 		if e.Download == nil {
-			e.Download = newbool(false)
+			e.Download = newBool(false)
 		}
 		if e.Multiple == nil {
-			e.Multiple = newbool(false)
+			e.Multiple = newBool(false)
 		}
 		if e.Delay == nil {
-			e.Delay = newint(0)
+			e.Delay = newInt(0)
+		}
+		if e.MinimumPriority == nil {
+			e.MinimumPriority = newFloat64(0)
 		}
 		jsonData.Sitemap.Selectors[i] = e
 	}
 	if jsonData.Settings.JavaScript == nil {
-		jsonData.Settings.JavaScript = newbool(false)
+		jsonData.Settings.JavaScript = newBool(false)
 	}
 	if jsonData.Settings.RateLimit == nil {
-		jsonData.Settings.RateLimit = newint(0)
+		jsonData.Settings.RateLimit = newInt(0)
 	}
 	sitemap = jsonData.Sitemap
 	settings = jsonData.Settings
@@ -234,6 +253,9 @@ func writeJSON() {
 		}
 		if e.Delay != nil && *e.Delay == 0 {
 			e.Delay = nil
+		}
+		if e.MinimumPriority != nil && *e.MinimumPriority == 0 {
+			e.MinimumPriority = nil
 		}
 		jsonData.Sitemap.Selectors[i] = e
 	}
@@ -280,8 +302,8 @@ func selectorLink(doc *goquery.Document, selector *selectors, baseURL string) []
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, errors := s.Attr("href")
-			if !errors {
+			href, err := s.Attr("href")
+			if !err {
 				log.Println("Error: HREF not found")
 			}
 			links = append(links, toFixedURL(href, baseURL))
@@ -295,8 +317,8 @@ func selectorElementAttribute(doc *goquery.Document, selector *selectors) []stri
 	var links []string
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
-			href, errors := s.Attr(selector.ExtractAttribute)
-			if !errors {
+			href, err := s.Attr(selector.ExtractAttribute)
+			if !err {
 				log.Println("Error: HREF not found")
 			}
 			links = append(links, href)
@@ -318,14 +340,14 @@ func selectorElement(doc *goquery.Document, selector *selectors) []interface{} {
 						resultText := s.Find(elementSelector.Selector).Text()
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorImage" {
-						resultText, errors := s.Find(elementSelector.Selector).Attr("src")
-						if !errors {
+						resultText, err := s.Find(elementSelector.Selector).Attr("src")
+						if !err {
 							log.Println("Error: HREF not found")
 						}
 						elementOutput[elementSelector.ID] = resultText
 					} else if elementSelector.Type == "SelectorLink" {
-						resultText, errors := s.Find(elementSelector.Selector).Attr("href")
-						if !errors {
+						resultText, err := s.Find(elementSelector.Selector).Attr("href")
+						if !err {
 							log.Println("Error: HREF not found")
 						}
 						elementOutput[elementSelector.ID] = resultText
