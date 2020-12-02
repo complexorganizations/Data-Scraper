@@ -551,7 +551,6 @@ func removeSitemap(ui lorca.UI) {
 	`)
 }
 
-
 func uiEditSelector(index int) string {
 	el := sitemap.Selectors[index]
 	page := `
@@ -588,27 +587,27 @@ func uiEditSelector(index int) string {
 							<option value="SelectorSitemapXmlLink" ` + ifThenElse(el.Type == "SelectorSitemapXmlLink", `selected`, "") + `>Selector Sitemap Xml Link</option>
 						</select>
 					</tr>
-					<tr id="attr_tr"`+ ifThenElse(el.Type == "SelectorElementAttribute", "", `class="hide"`)+`>
+					<tr id="attr_tr"` + ifThenElse(el.Type == "SelectorElementAttribute", "", `class="hide"`) + `>
 						<th>Attribute name</th>
 						<td><input type ="text" id="map_attr" value="` + el.AttributeName + `"></td>
 					</tr>
-					<tr id="xml_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+					<tr id="xml_tr"` + ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`) + `>
 						<th>Sitemap.xml Urls</th>
 						<td>
 							<div id="sitemaps">`
 	for i, e := range el.SitemapURLs {
 		page += `<input type="text" id="txt_sitemap_url` + strconv.Itoa(i+1) + `" value="` + e + `"></input>`
 	}
-	page +=					`</div>
+	page += `</div>
 							<button onclick=removeSitemap()>-</button>
 							<button onclick=addSitemap()>+</button>
 						</td>
 					</tr>
-					<tr id="fur_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+					<tr id="fur_tr"` + ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`) + `>
 						<th>found url regex</th>
 						<td><input type ="text" id="map_fur" value="` + el.FoundUrlRegex + `"></td>
 					</tr>
-					<tr id="mip_tr"`+ ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`)+`>
+					<tr id="mip_tr"` + ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`) + `>
 						<th>minimum priority</th>
 						<td>`
 	if el.MinimumPriority != nil {
@@ -616,13 +615,13 @@ func uiEditSelector(index int) string {
 	} else {
 		page += `<input type ="text" id="map_mip" value="">`
 	}
-	page +=					`</td>
+	page += `</td>
 					</tr>
-					<tr id="csl_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+					<tr id="csl_tr"` + ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`) + `>
 						<th>Click selector</th>
 						<td><input type ="text" id="map_csl" value="` + el.ClickSelector + `"></td>
 					</tr>
-					<tr id="cty_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+					<tr id="cty_tr"` + ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`) + `>
 						<th>Click type</th>
 						<td>
 							<select id="map_cty">
@@ -631,7 +630,7 @@ func uiEditSelector(index int) string {
 							</select>
 						</td>
 					</tr>
-					<tr id="ceu_tr"`+ ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`)+`>
+					<tr id="ceu_tr"` + ifThenElse(el.Type == "SelectorElementClick", "", `class="hide"`) + `>
 						<th>Click element uniqueness</th>
 						<td>
 							<select id="map_ceu">
@@ -648,7 +647,7 @@ func uiEditSelector(index int) string {
 	} else {
 		page += `<tr id="download" ` + ifThenElse(el.Type == "SelectorImage", "", `class="hide"`) + `><th>Download</th><td><input type="checkbox" id="download"></input></td></tr>`
 	}
-	page += 		`<tr>
+	page += `<tr>
 						<th>parent selectors</th>
 						<td>
 							<select id="map_parents" multiple>
@@ -668,11 +667,11 @@ func uiEditSelector(index int) string {
 							<button onclick="selectElement(` + strconv.Itoa(index) + `, '` + sitemap.StartURL[0] + `')">Select</button>
 						</td>
 					</tr>
-					<tr id="hrs_tr"`+ ifThenElse(el.Type == "SelectorTable", "", `class="hide"`)+`>
+					<tr id="hrs_tr"` + ifThenElse(el.Type == "SelectorTable", "", `class="hide"`) + `>
 						<th>header row selectors</th>
 						<td><input type ="text" id="map_hrs" value="` + el.HeaderRowSelector + `"></td>
 					</tr>
-					<tr id="drs_tr"`+ ifThenElse(el.Type == "SelectorTable", "", `class="hide"`)+`>
+					<tr id="drs_tr"` + ifThenElse(el.Type == "SelectorTable", "", `class="hide"`) + `>
 						<th>data row selector</th>
 						<td><input type ="text" id="map_drs" value="` + el.DataRowsSelector + `"></td>
 					</tr>`
