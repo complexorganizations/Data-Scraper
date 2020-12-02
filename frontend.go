@@ -496,7 +496,8 @@ func saveSelector(ui lorca.UI, index int) {
 	el.HeaderRowSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_hrs").value;`))
 	el.DataRowsSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_drs").value;`))
 	el.FoundUrlRegex = fmt.Sprint(ui.Eval(`document.getElementById("map_fur").value;`))
-	*el.MinimumPriority, err = strconv.ParseFloat(fmt.Sprint(ui.Eval(`document.getElementById("map_mip").value;`)), 64)
+	mp, err := strconv.ParseFloat(fmt.Sprint(ui.Eval(`document.getElementById("map_mip").value;`)), 64)
+	el.MinimumPriority = newFloat64(mp)
 	if err != nil {
 		frontendLog(err)
 	}
