@@ -304,7 +304,6 @@ func saveMap(ui lorca.UI) {
 		code := fmt.Sprintf(`document.getElementById("txt_starturl%d").value;`, i+1)
 		sitemap.StartURL = append(sitemap.StartURL, fmt.Sprint(ui.Eval(code)))
 	}
-
 	if fmt.Sprint(ui.Eval(`document.getElementById("login").checked.toString();`)) == "true" {
 		sitemap.Login = &login{
 			URL:      fmt.Sprint(ui.Eval(`document.getElementById("txt_login_url").value;`)),
@@ -368,7 +367,6 @@ func uiEditMap() string {
 					let url_num = ` + strconv.Itoa(len(sitemap.StartURL)) + `
 					let url_inputs = document.getElementById("urlInputs");
 					let el;
-
 					let checkbox = document.getElementById("login");
 					let show_login = document.getElementById("show_login");
 					checkbox.addEventListener('change', function() {
@@ -490,7 +488,6 @@ func saveSelector(ui lorca.UI, index int) {
 	el.Regex = fmt.Sprint(ui.Eval(`document.getElementById("map_regex").value;`))
 	intA, err := strconv.Atoi(fmt.Sprint(ui.Eval(`document.getElementById("map_delay").value;`)))
 	el.Delay = newInt(intA)
-
 	el.Download = newBool(fmt.Sprint(ui.Eval(`document.getElementById("download").checked.toString();`)) == "true")
 	el.AttributeName = fmt.Sprint(ui.Eval(`document.getElementById("map_attr").value;`))
 	el.HeaderRowSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_hrs").value;`))
@@ -510,7 +507,6 @@ func saveSelector(ui lorca.UI, index int) {
 	el.ClickSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_csl").value;`))
 	el.ClickType = fmt.Sprint(ui.Eval(`document.getElementById("map_cty").value;`))
 	el.ClickElementUnique = fmt.Sprint(ui.Eval(`document.getElementById("map_ceu").value;`))
-
 	sitemap.Selectors[index] = el
 	writeJSON()
 	err = ui.Load("data:text/html," + url.PathEscape(uiViewSelectors()))
@@ -696,7 +692,6 @@ func uiEditSelector(index int) string {
 				<script>
 					let sitemap_num = ` + strconv.Itoa(len(el.SitemapURLs)) + `
 					let ua = document.getElementById("sitemaps");
-
 					let select = document.getElementById("map_type");
 					let download = document.getElementById("download");
 					let attr_tr = document.getElementById("attr_tr");
