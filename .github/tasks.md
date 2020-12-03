@@ -1,5 +1,4 @@
-- [ ] Build a proper GUI for all the selectors, there are alot of things missing for multiple selectors
-- [ ] The selectors wont work properly
+- [ ] Add the code for all the selectors to backend
 - [ ] Instead of downloading the page and trying to use the selector, lets just do it like a browser.
 - [ ] Code Optimizations
 - [ ] Bug Fixing
