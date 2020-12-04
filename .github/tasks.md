@@ -1,4 +1,4 @@
-- [ ] Add the code for all the selectors to backend
+- [ ] Add the code for all the selectors to backend [Popup Link // Table // Element attribute // HTML // Element // Element scroll down // Element click // Groupped // Sitemap]
 - [ ] Instead of downloading the page and trying to use the selector, lets just do it like a browser.
 - [ ] Code Optimizations
 - [ ] Bug Fixing
