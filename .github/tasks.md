@@ -1,5 +1,4 @@
 - [ ] Add the code for all the selectors to backend [Popup Link // Table // Element attribute // HTML // Element // Element scroll down // Element click // Groupped // Sitemap]
-- [ ] Instead of using `multiple` if multiple elements are selected than its multiple but if its a single one than its single
 - [ ] Instead of downloading the page and trying to use the selector, lets just do it like a browser.
 - [ ] Code Optimizations
 - [ ] Bug Fixing
