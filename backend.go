@@ -10,10 +10,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -26,6 +22,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 )
 
 var (
@@ -700,6 +701,30 @@ func getURL(urls []string) <-chan string {
 	return c
 }
 
+func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
+	var links []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			val, ok := s.Attr("target")
+			if ok {
+				log.Println("Error: Target not found")
+			}
+			if val == "_blank" {
+				href, err := s.Attr("href")
+				if !err {
+					log.Println("Error: HREF not found")
+				}
+				res := strings.HasPrefix(href, "javascript:")
+				if !res {
+					links = append(links, toFixedURL(href, baseURL))
+				}
+			}
+		},
+	)
+	fmt.Println("links", links)
+	return links
+}
+
 func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	userAgents := settings.UserAgents
@@ -780,6 +805,9 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 						linkOutput[selector.ID] = resultText
 					} else if selector.Type == "SelectorTable" {
 						resultText := selectorTable(doc, &selector)
+						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorPopupLink" {
+						resultText := selectorPopupLink(doc, &selector, job.startURL)
 						linkOutput[selector.ID] = resultText
 					}
 				}
