@@ -705,9 +705,11 @@ func selectorHTML(doc *goquery.Document, selector *selectors) []string {
 	var text []string
 	doc.Find(selector.Selector).Each(
 		func(i int, s *goquery.Selection) {
-			htmlText := s.Text()
-			if htmlText != "" {
-				text = append(text, strings.TrimSpace(htmlText))
+			WrapInnerHTML := s.WrapInnerHtml(selector.Selector)
+			innerHTML := WrapInnerHTML.Text()
+
+			if innerHTML != "" {
+				text = append(text, strings.TrimSpace(innerHTML))
 			}
 		},
 	)
