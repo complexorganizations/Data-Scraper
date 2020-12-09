@@ -701,6 +701,20 @@ func getURL(urls []string) <-chan string {
 	return c
 }
 
+func selectorHTML(doc *goquery.Document, selector *selectors) []string {
+	var text []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			htmlText := s.Text()
+			if htmlText != "" {
+				text = append(text, strings.TrimSpace(htmlText))
+			}
+		},
+	)
+	fmt.Println("text", text)
+	return text
+}
+
 func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
 	var links []string
 	doc.Find(selector.Selector).Each(
@@ -809,6 +823,9 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 					} else if selector.Type == "SelectorPopupLink" {
 						resultText := selectorPopupLink(doc, &selector, job.startURL)
 						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorHTML" {
+						outputText := selectorHTML(doc, &selector)
+						linkOutput[selector.ID] = outputText
 					}
 				}
 			}
