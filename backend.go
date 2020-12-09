@@ -10,6 +10,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,11 +26,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 )
 
 var (
@@ -58,9 +57,9 @@ type selectors struct {
 	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
 	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
 	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
-	ClickSelector      string   `json:"clickSelector,omitempty"` //csl_tr
-	ClickType          string   `json:"clickType"`               //cty_tr
-	ClickElementUnique string   `json:"clickElementUnique"`      //ceu_tr
+	ClickSelector      string   `json:"clickSelector,omitempty"`
+	ClickType          string   `json:"clickType,omitempty"`
+	ClickElementUnique string   `json:"clickElementUnique,omitempty"`
 }
 
 type login struct {
