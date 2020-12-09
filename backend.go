@@ -10,10 +10,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -26,6 +22,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 )
 
 var (
@@ -738,6 +739,20 @@ func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL strin
 	return links
 }
 
+func selectorGroup(doc *goquery.Document, selector *selectors) []string {
+	var group []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			htmlText := s.Text()
+			if htmlText != "" {
+				group = append(group, htmlText)
+			}
+		},
+	)
+	fmt.Println("group", group)
+	return group
+}
+
 func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	userAgents := settings.UserAgents
@@ -824,6 +839,9 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 						linkOutput[selector.ID] = resultText
 					} else if selector.Type == "SelectorHTML" {
 						outputText := selectorHTML(doc, &selector)
+						linkOutput[selector.ID] = outputText
+					} else if selector.Type == "SelectorGroup" {
+						outputText := selectorGroup(doc, &selector)
 						linkOutput[selector.ID] = outputText
 					}
 				}
