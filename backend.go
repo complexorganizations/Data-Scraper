@@ -142,6 +142,17 @@ type recognitionConfig struct {
 	Model        string `json:"model"`
 }
 
+// XMLData struct
+type XMLData struct {
+	XMLName xml.Name `xml:"urlset"`
+	Url     []Url    `xml:"url"`
+}
+
+// Url struct
+type Url struct {
+	Location string `xml:"loc"`
+}
+
 func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if len(m) == 0 {
 		return nil
@@ -717,6 +728,21 @@ func selectorHTML(doc *goquery.Document, selector *selectors) []string {
 	return text
 }
 
+func selectorSitemapXML(doc *goquery.Document, selector *selectors) []Url {
+	var sitemaplinks XMLData
+	for _, link := range selector.SitemapURLs {
+		response, err := http.Get(link)
+		if err != nil {
+			defer response.Body.Close()
+			return sitemaplinks.Url
+		}
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		xml.Unmarshal(body, &sitemaplinks)
+	}
+	return sitemaplinks.Url
+}
+
 func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
 	var links []string
 	doc.Find(selector.Selector).Each(
@@ -844,6 +870,9 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 						linkOutput[selector.ID] = outputText
 					} else if selector.Type == "SelectorGroup" {
 						outputText := selectorGroup(doc, &selector)
+						linkOutput[selector.ID] = outputText
+					} else if selector.Type == "SelectorSitemapXmlLink" {
+						outputText := selectorSitemapXML(doc, &selector)
 						linkOutput[selector.ID] = outputText
 					}
 				}
