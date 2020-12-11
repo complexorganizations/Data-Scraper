@@ -43,23 +43,23 @@ const (
 type selectors struct {
 	ID               string   `json:"id,omitempty"`
 	Type             string   `json:"type,omitempty"`
+	Download         *bool    `json:"download,omitempty"`
 	ParentSelectors  []string `json:"parentSelectors,omitempty"`
 	Selector         string   `json:"selector,omitempty"`
 	Multiple         *bool    `json:"multiple,omitempty"`
 	Regex            string   `json:"regex,omitempty"`
 	Delay            *int     `json:"delay,omitempty"`
 	ExtractAttribute string   `json:"extractAttribute,omitempty"`
-	//Special Attribute data
-	Download           *bool    `json:"download,omitempty"`
-	AttributeName      string   `json:"attributeName,omitempty"`
-	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`
-	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`
-	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
-	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
-	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
-	ClickSelector      string   `json:"clickSelector,omitempty"` //csl_tr
-	ClickType          string   `json:"clickType"`               //cty_tr
-	ClickElementUnique string   `json:"clickElementUnique"`      //ceu_tr
+	//Special Attribute data	
+	AttributeName      string   `json:"attributeName,omitempty"`	
+	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`	
+	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`	
+	SitemapURLs        []string `json:"sitemapUrls,omitempty"`	
+	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`	
+	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`	
+	ClickSelector      string   `json:"clickSelector,omitempty"`	
+	ClickType          string   `json:"clickType,omitempty"`	
+	ClickElementUnique string   `json:"clickElementUnique,omitempty"`
 }
 
 type login struct {
@@ -139,6 +139,17 @@ type wordInfo struct {
 type recognitionConfig struct {
 	LanguageCode string `json:"languageCode"`
 	Model        string `json:"model"`
+}
+
+// XMLData struct
+type XMLData struct {
+	XMLName xml.Name `xml:"urlset"`
+	Url     []Url    `xml:"url"`
+}
+
+// Url struct
+type Url struct {
+	Location string `xml:"loc"`
 }
 
 func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -700,6 +711,75 @@ func getURL(urls []string) <-chan string {
 	return c
 }
 
+func selectorHTML(doc *goquery.Document, selector *selectors) []string {
+	var text []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			WrapInnerHTML := s.WrapInnerHtml(selector.Selector)
+			innerHTML := WrapInnerHTML.Text()
+
+			if innerHTML != "" {
+				text = append(text, strings.TrimSpace(innerHTML))
+			}
+		},
+	)
+	fmt.Println("text", text)
+	return text
+}
+
+func selectorSitemapXML(doc *goquery.Document, selector *selectors) []Url {
+	var sitemaplinks XMLData
+	for _, link := range selector.SitemapURLs {
+		response, err := http.Get(link)
+		if err != nil {
+			defer response.Body.Close()
+			return sitemaplinks.Url
+		}
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		xml.Unmarshal(body, &sitemaplinks)
+	}
+	return sitemaplinks.Url
+}
+
+func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
+	var links []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			val, ok := s.Attr("target")
+			if ok {
+				log.Println("Error: Target not found")
+			}
+			if val == "_blank" {
+				href, err := s.Attr("href")
+				if !err {
+					log.Println("Error: HREF not found")
+				}
+				res := strings.HasPrefix(href, "javascript:")
+				if !res {
+					links = append(links, toFixedURL(href, baseURL))
+				}
+			}
+		},
+	)
+	fmt.Println("links", links)
+	return links
+}
+
+func selectorGroup(doc *goquery.Document, selector *selectors) []string {
+	var group []string
+	doc.Find(selector.Selector).Each(
+		func(i int, s *goquery.Selection) {
+			htmlText := s.Text()
+			if htmlText != "" {
+				group = append(group, htmlText)
+			}
+		},
+	)
+	fmt.Println("group", group)
+	return group
+}
+
 func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup) {
 	defer wg.Done()
 	userAgents := settings.UserAgents
@@ -781,6 +861,18 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 					} else if selector.Type == "SelectorTable" {
 						resultText := selectorTable(doc, &selector)
 						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorPopupLink" {
+						resultText := selectorPopupLink(doc, &selector, job.startURL)
+						linkOutput[selector.ID] = resultText
+					} else if selector.Type == "SelectorHTML" {
+						outputText := selectorHTML(doc, &selector)
+						linkOutput[selector.ID] = outputText
+					} else if selector.Type == "SelectorGroup" {
+						outputText := selectorGroup(doc, &selector)
+						linkOutput[selector.ID] = outputText
+					} else if selector.Type == "SelectorSitemapXmlLink" {
+						outputText := selectorSitemapXML(doc, &selector)
+						linkOutput[selector.ID] = outputText
 					}
 				}
 			}
