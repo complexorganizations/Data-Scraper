@@ -728,19 +728,65 @@ func selectorHTML(doc *goquery.Document, selector *selectors) []string {
 	return text
 }
 
-func selectorSitemapXML(doc *goquery.Document, selector *selectors) []Url {
+func selectorSitemapXML(selector *selectors) sitemapResponse {
 	var sitemaplinks XMLData
+	var resp sitemapResponse
 	for _, link := range selector.SitemapURLs {
 		response, err := http.Get(link)
 		if err != nil {
 			defer response.Body.Close()
-			return sitemaplinks.Url
+			return resp
 		}
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		xml.Unmarshal(body, &sitemaplinks)
 	}
-	return sitemaplinks.Url
+
+	for _, v := range sitemaplinks.Url {
+		response, err := http.Get(v.Location)
+		if err != nil {
+			defer response.Body.Close()
+			return resp
+		}
+		defer response.Body.Close()
+		doc, err := goquery.NewDocumentFromReader(response.Body)
+		err = response.Body.Close()
+		baseURL, _ := doc.Find("base").Attr("href")
+		title := doc.Find("title").Text()
+
+		doc.Find("meta").Each(func(i int, s *goquery.Selection) {
+			if name, _ := s.Attr("name"); name == "description" {
+				description, _ := s.Attr("content")
+				fmt.Printf("Description field: %s\n", description)
+				resp.Description = description
+			}
+		})
+
+		doc.Find("body img").EachWithBreak(func(index int, item *goquery.Selection) bool {
+			link, _ := item.Attr("src")
+			width, _ := item.Attr("width")
+			height, _ := item.Attr("height")
+			if width >= "300" && height >= "300" {
+				imageURL := toFixedURL(link, baseURL)
+				resp.Image = imageURL
+			}
+			return true
+		})
+
+		if resp.Image == "" {
+			doc.Find("meta").Each(func(i int, s *goquery.Selection) {
+				if property, _ := s.Attr("property"); property == "og:image" {
+					image, _ := s.Attr("content")
+					fmt.Printf("image field: %s\n", image)
+					resp.Image = image
+				}
+			})
+		}
+
+		resp.Title = title
+		resp.URL = v.Location
+	}
+	return resp
 }
 
 func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
@@ -872,7 +918,7 @@ func worker(jobs <-chan workerJob, results chan<- workerJob, wg *sync.WaitGroup)
 						outputText := selectorGroup(doc, &selector)
 						linkOutput[selector.ID] = outputText
 					} else if selector.Type == "SelectorSitemapXmlLink" {
-						outputText := selectorSitemapXML(doc, &selector)
+						outputText := selectorSitemapXML(&selector)
 						linkOutput[selector.ID] = outputText
 					}
 				}
