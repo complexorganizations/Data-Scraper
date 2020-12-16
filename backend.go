@@ -10,6 +10,10 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,11 +26,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 )
 
 var (
@@ -44,22 +43,22 @@ const (
 type selectors struct {
 	ID               string   `json:"id,omitempty"`
 	Type             string   `json:"type,omitempty"`
+	Download         *bool    `json:"download,omitempty"`
 	ParentSelectors  []string `json:"parentSelectors,omitempty"`
 	Selector         string   `json:"selector,omitempty"`
 	Multiple         *bool    `json:"multiple,omitempty"`
 	Regex            string   `json:"regex,omitempty"`
 	Delay            *int     `json:"delay,omitempty"`
 	ExtractAttribute string   `json:"extractAttribute,omitempty"`
-	//Special Attribute data
-	Download           *bool    `json:"download,omitempty"`
-	AttributeName      string   `json:"attributeName,omitempty"`
-	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`
-	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`
-	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
-	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
-	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
-	ClickSelector      string   `json:"clickSelector,omitempty"`
-	ClickType          string   `json:"clickType,omitempty"`
+	//Special Attribute data	
+	AttributeName      string   `json:"attributeName,omitempty"`	
+	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`	
+	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`	
+	SitemapURLs        []string `json:"sitemapUrls,omitempty"`	
+	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`	
+	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`	
+	ClickSelector      string   `json:"clickSelector,omitempty"`	
+	ClickType          string   `json:"clickType,omitempty"`	
 	ClickElementUnique string   `json:"clickElementUnique,omitempty"`
 }
 
