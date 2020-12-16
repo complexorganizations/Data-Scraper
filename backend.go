@@ -10,10 +10,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -26,6 +22,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/target"
+	"github.com/chromedp/chromedp"
+	"github.com/dlclark/regexp2"
 )
 
 var (
@@ -50,15 +51,15 @@ type selectors struct {
 	Regex            string   `json:"regex,omitempty"`
 	Delay            *int     `json:"delay,omitempty"`
 	ExtractAttribute string   `json:"extractAttribute,omitempty"`
-	//Special Attribute data	
-	AttributeName      string   `json:"attributeName,omitempty"`	
-	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`	
-	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`	
-	SitemapURLs        []string `json:"sitemapUrls,omitempty"`	
-	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`	
-	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`	
-	ClickSelector      string   `json:"clickSelector,omitempty"`	
-	ClickType          string   `json:"clickType,omitempty"`	
+	//Special Attribute data
+	AttributeName      string   `json:"attributeName,omitempty"`
+	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`
+	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`
+	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
+	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
+	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
+	ClickSelector      string   `json:"clickSelector,omitempty"`
+	ClickType          string   `json:"clickType,omitempty"`
 	ClickElementUnique string   `json:"clickElementUnique,omitempty"`
 }
 
@@ -150,6 +151,14 @@ type XMLData struct {
 // Url struct
 type Url struct {
 	Location string `xml:"loc"`
+}
+
+// SitemapResponse struct
+type sitemapResponse struct {
+	Title       string `json:"title"`
+	URL         string `json:"url"`
+	Image       string `json:"image"`
+	Description string `json:"description"`
 }
 
 func (m websiteData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
