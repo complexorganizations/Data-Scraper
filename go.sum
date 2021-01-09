@@ -10,6 +10,8 @@ github.com/chromedp/chromedp v0.6.0 h1:jjzHzXW5pNdKt1D9cEDAKZM/yZ2EwL/hLyGbCUFld
 github.com/chromedp/chromedp v0.6.0/go.mod h1:Yay7TUDCNOQBK8EJDUon6AUaQI12VEBOuULcGtY4uDY=
 github.com/chromedp/sysutil v1.0.0 h1:+ZxhTpfpZlmchB58ih/LBHX52ky7w2VhQVKQMucy3Ic=
 github.com/chromedp/sysutil v1.0.0/go.mod h1:kgWmDdq8fTzXYcKIBqIYvRRTnYb9aNS9moAV0xufSww=
+github.com/complexorganizations/gocreate v0.0.0-20210109171415-246da20da052 h1:McDc2yEzBcRrYODII5IGzTHTTrb5+UPRyI9ydV0Y5N8=
+github.com/complexorganizations/gocreate v0.0.0-20210109171415-246da20da052/go.mod h1:T1ctqAUxxaPOHdpY+BrqpHAGZU0kVvaVpssxFYAYIrE=
 github.com/dlclark/regexp2 v1.4.0 h1:F1rxgk7p4uKjwIQxBs9oAXe5CqrXlCduYEJvrF4u93E=
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
