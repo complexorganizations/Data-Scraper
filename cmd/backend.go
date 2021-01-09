@@ -37,7 +37,7 @@ var (
 )
 
 const (
-	configFile = "sitemap.json"
+	configFile = "config/../sitemap.json"
 )
 
 type selectors struct {
