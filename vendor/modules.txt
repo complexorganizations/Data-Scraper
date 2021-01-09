@@ -1,7 +1,8 @@
 # github.com/PuerkitoBio/goquery v1.6.0
 ## explicit
 github.com/PuerkitoBio/goquery
-# github.com/andybalholm/cascadia v1.1.0
+# github.com/andybalholm/cascadia v1.2.0
+## explicit
 github.com/andybalholm/cascadia
 # github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3
 ## explicit
@@ -81,10 +82,12 @@ github.com/mailru/easyjson/jwriter
 # github.com/zserge/lorca v0.1.9
 ## explicit
 github.com/zserge/lorca
-# golang.org/x/net v0.0.0-20200222125558-5a598a2470a0
+# golang.org/x/net v0.0.0-20201224014010-6772e930b67b
+## explicit
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/websocket
-# golang.org/x/sys v0.0.0-20210104204734-6f8348627aad
+# golang.org/x/sys v0.0.0-20210108172913-0df2131ae363
+## explicit
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
