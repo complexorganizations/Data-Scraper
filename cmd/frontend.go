@@ -41,7 +41,7 @@ func contains(s []string, e string) bool {
 const globalStyles = `
 	body {
 		background-color: #f1f3f4;
-		padding: 16px; 
+		padding: 16px;
 	}
 	th, td {
 		padding: 3px;
@@ -714,24 +714,24 @@ func uiEditSelector(index int) string {
 						ceu_tr.classList.add("hide");
 						switch(select.value) {
 							case "SelectorImage":
-								download.classList.remove("hide");		
+								download.classList.remove("hide");
 								break;
 							case "SelectorElementAttribute":
-								attr_tr.classList.remove("hide");		
+								attr_tr.classList.remove("hide");
 								break;
 							case "SelectorTable":
 								hrs_tr.classList.remove("hide");
-								drs_tr.classList.remove("hide");		
+								drs_tr.classList.remove("hide");
 								break;
 							case "SelectorSitemapXmlLink":
 								xml_tr.classList.remove("hide");
 								fur_tr.classList.remove("hide");
-								mip_tr.classList.remove("hide");		
+								mip_tr.classList.remove("hide");
 								break;
 							case "SelectorElementClick":
 								csl_tr.classList.remove("hide");
 								cty_tr.classList.remove("hide");
-								ceu_tr.classList.remove("hide");		
+								ceu_tr.classList.remove("hide");
 								break;
 						}
 					});
@@ -902,7 +902,7 @@ func uiSelectElement(index int, selectURL string) string {
 			                    identifiers += hover.tagName.toLocaleLowerCase();
 			                    if (hover.id.length > 0)
 			                        identifiers += "#" + hover.id;
-			
+
 			                    hover.classList.forEach((e) => {
 			                        identifiers += "." + e;
 			                    })
@@ -962,33 +962,4 @@ func bindFunctions(ui lorca.UI) error {
 		}
 	}
 	return nil
-}
-
-func main() {
-	readJSON()
-	if !settings.Gui {
-		scrape()
-		return
-	}
-	ui, err := lorca.New("", "", 900, 600)
-	if err != nil {
-		frontendLog(err)
-		return
-	}
-	err = bindFunctions(ui)
-	if err != nil {
-		frontendLog(err)
-	}
-	err = ui.Load("data:text/html," + url.PathEscape(uiViewSitemap()))
-	if err != nil {
-		frontendLog(err)
-	}
-	<-ui.Done()
-	err = ui.Close()
-	if err != nil {
-		frontendLog(err)
-	}
-	if shouldScrape {
-		scrape()
-	}
 }
