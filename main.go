@@ -1,6 +1,9 @@
 package main
 
-import ()
+import (
+	"cmd/backend"
+	"cmd/frontend"
+)
 
 func main() {
 	readJSON()
