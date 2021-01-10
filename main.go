@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cmd/backend"
-	"cmd/frontend"
+	"data-scraper/cmd/backend"
+	"data-scraper/cmd/frontend"
 )
 
 func main() {
