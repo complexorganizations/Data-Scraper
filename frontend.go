@@ -492,7 +492,7 @@ func saveSelector(ui lorca.UI, index int) {
 	el.AttributeName = fmt.Sprint(ui.Eval(`document.getElementById("map_attr").value;`))
 	el.HeaderRowSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_hrs").value;`))
 	el.DataRowsSelector = fmt.Sprint(ui.Eval(`document.getElementById("map_drs").value;`))
-	el.FoundUrlRegex = fmt.Sprint(ui.Eval(`document.getElementById("map_fur").value;`))
+	el.FoundURLRegex = fmt.Sprint(ui.Eval(`document.getElementById("map_fur").value;`))
 	mp, err := strconv.ParseFloat(fmt.Sprint(ui.Eval(`document.getElementById("map_mip").value;`)), 64)
 	el.MinimumPriority = newFloat64(mp)
 	if err != nil {
@@ -602,7 +602,7 @@ func uiEditSelector(index int) string {
 					</tr>
 					<tr id="fur_tr"` + ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`) + `>
 						<th>found url regex</th>
-						<td><input type ="text" id="map_fur" value="` + el.FoundUrlRegex + `"></td>
+						<td><input type ="text" id="map_fur" value="` + el.FoundURLRegex + `"></td>
 					</tr>
 					<tr id="mip_tr"` + ifThenElse(el.Type == "SelectorSitemapXmlLink", "", `class="hide"`) + `>
 						<th>minimum priority</th>

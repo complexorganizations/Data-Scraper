@@ -37,8 +37,7 @@ var (
 )
 
 const (
-	configPath = fmt.Sprint(ProjectPath, "configs/sitemap.json")
-	configFile = (configPath)
+	configFile = ("configs/sitemap.json")
 )
 
 type selectors struct {
@@ -56,7 +55,7 @@ type selectors struct {
 	HeaderRowSelector  string   `json:"headerRowSelector,omitempty"`
 	DataRowsSelector   string   `json:"dataRowsSelector,omitempty"`
 	SitemapURLs        []string `json:"sitemapUrls,omitempty"`
-	FoundUrlRegex      string   `json:"foundUrlRegex,omitempty"`
+	FoundURLRegex      string   `json:"FoundURLRegex,omitempty"`
 	MinimumPriority    *float64 `json:"minimumPriority,omitempty"`
 	ClickSelector      string   `json:"clickSelector,omitempty"`
 	ClickType          string   `json:"clickType,omitempty"`
@@ -145,11 +144,11 @@ type recognitionConfig struct {
 // XMLData struct
 type XMLData struct {
 	XMLName xml.Name `xml:"urlset"`
-	Url     []Url    `xml:"url"`
+	URL     []URL    `xml:"url"`
 }
 
-// Url struct
-type Url struct {
+// URL struct
+type URL struct {
 	Location string `xml:"loc"`
 }
 
@@ -728,19 +727,19 @@ func selectorHTML(doc *goquery.Document, selector *selectors) []string {
 	return text
 }
 
-func selectorSitemapXML(doc *goquery.Document, selector *selectors) []Url {
+func selectorSitemapXML(doc *goquery.Document, selector *selectors) []URL {
 	var sitemaplinks XMLData
 	for _, link := range selector.SitemapURLs {
 		response, err := http.Get(link)
 		if err != nil {
 			defer response.Body.Close()
-			return sitemaplinks.Url
+			return sitemaplinks.URL
 		}
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		xml.Unmarshal(body, &sitemaplinks)
 	}
-	return sitemaplinks.Url
+	return sitemaplinks.URL
 }
 
 func selectorPopupLink(doc *goquery.Document, selector *selectors, baseURL string) []string {
