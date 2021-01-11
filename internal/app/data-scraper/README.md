@@ -1,0 +1,1 @@
+internal/app/data-scraper
