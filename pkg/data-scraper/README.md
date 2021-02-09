@@ -1,1 +1,0 @@
-### `internal/pkg/data-scraper`
