@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	_ "embed"
 	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
@@ -36,9 +37,8 @@ var (
 	rate      int
 )
 
-const (
-	configFile = "configs/sitemap.json"
-)
+//go:embed configs/sitemap.json
+var configFile string
 
 type selectors struct {
 	ID               string   `json:"id,omitempty"`
@@ -220,11 +220,8 @@ func newFloat64(b float64) *float64 {
 
 func readJSON() {
 	jsonData := jsonType{}
-	data, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		logErrors(err)
-	}
-	err = json.Unmarshal(data, &jsonData)
+	configFileByte := []byte(configFile)
+	err := json.Unmarshal(configFileByte, &jsonData)
 	if err != nil {
 		logErrors(err)
 	}
