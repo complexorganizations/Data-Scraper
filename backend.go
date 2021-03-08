@@ -220,11 +220,8 @@ func newFloat64(b float64) *float64 {
 
 func readJSON() {
 	jsonData := jsonType{}
-	data, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		logErrors(err)
-	}
-	err = json.Unmarshal(data, &jsonData)
+	configFileByte := []byte(configFile)
+	err := json.Unmarshal(configFileByte, &jsonData)
 	if err != nil {
 		logErrors(err)
 	}
