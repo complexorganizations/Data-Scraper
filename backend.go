@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	_ "embed"
 	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
@@ -36,9 +37,8 @@ var (
 	rate      int
 )
 
-const (
-	configFile = "configs/sitemap.json"
-)
+//go:embed configs/sitemap.json
+var configFile string
 
 type selectors struct {
 	ID               string   `json:"id,omitempty"`
