@@ -2,10 +2,10 @@ github.com/PuerkitoBio/goquery v1.6.1 h1:FgjbQZKl5HTmcn4sKBgvx8vv63nhyhIpv7lJpFG
 github.com/PuerkitoBio/goquery v1.6.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/andybalholm/cascadia v1.1.0 h1:BuuO6sSfQNFRu1LppgbD25Hr2vLYW25JvxHs5zzsLTo=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
-github.com/chromedp/cdproto v0.0.0-20210318231247-733a37e2c059 h1:mlK+5AZ3PhFQDGR/xpEb8x8BsxreV2em3VCfEnZviMI=
-github.com/chromedp/cdproto v0.0.0-20210318231247-733a37e2c059/go.mod h1:At5TxYYdxkbQL0TSefRjhLE3Q0lgvqKKMSFUglJ7i1U=
-github.com/chromedp/chromedp v0.6.9 h1:vJHNDF/lv4v3JFfZ5ZanoLfbI5A8DJF13q6lyGkdLBU=
-github.com/chromedp/chromedp v0.6.9/go.mod h1:gu2vg0pL6XBSo3ilFexSe7Yrg9WwXujaMAx2D7EbEXw=
+github.com/chromedp/cdproto v0.0.0-20210323015217-0942afbea50e h1:UimnzLuARNkGi2XsNznUoOLFP/noktdUMrr7fcb3D4U=
+github.com/chromedp/cdproto v0.0.0-20210323015217-0942afbea50e/go.mod h1:At5TxYYdxkbQL0TSefRjhLE3Q0lgvqKKMSFUglJ7i1U=
+github.com/chromedp/chromedp v0.6.10 h1:Yd4X6ngkWbn6A+hv6mUzV9kVHrPn7L4+vf2uyNbze2s=
+github.com/chromedp/chromedp v0.6.10/go.mod h1:Q8L2uDLH9YFYbThK5fqPpyWa3CT4y9dqHLxaQr+Yhl8=
 github.com/chromedp/sysutil v1.0.0 h1:+ZxhTpfpZlmchB58ih/LBHX52ky7w2VhQVKQMucy3Ic=
 github.com/chromedp/sysutil v1.0.0/go.mod h1:kgWmDdq8fTzXYcKIBqIYvRRTnYb9aNS9moAV0xufSww=
 github.com/dlclark/regexp2 v1.4.0 h1:F1rxgk7p4uKjwIQxBs9oAXe5CqrXlCduYEJvrF4u93E=
