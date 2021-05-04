@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/zserge/lorca"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -767,7 +767,7 @@ func uiSelectElement(index int, selectURL string) string {
 	resp, err := client.Do(req)
 	var html []byte
 	if err == nil {
-		html, err = ioutil.ReadAll(resp.Body)
+		html, err = io.ReadAll(resp.Body)
 		if err != nil {
 			frontendLog(err)
 		}
