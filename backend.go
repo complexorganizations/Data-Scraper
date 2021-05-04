@@ -16,7 +16,6 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/dlclark/regexp2"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -273,7 +272,7 @@ func writeJSON() {
 	if err != nil {
 		logErrors(err)
 	}
-	err = ioutil.WriteFile(configFile, dataJSON, 0644)
+	err = os.WriteFile(configFile, dataJSON, 0644)
 	if err != nil {
 		logErrors(err)
 	}
@@ -729,7 +728,7 @@ func selectorSitemapXML(doc *goquery.Document, selector *selectors) []URL {
 			return sitemaplinks.URL
 		}
 		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := os.ReadAll(response.Body)
 		xml.Unmarshal(body, &sitemaplinks)
 	}
 	return sitemaplinks.URL
@@ -907,7 +906,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 		for job := range results {
 			if len(job.linkOutput) != 0 {
 				if job.parent == "_root" {
-					out, err := ioutil.ReadFile(settings.OutputFile)
+					out, err := os.ReadFile(settings.OutputFile)
 					if err != nil {
 						logErrors(err)
 						os.Exit(1)
@@ -922,7 +921,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 							logErrors(err)
 							os.Exit(1)
 						}
-						_ = ioutil.WriteFile(settings.OutputFile, output, 0644)
+						_ = os.WriteFile(settings.OutputFile, output, 0644)
 					case "csv":
 						csvFile, err := os.OpenFile(settings.OutputFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 						if err != nil {
@@ -952,7 +951,7 @@ func scraper(siteMap *scraping, parent string) map[string]interface{} {
 							logErrors(err)
 							os.Exit(1)
 						}
-						_ = ioutil.WriteFile(settings.OutputFile, output, 0644)
+						_ = os.WriteFile(settings.OutputFile, output, 0644)
 					default:
 						fmt.Println("Error: Please choose an output format.")
 					}
@@ -982,7 +981,7 @@ func outputResult() {
 		"json": true,
 	}
 	if allowedFormat[userFormat] {
-		err := ioutil.WriteFile(settings.OutputFile, []byte{}, 0644)
+		err := os.WriteFile(settings.OutputFile, []byte{}, 0644)
 		if err != nil {
 			logErrors(err)
 		}
