@@ -728,7 +728,7 @@ func selectorSitemapXML(doc *goquery.Document, selector *selectors) []URL {
 			return sitemaplinks.URL
 		}
 		defer response.Body.Close()
-		body, _ := os.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		xml.Unmarshal(body, &sitemaplinks)
 	}
 	return sitemaplinks.URL
