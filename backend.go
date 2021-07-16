@@ -14,13 +14,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
-	"github.com/dlclark/regexp2"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"reflect"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -280,11 +280,11 @@ func writeJSON() {
 
 func selectorText(doc *goquery.Document, selector *selectors) []string {
 	var text []string
-	var matchText *regexp2.Match
+	var matchText *regexp.Match
 	doc.Find(selector.Selector).EachWithBreak(
 		func(i int, s *goquery.Selection) bool {
 			if selector.Regex != "" {
-				re := regexp2.MustCompile(selector.Regex, 0)
+				re := regexp.MustCompile(selector.Regex, 0)
 				matchText, _ = re.FindStringMatch(s.Text())
 				if matchText != nil {
 					text = append(text, strings.TrimSpace(matchText.String()))
@@ -680,7 +680,7 @@ func navigateURL(url, userAgent string) *goquery.Document {
 func getURL(urls []string) <-chan string {
 	c := make(chan string)
 	go func() {
-		re := regexp2.MustCompile(`(\[\d{1,10}-\d{1,10}\]$)`, 0)
+		re := regexp.MustCompile(`(\[\d{1,10}-\d{1,10}\]$)`, 0)
 		for _, urlLink := range urls {
 			stringMatch, _ := re.FindStringMatch(urlLink)
 			if stringMatch != nil {
